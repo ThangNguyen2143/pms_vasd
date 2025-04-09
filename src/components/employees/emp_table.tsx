@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { FieldDto } from "~/lib/type";
 import Dialog from "../ui/dialog";
+import clsx from "clsx";
 
 function TableItem({ emp, feildTable }: { emp: any; feildTable: FieldDto[] }) {
   return (
@@ -16,8 +18,7 @@ function TableItem({ emp, feildTable }: { emp: any; feildTable: FieldDto[] }) {
               >
                 <div className="flex flex-col gap-4">
                   <label className="input">
-                    <span className="label">Họ tên</span>
-                    <input type="text" placeholder={emp[item.display]} />
+                    <span className="label">Xin chào</span>
                   </label>
                 </div>
               </Dialog>
@@ -26,7 +27,13 @@ function TableItem({ emp, feildTable }: { emp: any; feildTable: FieldDto[] }) {
         } else if (item.display == "Trạng thái") {
           return (
             <td key={"-" + index}>
-              <div className="badge">{emp[item.code] ? "Active" : "Block"}</div>
+              <div className={clsx("badge", "badge-info")}>
+                {emp[item.code]
+                  ? emp[item.code] == "NEW"
+                    ? "NEW"
+                    : "Active"
+                  : "Block"}
+              </div>
             </td>
           );
         }

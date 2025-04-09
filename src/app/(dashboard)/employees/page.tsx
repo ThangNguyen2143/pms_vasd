@@ -1,4 +1,11 @@
 import { EmployeeTab, GroupTab } from "~/components/employees";
+import type { Metadata } from "next";
+import AddUserBtn from "~/components/employees/add-user-btn";
+
+export const metadata: Metadata = {
+  title: "Quản lý nhân viên",
+  description: "Trang quản lý nhân viên",
+};
 
 function EmployeesPage() {
   return (
@@ -13,7 +20,7 @@ function EmployeesPage() {
         <div className="flex flex-col w-full h-full align-middle gap-4">
           <div className="flex flex-row justify-between items-center">
             <p>Danh sách người dùng</p>
-            <button className="btn btn-info">Tạo người dùng</button>
+            <AddUserBtn />
           </div>
           <div className="flex flex-row justify-between items-center gap-4">
             <div>
@@ -40,7 +47,6 @@ function EmployeesPage() {
         name="group_tabs"
         className="tab"
         aria-label="Nhóm người dùng"
-        defaultChecked
       />
 
       <div className="tab-content border-base-300 bg-base-100 p-10">

@@ -1,14 +1,23 @@
 import { Pencil } from "lucide-react";
-import { getItem } from "~/lib/services";
+import ErrorMessage from "~/components/ui/error-message";
+import { encodeBase64, getItem } from "~/lib/services";
 
-async function ProjectByProjectPage({
-  params,
-}: {
-  params: { product_id: string };
+async function ProjectByProjectPage(props: {
+  params: Promise<{ product_id: string }>;
 }) {
-  const endpointProject = "/project/" + params.product_id;
-  const dataProject = await getItem({ endpoint: endpointProject });
-  console.log(dataProject, params.product_id);
+  const params = await props.params;
+  const endpointProject =
+    "/project/" + encodeBase64({ product_id: params.product_id });
+  const getDataProject = await getItem({ endpoint: endpointProject });
+  if (getDataProject?.code !== 200) {
+    return (
+      <ErrorMessage
+        message={getDataProject?.value.message}
+        code={getDataProject?.code}
+      />
+    );
+  }
+  const dataProject = getDataProject.value;
   return (
     <main className="flex flex-col gap-4 p-4">
       <div>
@@ -32,7 +41,7 @@ async function ProjectByProjectPage({
             </tr>
           </thead>
           <tbody>
-            {/* {dataProject.map((item, index) => {
+            {dataProject.map((item, index) => {
               return (
                 <tr key={index}>
                   <th>{index + 1}</th>
@@ -46,7 +55,7 @@ async function ProjectByProjectPage({
                   </td>
                 </tr>
               );
-            })} */}
+            })}
           </tbody>
         </table>
       </div>

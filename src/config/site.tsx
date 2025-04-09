@@ -16,7 +16,7 @@ export type Navigation = {
 
 export const siteConfig = {
   title: "PMS VASD",
-  description: "Làm thử website quản lý nhân viên",
+  description: "website quản lý tiến độ dự án",
 };
 
 export const navigations: Navigation[] = [
@@ -38,7 +38,7 @@ export const navigations: Navigation[] = [
   {
     icon: ListCheck,
     name: "Công việc",
-    href: "/task",
+    href: "/tasks",
   },
   {
     icon: Users,

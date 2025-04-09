@@ -14,7 +14,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: siteConfig.title,
+  title: {
+    template: `%s | ${siteConfig.title}`,
+    default: siteConfig.title,
+  },
+  keywords: ["PMS", "PMS VASD", "VASD"],
   description: siteConfig.description,
 };
 

@@ -7,12 +7,12 @@ export type ProductDto = {
   id: string;
   name: string;
   description: string;
-  createdBy: string;
+  created_by: string;
   status: string;
   createdAt: string;
 };
 export type UserDto = {
-  id: number;
+  userid: number;
   userData: {
     display_name: string;
     birthday: string;

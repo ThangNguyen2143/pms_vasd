@@ -1,5 +1,5 @@
 import { decode, encode } from "base-64";
-import { getSession } from "./session";
+import { verifySession } from "./dal";
 
 const DOMAIN = process.env.DOMAIN;
 export function encodeBase64(obj: object): string {
@@ -16,8 +16,7 @@ export async function getItem({
   cache?: RequestCache;
 }) {
   try {
-    // Còn thiếu base64
-    const session = await getSession();
+    const session = await verifySession();
     const result = await fetch(DOMAIN + endpoint, {
       cache,
       headers: {
@@ -26,9 +25,15 @@ export async function getItem({
     });
     const body = await result.json();
     if (body.code != 200) {
-      throw body.message;
+      return {
+        code: body.code,
+        value: {
+          message: body.message,
+          hint: body.hint,
+        },
+      };
     }
-    return body.value;
+    return { code: 200, value: body.value };
   } catch (error) {
     return undefined;
   }
@@ -50,9 +55,15 @@ export async function postItem({
 
   const body = await result.json();
   if (body.code != 200) {
-    throw body.message;
+    return {
+      code: body.code,
+      value: {
+        message: body.message,
+        hint: body.hint,
+      },
+    };
   }
-  return body.value;
+  return { code: 200, value: body.value };
 }
 export async function putItem({
   endpoint,
@@ -71,9 +82,15 @@ export async function putItem({
 
   const body = await result.json();
   if (body.code != 200) {
-    throw body.message;
+    return {
+      code: body.code,
+      value: {
+        message: body.message,
+        hint: body.hint,
+      },
+    };
   }
-  return body.value;
+  return { code: 200, value: body.value };
 }
 export async function deleteItem({
   endpoint,
@@ -92,7 +109,13 @@ export async function deleteItem({
 
   const body = await result.json();
   if (body.code != 200) {
-    throw body.message;
+    return {
+      code: body.code,
+      value: {
+        message: body.message,
+        hint: body.hint,
+      },
+    };
   }
-  return body.value;
+  return { code: 200, value: body.value };
 }

@@ -2,6 +2,7 @@
 
 import { signIn } from "~/app/(auth)/login/actions/auth";
 import { useActionState } from "react";
+import ErrorMessage from "./error-message";
 
 export default function SignInForm() {
   const [state, action, pending] = useActionState(signIn, undefined);
@@ -11,16 +12,19 @@ export default function SignInForm() {
       <fieldset className="fieldset w-xs bg-base-200 border border-base-300 p-4 rounded-box">
         <legend className="fieldset-legend">Đăng nhập</legend>
 
-        <label className="fieldset-label" htmlFor="username">
+        <label className="fieldset-label " htmlFor="username">
           Tài khoản
         </label>
         <input
           type="text"
-          className="input"
+          className="input validator"
           placeholder="Nhập tài khoản"
           name="username"
+          required
         />
-        {state?.errors?.username && <p>{state.errors.username}</p>}
+        {state?.errors?.username && (
+          <p className="validator-hint">{state.errors.username}</p>
+        )}
         <label className="fieldset-label" htmlFor="password">
           Mật khẩu
         </label>
@@ -32,10 +36,11 @@ export default function SignInForm() {
         />
         {state?.errors?.password && (
           <div>
-            <p>Password must:</p>
             <ul>
               {state.errors.password.map((error) => (
-                <li key={error}>- {error}</li>
+                <li key={error} className="validator-hint">
+                  - {error}
+                </li>
               ))}
             </ul>
           </div>
@@ -48,6 +53,13 @@ export default function SignInForm() {
           Đăng nhập
         </button>
       </fieldset>
+      {state?.errors?.server && (
+        <ErrorMessage
+          code={state.errors.server.code}
+          message={state.errors.server.message}
+          hint={state.errors.server.hint}
+        />
+      )}
     </form>
   );
 }

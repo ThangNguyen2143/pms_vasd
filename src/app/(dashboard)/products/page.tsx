@@ -1,4 +1,5 @@
 import { Pencil } from "lucide-react";
+import ErrorMessage from "~/components/ui/error-message";
 import { encodeBase64, getItem } from "~/lib/services";
 
 function reshapeData(data: any[], userData: any[]) {
@@ -22,7 +23,25 @@ async function ProductsPage() {
   const dataProduct = await getItem({ endpoint: endpointProduct });
   const endpointUser = "/user/" + encodeBase64({ type: "all" });
   const dataUser = await getItem({ endpoint: endpointUser });
-  const dataList = reshapeData(dataProduct, dataUser);
+  if (dataProduct?.code !== 200) {
+    return (
+      <ErrorMessage
+        message={dataProduct?.value.message}
+        code={dataProduct?.code}
+        hint={dataProduct?.value.hint}
+      />
+    );
+  }
+  if (dataUser?.code !== 200) {
+    return (
+      <ErrorMessage
+        message={dataUser?.value.message}
+        code={dataUser?.code}
+        hint={dataUser?.value.hint}
+      />
+    );
+  }
+  const dataList = reshapeData(dataProduct?.value, dataUser?.value);
   return (
     <main className="flex flex-col gap-4 p-4">
       <div>

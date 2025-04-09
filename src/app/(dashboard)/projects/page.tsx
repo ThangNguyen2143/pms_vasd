@@ -1,8 +1,15 @@
+import ErrorMessage from "~/components/ui/error-message";
 import { encodeBase64, getItem } from "~/lib/services";
 
 async function ProjectPage() {
   const endpointProduct = "/product/" + encodeBase64({ type: "all" });
-  const dataProduct = await getItem({ endpoint: endpointProduct });
+  const dataGet = await getItem({ endpoint: endpointProduct });
+  if (dataGet?.code !== 200) {
+    return (
+      <ErrorMessage message={dataGet?.value.message} code={dataGet?.code} />
+    );
+  }
+  const dataProduct = dataGet.value;
   return (
     <div className="flex flex-col gap-4 p-4">
       <h1 className="text-2xl font-bold">Project</h1>

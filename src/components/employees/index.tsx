@@ -2,7 +2,7 @@ import { encodeBase64, getItem } from "~/lib/services";
 import Emp_Table from "./emp_table";
 import { FieldDto } from "~/lib/type";
 
-function reshapeData(data: any[], fieldTable: FieldDto[]) {
+function reshapeDataForTable(data: any[], fieldTable: FieldDto[]) {
   return data.map((item) => {
     const reshapedItem: any = {};
     fieldTable.forEach((field) => {
@@ -13,6 +13,19 @@ function reshapeData(data: any[], fieldTable: FieldDto[]) {
       }
     });
     return reshapedItem;
+  });
+}
+function assignCreateUserForData(data: any[], userData: any[]) {
+  if (!data || !userData) {
+    return [];
+  }
+
+  return data.map((item) => {
+    return {
+      ...item,
+      create_by: userData.find((user) => user.userid === item.create_by)
+        ?.userData?.display_name,
+    };
   });
 }
 async function EmployeeTab() {
@@ -44,10 +57,10 @@ async function EmployeeTab() {
     },
   ];
 
-  if (!listEmployee) {
+  if (!listEmployee?.value) {
     return <div className="alert alert-error">Không có dữ liệu</div>;
   }
-  const reshapedData = reshapeData(listEmployee, fieldTable);
+  const reshapedData = reshapeDataForTable(listEmployee.value, fieldTable);
   return <Emp_Table empData={reshapedData} feildTable={fieldTable} />;
 }
 
@@ -72,10 +85,52 @@ async function GroupTab() {
       display: "Thao tác",
     },
   ];
+  if (listGroup?.code !== 200) {
+    return <div className="alert alert-error">Không có dữ liệu</div>;
+  }
+  const reshapedData = reshapeDataForTable(listGroup.value, fieldTable);
+  return <Emp_Table empData={reshapedData} feildTable={fieldTable} />;
+}
+async function TaskList({ project_id }: { project_id: number }) {
+  // const project_id = "1"; // Thay thế bằng ID dự án thực tế
+  const endpoint = "/tasks/" + encodeBase64({ project_id });
+  const listGroup = await getItem({ endpoint });
+  const endpointUser = "/user/" + encodeBase64({ type: "all" });
+  const dataUser = await getItem({ endpoint: endpointUser });
+  const fieldTable = [
+    {
+      code: "title",
+      display: "Công việc",
+    },
+    {
+      code: "description",
+      display: "Mô tả",
+    },
+    {
+      code: "create_by",
+      display: "Người tạo",
+    },
+    {
+      code: "dead_line",
+      display: "Deadline",
+    },
+    {
+      code: "status",
+      display: "Trạng thái",
+    },
+    {
+      code: "",
+      display: "Thao tác",
+    },
+  ];
   if (!listGroup) {
     return <div className="alert alert-error">Không có dữ liệu</div>;
   }
-  const reshapedData = reshapeData(listGroup, fieldTable);
+  const listGroupWithUser = assignCreateUserForData(
+    listGroup.value,
+    dataUser?.value
+  );
+  const reshapedData = reshapeDataForTable(listGroupWithUser, fieldTable);
   return <Emp_Table empData={reshapedData} feildTable={fieldTable} />;
 }
-export { GroupTab, EmployeeTab };
+export { GroupTab, EmployeeTab, TaskList };

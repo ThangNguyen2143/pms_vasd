@@ -1,8 +1,12 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import UserIcon from "./user";
 
-export default function TopNav({ title }: { title: string }) {
+export default function TopNav({ name }: { name: string }) {
+  const pathname = usePathname();
+  const title =
+    pathname.split("/").slice()[1].replace(/-/g, " ").toUpperCase() || "Home";
   return (
     <div className="navbar bg-base-100 shadow-sm">
       <div className="flex-1">
@@ -37,7 +41,7 @@ export default function TopNav({ title }: { title: string }) {
             </svg>
           </label>
         </div>
-        <UserIcon />
+        <UserIcon userName={name} />
       </div>
     </div>
   );
