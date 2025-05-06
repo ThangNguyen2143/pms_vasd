@@ -3,6 +3,7 @@ import { AccountType, FieldDto, GroupDto } from "~/lib/type";
 import clsx from "clsx";
 import Link from "next/link";
 import { encodeBase64 } from "~/lib/services";
+import RemoveGroupBtn from "./remove-group";
 
 function TableItem({
   emp,
@@ -32,6 +33,14 @@ function TableItem({
               </Link>
             </td>
           );
+        } else if (item.display == "Xóa") {
+          return (
+            <td key={"-" + index}>
+              <RemoveGroupBtn
+                group_id={emp[item.code as keyof GroupDto] || ""}
+              />
+            </td>
+          );
         } else if (item.display == "Trạng thái") {
           return (
             <td key={"-" + index}>
@@ -46,7 +55,11 @@ function TableItem({
           );
         } else
           return (
-            <td key={"a" + index}>{emp[item.code] ? emp[item.code] : ""}</td>
+            <td key={"a" + index}>
+              {emp[item.code as keyof GroupDto]
+                ? emp[item.code as keyof GroupDto]
+                : ""}
+            </td>
           );
       })}
     </tr>

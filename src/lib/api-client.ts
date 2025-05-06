@@ -2,7 +2,7 @@
 import type { DataResponse } from "./type";
 
 // Import your existing methods
-import { getItem, postItem, putItem } from "./services"; // Replace with actual import path
+import { deleteItem, getItem, postItem, putItem } from "./services"; // Replace with actual import path
 import { verifySession } from "./dal";
 import { redirect } from "next/navigation";
 
@@ -90,6 +90,36 @@ export async function updateData<T, D>({
     const response = await putItem({
       endpoint,
       data: JSON.stringify({ data, token: session.token }),
+    });
+    if (response.code === 401) {
+      // Handle unauthorized access, e.g., redirect to login
+      redirect("/login");
+    }
+    return response as DataResponse<T>;
+  } catch (error) {
+    console.error("API call failed:", error);
+    return {
+      code: 500,
+      status: "Error",
+      hint: "Unexpected error",
+      message:
+        error instanceof Error ? error.message : "An unknown error occurred",
+      value: null as unknown as T,
+    };
+  }
+}
+export async function deleteData<T>({
+  endpoint,
+}: {
+  endpoint: string;
+}): Promise<DataResponse<T>> {
+  try {
+    const session = await verifySession(); // Replace with your actual session verification method
+    if (!session) {
+      throw new Error("Session verification failed");
+    }
+    const response = await deleteItem({
+      endpoint,
     });
     if (response.code === 401) {
       // Handle unauthorized access, e.g., redirect to login

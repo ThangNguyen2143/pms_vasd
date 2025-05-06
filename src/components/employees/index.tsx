@@ -165,6 +165,10 @@ async function GroupTab() {
       code: "group_id",
       display: "Thao tác",
     },
+    {
+      code: "group_id",
+      display: "Xóa",
+    },
   ];
   if (listGroup?.code !== 200) {
     return <div className="alert alert-error">Không có dữ liệu</div>;

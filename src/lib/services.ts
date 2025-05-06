@@ -70,19 +70,14 @@ export async function putItem({
   });
   return await result.json();
 }
-export async function deleteItem({
-  endpoint,
-  data,
-}: {
-  endpoint: string;
-  data?: BodyInit;
-}) {
+export async function deleteItem({ endpoint }: { endpoint: string }) {
+  const session = await verifySession();
   const result = await fetch(DOMAIN + endpoint, {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
+      token: session?.token || "",
     },
-    body: data,
   });
 
   return await result.json();
