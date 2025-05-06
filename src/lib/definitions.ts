@@ -104,3 +104,20 @@ export type UpdatedPasswordState =
       };
     }
   | undefined;
+export const CreateProductSchema = z.object({
+  name: z.string().trim().min(1, "Tên sản phẩm không được để trống"),
+  description: z.string().trim().min(1, "Mô tả không được để trống"),
+});
+export type CreateProductState =
+  | {
+      errors?: {
+        name?: string[];
+        description?: string[];
+      };
+      message?: {
+        message?: string;
+        hint?: string;
+        code?: number;
+      };
+    }
+  | undefined;

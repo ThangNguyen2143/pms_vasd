@@ -1,7 +1,12 @@
 "use server";
 import { redirect } from "next/navigation";
 import { createData } from "~/lib/api-client";
-import { CreateGroupSchema, CreateGroupState } from "~/lib/definitions";
+import {
+  CreateGroupSchema,
+  CreateGroupState,
+  CreateUserSchema,
+  CreateUserState,
+} from "~/lib/definitions";
 import { CreateUserDto } from "~/lib/type";
 
 export async function HandlerAddUser(
@@ -94,5 +99,5 @@ export async function HandleAddGroup(
       },
     };
   }
-  redirect("/employees/group");
+  redirect("/employees/groups");
 }

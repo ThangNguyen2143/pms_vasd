@@ -21,7 +21,7 @@ export type ProductDto = {
   id: string;
   name: string;
   description: string;
-  created_by: string;
+  create_by: number;
   status: string;
   createdAt: string;
 };
