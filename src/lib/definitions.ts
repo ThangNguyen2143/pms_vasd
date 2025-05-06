@@ -36,6 +36,71 @@ export type CreateUserState =
         email?: string[];
         telegram?: string[];
       };
-      message?: string;
+      message?: {
+        message?: string;
+        hint?: string;
+        code?: number;
+      };
+    }
+  | undefined;
+export const CreateGroupSchema = z.object({
+  group_name: z.string().trim().min(1, "Tên nhóm không được để trống"),
+  group_description: z.string().trim().min(1, "Mô tả không được để trống"),
+});
+export type CreateGroupState =
+  | {
+      errors?: {
+        group_name?: string[];
+        group_description?: string[];
+      };
+      message?: {
+        message?: string;
+        hint?: string;
+        code?: number;
+      };
+    }
+  | undefined;
+export const UpdatedUserSchema = z.object({
+  id: z.string(),
+  display_name: z.string().trim().min(1, "Tên không được để trống"),
+  birthday: z.string().trim().min(1, "Ngày sinh không được để trống"),
+  gender: z.string().trim().min(1, "Giới tính không được để trống"),
+  email: z.string().trim().min(1, "Email không được để trống"),
+  telegram: z.string().trim().min(1, "Telegram không được để trống"),
+});
+export type UpdatedUserState =
+  | {
+      errors?: {
+        id?: string[];
+        display_name?: string[];
+        birthday?: string[];
+        gender?: string[];
+        email?: string[];
+        telegram?: string[];
+      };
+      message?: {
+        message?: string;
+        hint?: string;
+        code?: number;
+      };
+    }
+  | undefined;
+export const UpdatedPasswordSchema = z.object({
+  username: z.string(),
+  current_password: z.string(),
+  new_password: z.string(),
+});
+export type UpdatedPasswordState =
+  | {
+      errors?: {
+        username?: string[];
+        current_password?: string[];
+        new_password?: string[];
+      };
+      message?: {
+        message?: string;
+        hint?: string;
+        code?: number;
+      };
     }
   | undefined;

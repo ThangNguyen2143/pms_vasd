@@ -14,7 +14,7 @@ interface DialogProp {
 }
 
 function Dialog(prop: DialogProp) {
-  var classBtnAtr =
+  const classBtnAtr =
     "btn btn-" +
     prop.typeBtn.trim() +
     (prop.sizeBtn ? " btn-" + prop.sizeBtn?.trim() : "");

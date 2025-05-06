@@ -1,7 +1,8 @@
 import { decode, encode } from "base-64";
 import { verifySession } from "./dal";
+import { DataResponse } from "./type";
 
-const DOMAIN = process.env.DOMAIN;
+const DOMAIN = process.env.DOMAIN || "https://pmapi.vasd.vn/api";
 export function encodeBase64(obj: object): string {
   return encode(JSON.stringify(obj));
 }
@@ -15,28 +16,14 @@ export async function getItem({
   endpoint: string;
   cache?: RequestCache;
 }) {
-  try {
-    const session = await verifySession();
-    const result = await fetch(DOMAIN + endpoint, {
-      cache,
-      headers: {
-        token: session?.token || "",
-      },
-    });
-    const body = await result.json();
-    if (body.code != 200) {
-      return {
-        code: body.code,
-        value: {
-          message: body.message,
-          hint: body.hint,
-        },
-      };
-    }
-    return { code: 200, value: body.value };
-  } catch (error) {
-    return undefined;
-  }
+  const session = await verifySession();
+  const result = await fetch(DOMAIN + endpoint, {
+    cache,
+    headers: {
+      token: session?.token || "",
+    },
+  });
+  return await result.json();
 }
 export async function postItem({
   endpoint,
@@ -45,25 +32,27 @@ export async function postItem({
   endpoint: string;
   data?: BodyInit;
 }) {
-  const result = await fetch(DOMAIN + endpoint, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: data,
-  });
-
-  const body = await result.json();
-  if (body.code != 200) {
-    return {
-      code: body.code,
-      value: {
-        message: body.message,
-        hint: body.hint,
+  try {
+    const result = await fetch(DOMAIN + endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
+      body: data,
+    });
+
+    return await result.json();
+  } catch (error) {
+    console.error(error);
+    const res: DataResponse<""> = {
+      code: 999,
+      hint: "Không thể kết nối",
+      message: "Error server",
+      status: "failed",
+      value: "",
     };
+    return res;
   }
-  return { code: 200, value: body.value };
 }
 export async function putItem({
   endpoint,
@@ -79,18 +68,7 @@ export async function putItem({
     },
     body: data,
   });
-
-  const body = await result.json();
-  if (body.code != 200) {
-    return {
-      code: body.code,
-      value: {
-        message: body.message,
-        hint: body.hint,
-      },
-    };
-  }
-  return { code: 200, value: body.value };
+  return await result.json();
 }
 export async function deleteItem({
   endpoint,
@@ -107,15 +85,5 @@ export async function deleteItem({
     body: data,
   });
 
-  const body = await result.json();
-  if (body.code != 200) {
-    return {
-      code: body.code,
-      value: {
-        message: body.message,
-        hint: body.hint,
-      },
-    };
-  }
-  return { code: 200, value: body.value };
+  return await result.json();
 }

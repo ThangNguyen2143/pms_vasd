@@ -2,7 +2,7 @@
 import "server-only";
 import { cookies } from "next/headers";
 export type Session = {
-  userId: string;
+  userId: number;
   name: string;
   expires: string;
   token: string;
