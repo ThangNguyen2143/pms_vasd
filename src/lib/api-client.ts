@@ -1,10 +1,10 @@
 "use server";
+import "server-only";
 import type { DataResponse } from "./type";
 
 // Import your existing methods
 import { deleteItem, getItem, postItem, putItem } from "./services"; // Replace with actual import path
 import { verifySession } from "./dal";
-import { redirect } from "next/navigation";
 
 // Add similar imports for your POST, PUT, DELETE methods
 // import { postItem, putItem, deleteItem } from "your-library-path"
@@ -19,10 +19,6 @@ export async function fetchData<T>({
   try {
     // Use your existing getItem method
     const response = await getItem({ endpoint, cache });
-    if (response.code === 401) {
-      // Handle unauthorized access, e.g., redirect to login
-      redirect("/login");
-    }
     return response as DataResponse<T>;
   } catch (error) {
     // Handle unexpected errors
@@ -56,10 +52,6 @@ export async function createData<T, D>({
       endpoint,
       data: JSON.stringify({ data, token: session.token }),
     });
-    if (response.code === 401) {
-      // Handle unauthorized access, e.g., redirect to login
-      redirect("/login");
-    }
     return response as DataResponse<T>;
   } catch (error) {
     console.error("API call failed:", error);
@@ -91,10 +83,6 @@ export async function updateData<T, D>({
       endpoint,
       data: JSON.stringify({ data, token: session.token }),
     });
-    if (response.code === 401) {
-      // Handle unauthorized access, e.g., redirect to login
-      redirect("/login");
-    }
     return response as DataResponse<T>;
   } catch (error) {
     console.error("API call failed:", error);
@@ -121,10 +109,6 @@ export async function deleteData<T>({
     const response = await deleteItem({
       endpoint,
     });
-    if (response.code === 401) {
-      // Handle unauthorized access, e.g., redirect to login
-      redirect("/login");
-    }
     return response as DataResponse<T>;
   } catch (error) {
     console.error("API call failed:", error);

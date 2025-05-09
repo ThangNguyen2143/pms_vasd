@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
@@ -24,19 +25,13 @@ function reshapeData(data: ProductDto[] | null, userData: UserDto[] | null) {
   });
 }
 
-function ProductTable() {
-  const endpointProduct = "/product/" + encodeBase64({ type: "all" });
-  const endpointUser = "/user/" + encodeBase64({ type: "all" });
+function ProductTable({ project_id }: { project_id: number }) {
   const {
     data: productList,
     getData: getProduct,
     errorData,
   } = useApi<ProductDto[]>();
-  const {
-    data: userList,
-    getData: getUser,
-    errorData: userError,
-  } = useApi<UserDto[]>();
+  const { data: userList, getData: getUser } = useApi<UserDto[]>();
   const {
     putData,
     errorData: errorUpdateStatus,
@@ -44,35 +39,45 @@ function ProductTable() {
   } = useApi<"", { id: string; status: string }>();
   const [selectedProduct, setSelectedProduct] = useState<ProductDto>();
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
+  const endpointUser = "/user/" + encodeBase64({ type: "all" });
   const openEditDialog = (product: ProductDto) => {
     setSelectedProduct(product);
     setEditDialogOpen(true);
   };
-
+  const endpointProduct =
+    "/product/" + encodeBase64({ type: "all", project_id });
   useEffect(() => {
-    const fetchData = async () => {
-      await getProduct(endpointProduct, "reload");
-      await getUser(endpointUser);
-    };
-    fetchData();
+    getUser(endpointUser, "reload");
   }, []);
-  if (!productList || !userList) {
-    return <div className="text-center">Đang tải dữ liệu...</div>;
+  useEffect(() => {
+    if (project_id != 0) {
+      getProduct(endpointProduct, "reload");
+    }
+  }, [project_id]);
+  if (project_id == 0) {
+    return (
+      <div className="alert alert-warning">
+        Vui lòng chọn phần mềm để xem danh sách sản phẩm.
+      </div>
+    );
   }
+
   const handlderClickActive = async (id_product: string) => {
     await putData("/product/status", { id: id_product, status: "active" });
-    if (!errorUpdateStatus) getProduct(endpointProduct, "reload");
+    if (!errorUpdateStatus) getProduct(endpointProduct);
     else {
       alert("cập nhật trạng thái thất bại");
     }
   };
-  if (errorData || userError) {
+
+  if (errorData && !productList) {
     return (
       <div className="alert alert-error">
-        Lỗi khi tải dữ liệu sản phẩm hoặc người dùng.
+        <span>{errorData.message}</span>
       </div>
     );
   }
+
   const dataList = reshapeData(productList, userList);
   return (
     <div className="overflow-x-auto">
@@ -217,7 +222,7 @@ function ProductTable() {
                   type="button"
                   className="btn btn-error"
                   onClick={async () => {
-                    const deleteEndpoint = `/product/delete/${encodeBase64({
+                    const deleteEndpoint = `/product/${encodeBase64({
                       id: selectedProduct.id,
                     })}`;
                     const res = await deleteData<ProductDto>({
@@ -225,7 +230,7 @@ function ProductTable() {
                     });
 
                     if (res.code === 200) {
-                      await getProduct(endpointProduct); // reload danh sách
+                      await getProduct(endpointProduct); // reload danh sách... Còn chưa fix
                       setEditDialogOpen(false);
                     } else {
                       alert("Xóa thất bại: " + res.message);

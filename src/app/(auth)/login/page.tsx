@@ -1,4 +1,4 @@
-import SignInForm from "~/components/ui/signup-form";
+import SignInForm from "~/components/ui/signin-form";
 
 function LoginPage() {
   return (

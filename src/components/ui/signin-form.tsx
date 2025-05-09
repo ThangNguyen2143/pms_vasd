@@ -1,49 +1,37 @@
 "use client";
-import { useRouter } from "next/navigation";
 import ErrorMessage from "./error-message";
-import { SignInFormSchema, FormState } from "~/lib/definitions";
-import { createSession } from "~/lib/session";
-import { postItem } from "~/lib/services";
-import { DataResponse } from "~/lib/type";
 import { useApiError } from "~/hooks/use-api-error";
+import { useActionState } from "react";
+import { signIn } from "~/app/(auth)/login/actions/auth";
 
-type SignInRespone = {
-  token: string;
-  username: string;
-  userid: number;
-  code: string;
-  display: string;
-  expired: string;
-};
 export default function SignInForm() {
-  const { errorData, handleApiError, isErrorDialogOpen, setIsErrorDialogOpen } =
-    useApiError();
-  const route = useRouter();
-  let state: FormState;
-  const action = async (formData: FormData) => {
-    const validatedFields = SignInFormSchema.safeParse({
-      username: formData.get("username"),
-      password: formData.get("password"),
-    });
-    if (validatedFields.error)
-      state = { errors: validatedFields.error.flatten().fieldErrors };
-    else {
-      const response: DataResponse<SignInRespone> = await postItem({
-        endpoint: "/user/login",
-        data: JSON.stringify({ data: validatedFields.data }),
-      });
-      if (response.code != 200) handleApiError(response);
-      else {
-        await createSession({
-          userId: response.value.userid,
-          expires: response.value.expired,
-          name: response.value.display,
-          token: response.value.token,
-        });
-        route.refresh();
-      }
-    }
-  };
+  const { errorData, isErrorDialogOpen, setIsErrorDialogOpen } = useApiError();
+  // const route = useRouter();
+  const [state, action, loading] = useActionState(signIn, undefined);
+
+  //   const validatedFields = SignInFormSchema.safeParse({
+  //     username: formData.get("username"),
+  //     password: formData.get("password"),
+  //   });
+  //   if (validatedFields.error)
+  //     state = { errors: validatedFields.error.flatten().fieldErrors };
+  //   else {
+  //     const response: DataResponse<SignInRespone> = await postItem({
+  //       endpoint: "/user/login",
+  //       data: JSON.stringify({ data: validatedFields.data }),
+  //     });
+  //     if (response.code != 200) handleApiError(response);
+  //     else {
+  //       await createSession({
+  //         userId: response.value.userid,
+  //         expires: response.value.expired,
+  //         name: response.value.display,
+  //         token: response.value.token,
+  //       });
+  //       route.refresh();
+  //     }
+  //   }
+  // };
   return (
     <form action={action}>
       <fieldset className="fieldset w-xs border border-base-300 p-4 rounded-box">
@@ -84,7 +72,11 @@ export default function SignInForm() {
             </ul>
           </div>
         )}
-        <button className="btn btn-neutral mt-4" type="submit">
+        <button
+          className="btn btn-neutral mt-4"
+          type="submit"
+          disabled={loading}
+        >
           Đăng nhập
         </button>
       </fieldset>

@@ -27,8 +27,12 @@ async function DetailGroupPage(props: {
   const searchParam = await props.searchParams;
   const name = searchParam.group_name;
   const description = searchParam.group_description;
+  if (!params.group) {
+    return <div className="alert alert-warning">Không tìm thấy nhóm</div>;
+  }
+  const groupId = (decodeBase64(params.group) as { group_id: string }).group_id;
   const group: GroupDto = {
-    group_id: decodeBase64(params.group).group_id,
+    group_id: groupId,
     group_name: name,
     group_description: description,
   };

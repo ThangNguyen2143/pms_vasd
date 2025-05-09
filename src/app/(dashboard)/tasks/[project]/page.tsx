@@ -1,13 +1,19 @@
-import { TaskList } from "~/components/employees";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+// import { TaskList } from "~/components/employees";
 import { decodeBase64 } from "~/lib/services";
 
 async function TaskByProductPage(prop: {
   params: Promise<{ project: string }>;
 }) {
   const { project } = await prop.params;
-  const projectdecode: { project_id: int } = decodeBase64(
+  const projectdecode: { project_id: number } = decodeBase64(
     decodeURIComponent(project)
-  ) as any;
+  ) as { project_id: number };
+  // return (
+  //   <div>
+  //     <span className="alert alert-info">Đang code....</span>
+  //   </div>
+  // );
   return (
     <div className="flex flex-col w-full h-full align-middle gap-4">
       <div className="flex flex-row justify-between items-center">
@@ -31,7 +37,10 @@ async function TaskByProductPage(prop: {
           </label>
         </div>
       </div>
-      <TaskList project_id={projectdecode.project_id} />
+      {/* <TaskList project_id={projectdecode.project_id} /> */}
+      <div>
+        <span className="alert alert-info">Đang code....</span>
+      </div>
     </div>
   );
 }

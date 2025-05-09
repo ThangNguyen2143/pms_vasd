@@ -1,5 +1,5 @@
 "use server";
-import { redirect } from "next/navigation";
+import { redirect, RedirectType } from "next/navigation";
 import { createData } from "~/lib/api-client";
 import {
   CreateGroupSchema,
@@ -63,7 +63,7 @@ export async function HandlerAddUser(
       },
     };
   }
-  redirect("/employees");
+  redirect("/employees", "push" as RedirectType);
 }
 export async function HandleAddGroup(
   state: CreateGroupState,

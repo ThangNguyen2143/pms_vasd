@@ -25,6 +25,7 @@ function AddUserBtn() {
       setIsOpenErrorDialog(true); // Show error dialog if there is a message
     }
     loadTypeAccount(); // Load account type when component mounts
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state?.message]); // Only run when state.message changes
   return (
     <>

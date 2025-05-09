@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { useApiError } from "./use-api-error";
 import { fetchData, createData, updateData } from "~/lib/api-client";
+import { DataResponse } from "~/lib/type";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function useApi<T, D = any>() {
   const [data, setData] = useState<T | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -58,7 +60,7 @@ export function useApi<T, D = any>() {
 
       // Check if the response contains an error code
       if (response.code != 200) {
-        handleApiError(response);
+        handleApiError(response as DataResponse<"">);
         setData(null);
         return null;
       }
@@ -91,7 +93,7 @@ export function useApi<T, D = any>() {
 
       // Check if the response contains an error code
       if (response.code != 200) {
-        handleApiError(response);
+        handleApiError(response as DataResponse<"">);
         setData(null);
         return null;
       }

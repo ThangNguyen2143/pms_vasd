@@ -7,9 +7,9 @@ import { HandlerUpdateUser } from "./action";
 function MainProfile({ user }: { user: UserDto }) {
   const [name, setName] = useState(user.userData.display_name);
   const [birthday, setBirthDay] = useState(user.userData.birthday);
-  const [email, setEmail] = useState(user.userData.contact[0].value || "");
+  const [email, setEmail] = useState(user.userData.contact[0]?.value || "");
   const [telegram, setTelegram] = useState(
-    user.userData.contact[1].value || ""
+    user.userData.contact[1]?.value || ""
   );
   const [gender, setGender] = useState(user.userData.gender);
   const [state, action] = useActionState(HandlerUpdateUser, undefined);
@@ -44,6 +44,11 @@ function MainProfile({ user }: { user: UserDto }) {
                   name="display_name"
                   onChange={(e) => setName(e.target.value)}
                 />
+                {state?.errors?.display_name && (
+                  <span className="text-red-500 text-sm">
+                    {state.errors.display_name}
+                  </span>
+                )}
               </label>
               <label className="input">
                 <span className="label">
@@ -55,6 +60,11 @@ function MainProfile({ user }: { user: UserDto }) {
                   name="birthday"
                   onChange={(e) => setBirthDay(e.target.value)}
                 />
+                {state?.errors?.birthday && (
+                  <span className="text-red-500 text-sm">
+                    {state.errors.birthday}
+                  </span>
+                )}
               </label>
               <label className="select">
                 <span className="label">
@@ -89,6 +99,11 @@ function MainProfile({ user }: { user: UserDto }) {
                     name="email"
                     onChange={(e) => setEmail(e.target.value)}
                   />
+                  {state?.errors?.email && (
+                    <span className="text-red-500 text-sm">
+                      {state.errors.email}
+                    </span>
+                  )}
                 </label>
                 <label className="input">
                   <span className="label">Telegram</span>
@@ -100,6 +115,11 @@ function MainProfile({ user }: { user: UserDto }) {
                     onChange={(e) => setTelegram(e.target.value)}
                   />
                 </label>
+                {state?.errors?.telegram && (
+                  <span className="text-red-500 text-sm">
+                    {state.errors.telegram}
+                  </span>
+                )}
               </div>
 
               <div className="flex pt-12 pb-8 gap-2">

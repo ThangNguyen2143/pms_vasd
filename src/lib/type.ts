@@ -67,3 +67,39 @@ export type CreateUserDto = {
     account_type: string;
   };
 };
+export type ProjectDto = {
+  id: number;
+  seft_code: string;
+  name: string;
+  description: string;
+  create_date: string;
+  start_date: string;
+  end_date: string;
+  status: string;
+};
+export type WorkShareDto = {
+  id: number;
+  title: string;
+  type: string;
+  type_name: string;
+  priority: string;
+  create_at: string;
+  request_at: string;
+  deadline?: string;
+  update_at?: string;
+  pic: string;
+  status: string;
+};
+export type WorkStatus = {
+  code: string;
+  display: string;
+};
+export type WorkType = {
+  code: string;
+  display: string;
+};
+export type Priority = {
+  code: string;
+  display: string;
+  hints: string;
+};

@@ -61,11 +61,15 @@ async function assignRoleForData(data: UserDto) {
     endpoint,
     cache: "no-cache",
   });
-  if (userRoleRespone.code != 200)
+  if (userRoleRespone.code != 200 && userRoleRespone.code != 404) {
     return {
       ...data,
       roles: "",
     };
+  }
+  if (userRoleRespone.code == 404) {
+    return { ...data, roles: [] };
+  }
   return {
     ...data,
     roles: userRoleRespone.value,
@@ -90,7 +94,7 @@ async function EmployeeTab({ typeAccount }: { typeAccount?: AccountType[] }) {
   const endpoint = "/user/" + encodeBase64({ type: "all" });
   const listEmployee = await fetchData<UserDto[]>({
     endpoint,
-    cache: "reload",
+    cache: "no-cache",
   });
   const fieldTable = [
     {
@@ -126,7 +130,6 @@ async function EmployeeTab({ typeAccount }: { typeAccount?: AccountType[] }) {
   if (!listEmployee?.value) {
     return <div className="alert alert-error">Không có dữ liệu</div>;
   }
-
   const listEmployeeWithType = await assignTypeAccountForData(
     listEmployee.value,
     typeAccount

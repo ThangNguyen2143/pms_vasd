@@ -5,8 +5,12 @@ import { usePathname } from "next/navigation";
 import { navigations } from "~/config/site";
 import { clsx } from "clsx";
 
-export default function Navigation() {
+export default function Navigation({ role }: { role?: string }) {
   const pathname = usePathname();
+  // Thêm loại tài khoản hiển thị trong menu điều hướng
+  if (role == "Guess") {
+    return <li></li>;
+  }
   return navigations.map((navigation) => {
     const Icon = navigation.icon;
     return (
@@ -20,10 +24,8 @@ export default function Navigation() {
               : "bg-transparent"
           )}
         >
-          <Icon size={16} className="mr-2 text-slate-800 dark:text-slate-200" />
-          <span className="text-sm text-slate-700 dark:text-slate-300">
-            {navigation.name}
-          </span>
+          <Icon size={16} className="mr-2" />
+          <span className="text-sm ">{navigation.name}</span>
         </Link>
       </li>
     );

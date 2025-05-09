@@ -2,7 +2,7 @@ import { decode, encode } from "base-64";
 import { verifySession } from "./dal";
 import { DataResponse } from "./type";
 
-const DOMAIN = process.env.DOMAIN || "https://pmapi.vasd.vn/api";
+const DOMAIN = process.env.DOMAIN || "http://192.168.1.200:5149/api";
 export function encodeBase64(obj: object): string {
   return encode(JSON.stringify(obj));
 }
@@ -20,7 +20,7 @@ export async function getItem({
   const result = await fetch(DOMAIN + endpoint, {
     cache,
     headers: {
-      token: session?.token || "",
+      token: session.token,
     },
   });
   return await result.json();
@@ -38,6 +38,7 @@ export async function postItem({
       headers: {
         "Content-Type": "application/json",
       },
+      cache: "no-store",
       body: data,
     });
 

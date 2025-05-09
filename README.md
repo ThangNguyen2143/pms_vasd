@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Project Guide: PMS_VASD
 
-## Getting Started
+## Introduction
 
-First, run the development server:
+This project is designed to manage and streamline processes for PMS_VASD. Follow the steps below to set up and use the project effectively.
+
+## Prerequisites
+
+- **Programming Language**: Ensure you have [language] installed (e.g., Python, Node.js, etc.).
+- **Dependencies**: Install required dependencies listed in `package.json` or `requirements.txt`.
+- **Database**: Set up the database as per the configuration in the project.
+
+## Installation
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/thangnguyen2143/pms_vasd.git
+   ```
+2. Navigate to the project directory:
+   ```bash
+   cd pms_vasd
+   ```
+3. Install dependencies:
+   ```bash
+   npm install
+   ```
+   or
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+## Configuration
+
+1. Copy the example configuration file:
+   ```bash
+   cp .env.example .env
+   ```
+2. Update the `.env` file with your environment-specific variables.
+
+## Usage
+
+1. Start the development server:
+   ```bash
+   npm start
+   ```
+   or
+   ```bash
+   python app.py
+   ```
+2. Access the application at `http://localhost:3000` (or the specified port).
+
+## Testing
+
+Run the test suite to ensure everything is working:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm test
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+or
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pytest
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Deployment
 
-## Learn More
+Follow the deployment guide in `DEPLOYMENT.md` for production setup.
 
-To learn more about Next.js, take a look at the following resources:
+## Contributing
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Fork the repository.
+2. Create a feature branch:
+   ```bash
+   git checkout -b feature-name
+   ```
+3. Commit your changes and push to your fork.
+4. Submit a pull request.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## License
 
-## Deploy on Vercel
+This project is licensed under the [CongThangNguyen]. See the `LICENSE` file for details.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Support
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+For issues or questions, open an issue in the repository or contact the maintainers.

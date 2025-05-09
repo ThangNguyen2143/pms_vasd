@@ -9,10 +9,11 @@ function UserIcon({
   name,
   username,
 }: {
-  id: number;
+  id?: number;
   name: string;
   username: string;
 }) {
+  if (!id) return <div className="btn btn-ghost">Đang tải...</div>;
   const userParse = encodeBase64({ id });
   return (
     <>
@@ -32,7 +33,11 @@ function UserIcon({
           <li>
             <a
               onClick={() =>
-                document.getElementById("dialog_form_change_pass")?.showModal()
+                (
+                  document.getElementById(
+                    "dialog_form_change_pass"
+                  ) as HTMLDialogElement
+                )?.showModal()
               }
             >
               Đổi mật khẩu

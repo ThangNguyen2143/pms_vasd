@@ -6,9 +6,16 @@ export type Session = {
   name: string;
   expires: string;
   token: string;
+  role: string;
 };
-export async function createSession({ userId, expires, token, name }: Session) {
-  const session = JSON.stringify({ userId, expires, token, name });
+export async function createSession({
+  userId,
+  expires,
+  token,
+  name,
+  role,
+}: Session) {
+  const session = JSON.stringify({ userId, expires, token, name, role });
   const cookieStore = await cookies();
 
   cookieStore.set("session", session, {

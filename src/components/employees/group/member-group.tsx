@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { FieldDto } from "~/lib/type";
 import RemoveUserGroup from "./remove-user-group";
 

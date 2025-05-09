@@ -1,16 +1,17 @@
-"use server";
 import { redirect } from "next/navigation";
 import { createData } from "~/lib/api-client";
-import { CreateProductSchema, CreateProductState } from "~/lib/definitions";
-
-export async function handleAddProduct(
-  state: CreateProductState,
+import { CreateProjectSchema, CreateProjectState } from "~/lib/definitions";
+export async function HandleAddProject(
+  state: CreateProjectState,
   formData: FormData
 ) {
-  const validatedFields = CreateProductSchema.safeParse({
-    project_id: Number.parseInt(formData.get("project_id") as string),
+  // Validate form fields
+  const validatedFields = CreateProjectSchema.safeParse({
     name: formData.get("name"),
     description: formData.get("description"),
+    start_date: new Date(formData.get("start_date") as string),
+    end_date: new Date(formData.get("end_date") as string),
+    seft_code: formData.get("seft_code"),
   });
   // If any form fields are invalid, return early
   if (!validatedFields.success) {
@@ -18,10 +19,12 @@ export async function handleAddProduct(
       errors: validatedFields.error.flatten().fieldErrors,
     };
   }
-  const dataSend = { ...validatedFields.data };
+  const dataSend = {
+    ...validatedFields.data,
+  };
   // 3. Insert the user call an Auth Library's API
   const data = await createData<"", typeof dataSend>({
-    endpoint: "/product",
+    endpoint: "/project",
     data: dataSend,
   });
   // 4. Handle the response from the API
@@ -34,5 +37,5 @@ export async function handleAddProduct(
       },
     };
   }
-  redirect("/products");
+  redirect("/projects/");
 }

@@ -7,7 +7,6 @@ import {
   UpdatedPasswordSchema,
   UpdatedPasswordState,
 } from "~/lib/definitions";
-import { deleteSession } from "~/lib/session";
 import { Contact } from "~/lib/type";
 
 export async function HandlerUpdateUser(

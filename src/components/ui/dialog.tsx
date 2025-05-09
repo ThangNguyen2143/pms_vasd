@@ -8,8 +8,7 @@ interface DialogProp {
   title: string;
   id?: string;
   sizeBtn?: string;
-  pathIconStart?: string;
-  pathIconEnd?: string;
+  sizeBox?: string;
   children: React.ReactNode;
 }
 
@@ -18,34 +17,30 @@ function Dialog(prop: DialogProp) {
     "btn btn-" +
     prop.typeBtn.trim() +
     (prop.sizeBtn ? " btn-" + prop.sizeBtn?.trim() : "");
+  let sizeBox: string = "";
+  if (prop.sizeBox) {
+    switch (prop.sizeBox) {
+      case "sm":
+        sizeBox = "w-3/12";
+        break;
+      case "lg":
+        sizeBox = "w-1/2 max-w-2xl";
+        break;
+      case "xl":
+        sizeBox = "w-11/12 max-w-5xl";
+        break;
+      default:
+        sizeBox = "";
+    }
+  }
   return (
-    <div>
+    <div className="flex">
       {/* The button to open modal */}
       <label
         htmlFor={prop.id != null ? prop.id : prop.title}
         className={classBtnAtr}
       >
-        {prop.pathIconStart != null && (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="1em"
-            height="1em"
-            viewBox="0 0 8 8"
-          >
-            <path fill="currentColor" d={prop.pathIconStart}></path>
-          </svg>
-        )}
         {prop.nameBtn}
-        {prop.pathIconEnd != null && (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="1em"
-            height="1em"
-            viewBox="0 0 8 8"
-          >
-            <path fill="currentColor" d={prop.pathIconEnd}></path>
-          </svg>
-        )}
       </label>
 
       {/* Put this part before </body> tag */}
@@ -55,7 +50,7 @@ function Dialog(prop: DialogProp) {
         className="modal-toggle"
       />
       <div className="modal" role="dialog">
-        <div className="modal-box">
+        <div className={"modal-box " + sizeBox}>
           <h3 className="mb-2 text-lg font-bold">{prop.title}</h3>
           {prop.children}
         </div>

@@ -1,9 +1,19 @@
 "use server";
 import { redirect } from "next/navigation";
+import { getMenu } from "~/lib/dal";
 import { SignInFormSchema, FormState } from "~/lib/definitions";
 import { postItem } from "~/lib/services";
 import { createSession, deleteSession } from "~/lib/session";
-
+import { DataResponse } from "~/lib/type";
+type SignInRespone = {
+  token: string;
+  username: string;
+  userid: number;
+  code: string;
+  display: string;
+  expired: string;
+  account_type: string;
+};
 export async function signIn(state: FormState, formData: FormData) {
   // Validate form fields
   const validatedFields = SignInFormSchema.safeParse({
@@ -22,7 +32,7 @@ export async function signIn(state: FormState, formData: FormData) {
   }
   const dataSend = JSON.stringify({ data: validatedFields.data });
   // 3. Insert the user call an Auth Library's API
-  const postResponse = await postItem({
+  const postResponse: DataResponse<SignInRespone> = await postItem({
     endpoint: "/user/login",
     data: dataSend,
   });
@@ -32,8 +42,8 @@ export async function signIn(state: FormState, formData: FormData) {
         username: undefined,
         password: undefined,
         server: {
-          message: postResponse.value.message,
-          hint: postResponse.value.hint || "",
+          message: postResponse.message,
+          hint: postResponse.hint || "",
           code: postResponse.code,
         },
       },
@@ -46,7 +56,15 @@ export async function signIn(state: FormState, formData: FormData) {
     expires: data.expired,
     name: data.display,
     token: data.token,
+    role: data.account_type,
   });
+  const nav = await getMenu();
+  if (nav && data.account_type == "Guess") {
+    // 4.1. If the user is a guest, redirect to the first menu item
+    const guessRoutes: string[] = nav.map((item) => `/${item.code}`);
+    // Check if the user is a guest and redirect accordingly
+    redirect(guessRoutes[0] || "/");
+  }
   // 5. Redirect user
   redirect("/");
 }

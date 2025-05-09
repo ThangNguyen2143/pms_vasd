@@ -1,8 +1,10 @@
 import {
+  ChartLine,
+  ChartNoAxesCombined,
   FolderKanban,
-  Gauge,
   ListCheck,
   type LucideIcon,
+  NotebookPen,
   Projector,
   Users,
 } from "lucide-react";
@@ -21,11 +23,6 @@ export const siteConfig = {
 
 export const navigations: Navigation[] = [
   {
-    icon: Gauge,
-    name: "Trang chủ",
-    href: "/",
-  },
-  {
     icon: FolderKanban,
     name: "Phần mềm",
     href: "/products",
@@ -39,6 +36,21 @@ export const navigations: Navigation[] = [
     icon: ListCheck,
     name: "Công việc",
     href: "/tasks",
+  },
+  {
+    icon: ChartLine,
+    name: "Theo dõi tiến độ",
+    href: "/work_share",
+  },
+  {
+    icon: NotebookPen,
+    name: "Ghi nhận yêu cầu",
+    href: "/requirements",
+  },
+  {
+    icon: ChartNoAxesCombined,
+    name: "Thống kê",
+    href: "/",
   },
   {
     icon: Users,

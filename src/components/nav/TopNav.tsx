@@ -1,22 +1,31 @@
 "use client";
-
 import Link from "next/link";
 import UserIcon from "./user";
 import Image from "next/image";
 import Navigation from "./sidenav/component/navigation";
-
-export default function TopNav({
-  userId,
-  name,
-  username,
-}: {
-  userId: number;
+import { useEffect, useState } from "react";
+import { getUser } from "~/lib/dal";
+import { logout } from "~/app/(auth)/login/actions/auth";
+type userSecurity = {
+  id: number | undefined;
   name: string;
   username: string;
-}) {
+  role: string;
+};
+export default function TopNav() {
   // const pathname = usePathname();
   // const title =
   //   pathname.split("/").slice()[1].replace(/-/g, " ").toUpperCase() || "Home";
+  const [user, setUser] = useState<userSecurity>();
+  useEffect(() => {
+    const temp = async () => {
+      const t = await getUser();
+      if (!t) logout();
+      else setUser(t);
+    };
+    temp();
+  }, []);
+  if (!user) return <div>Đang tải</div>;
   return (
     <div className="navbar bg-base-100 shadow-sm">
       <div className="navbar-start">
@@ -42,7 +51,7 @@ export default function TopNav({
             tabIndex={0}
             className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
           >
-            <Navigation />
+            <Navigation role={user.role} />
           </ul>
         </div>
         <Link className="btn btn-ghost text-xl" href="/">
@@ -53,7 +62,7 @@ export default function TopNav({
 
       <div className="navbar-center hidden lg:flex">
         <ul className="menu menu-horizontal px-1">
-          <Navigation />
+          <Navigation role={user.role} />
         </ul>
       </div>
       <div className="navbar-end">
@@ -79,7 +88,7 @@ export default function TopNav({
             <path d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Zm-9.5,6.69A8.14,8.14,0,0,1,7.08,5.22v.27A10.15,10.15,0,0,0,17.22,15.63a9.79,9.79,0,0,0,2.1-.22A8.11,8.11,0,0,1,12.14,19.73Z" />
           </svg>
         </label>
-        <UserIcon name={name} id={userId} username={username} />
+        <UserIcon name={user.name} id={user.id} username={user.username} />
       </div>
     </div>
   );

@@ -26,7 +26,7 @@ function ListofRole({
         group_id: string;
         role_code: string;
       };
-  const { putData, isLoading, errorData, data } = useApi<"", DataSend>();
+  const { putData, isLoading, errorData } = useApi<"", DataSend>();
   const handlerClick = async (role_code: string, isCheck: boolean) => {
     if (!isCheck) {
       if (user_code)

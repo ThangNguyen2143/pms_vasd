@@ -1,11 +1,9 @@
 "use client";
-
 import { useActionState, useEffect, useState } from "react";
-import { handleAddProduct } from ".";
 import ErrorMessage from "../ui/error-message";
-
-function AddProductBtn({ project_id }: { project_id: number }) {
-  const [state, action, pending] = useActionState(handleAddProduct, undefined);
+import { HandleAddProject } from "./actions";
+function AddProjectBtn() {
+  const [state, action, pending] = useActionState(HandleAddProject, undefined);
   const [isOpenErrorDialog, setIsOpenErrorDialog] = useState(false);
 
   useEffect(() => {
@@ -13,35 +11,23 @@ function AddProductBtn({ project_id }: { project_id: number }) {
       setIsOpenErrorDialog(true); // Show error dialog if there is a message
     }
   }, [state?.message]); // Only run when state.message changes
-  if (project_id === 0) {
-    return (
-      <label htmlFor="AddGroupDialog" className="btn btn-info disabled">
-        Thêm sản phẩm
-      </label>
-    );
-  }
+
   return (
     <>
-      <label htmlFor="AddGroupDialog" className="btn btn-info">
-        Thêm sản phẩm
+      <label htmlFor="AddProjectDialog" className="btn btn-primary">
+        Thêm dự án
       </label>
-      <input type="checkbox" id="AddGroupDialog" className="modal-toggle" />
+      <input type="checkbox" id="AddProjectDialog" className="modal-toggle" />
       <div className="modal" role="dialog">
         <div className="modal-box justify-items-center">
-          <h3 className="text-xl font-bold p-4">Thêm sản phẩm mới</h3>
+          <h3 className="text-xl font-bold p-4">Thêm dự án mới</h3>
           <form action={action}>
-            <input
-              type="hidden"
-              name="project_id"
-              value={project_id}
-              readOnly
-            />
             <div className="flex flex-col gap-4 justify-center">
               <label className="input">
-                <span className="label">Tên sản phẩm</span>
+                <span className="label">Tên dự án</span>
                 <input
                   type="text"
-                  placeholder="Nhập tên sản phẩm"
+                  placeholder="Nhập tên dự án"
                   name="name"
                   min={1}
                 />
@@ -52,10 +38,26 @@ function AddProductBtn({ project_id }: { project_id: number }) {
                 </div>
               )}
               <label className="input">
-                <span className="label">Mô tả</span>
+                <span className="label">Mã tự đặt</span>
                 <input
                   type="text"
-                  placeholder="Nhập mô tả sản phẩm"
+                  placeholder="Nhập tên dự án"
+                  name="seft_code"
+                  className="validator"
+                  min={1}
+                />
+              </label>
+              {state?.errors?.seft_code && (
+                <div className="validator-hint text-error">
+                  {state.errors.seft_code}
+                </div>
+              )}
+
+              <label className="input">
+                <span className="label">Mô tả dự án</span>
+                <input
+                  type="text"
+                  placeholder="Nhập mô tả dự án"
                   name="description"
                   className="validator"
                   minLength={2}
@@ -66,6 +68,24 @@ function AddProductBtn({ project_id }: { project_id: number }) {
                   {state.errors.description}
                 </div>
               )}
+              <label className="input">
+                <span className="label">Ngày bắt đầu</span>
+                <input type="date" name="start_date" className="validator" />
+              </label>
+              {state?.errors?.start_date && (
+                <div className="validator-hint text-error">
+                  {state.errors.start_date}
+                </div>
+              )}
+              <label className="input">
+                <span className="label">Ngày kết thúc</span>
+                <input type="date" name="end_date" className="validator" />
+              </label>
+              {state?.errors?.end_date && (
+                <div className="validator-hint text-error">
+                  {state.errors.end_date}
+                </div>
+              )}
               <div className="flex justify-between items-center gap-4">
                 <button
                   type="submit"
@@ -74,14 +94,17 @@ function AddProductBtn({ project_id }: { project_id: number }) {
                 >
                   {pending ? "Đang xử lý..." : "Thêm"}
                 </button>
-                <label htmlFor="AddGroupDialog" className="btn btn-error ml-4">
+                <label
+                  htmlFor="AddProjectDialog"
+                  className="btn btn-error ml-4"
+                >
                   Hủy
                 </label>
               </div>
             </div>
           </form>
 
-          <label className="modal-backdrop" htmlFor="AddGroupDialog">
+          <label className="modal-backdrop" htmlFor="AddProjectDialog">
             Close
           </label>
         </div>
@@ -103,4 +126,4 @@ function AddProductBtn({ project_id }: { project_id: number }) {
   );
 }
 
-export default AddProductBtn;
+export default AddProjectBtn;

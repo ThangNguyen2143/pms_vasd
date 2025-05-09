@@ -1,16 +1,21 @@
 "use server";
 import { redirect } from "next/navigation";
 import { createData } from "~/lib/api-client";
-import { CreateProductSchema, CreateProductState } from "~/lib/definitions";
+import { CreateWorkSchema, CreateWorkState } from "~/lib/definitions";
 
-export async function handleAddProduct(
-  state: CreateProductState,
+//Handler add new work
+export async function HandlerAddWork(
+  state: CreateWorkState,
   formData: FormData
 ) {
-  const validatedFields = CreateProductSchema.safeParse({
+  const validatedFields = CreateWorkSchema.safeParse({
+    title: formData.get("title"),
+    priority: formData.get("priority"),
+    type: formData.get("type"),
+    request_at: formData.get("request_at") as string,
+    deadline: formData.get("deadline") as string,
     project_id: Number.parseInt(formData.get("project_id") as string),
-    name: formData.get("name"),
-    description: formData.get("description"),
+    pic: formData.get("pic"),
   });
   // If any form fields are invalid, return early
   if (!validatedFields.success) {
@@ -18,10 +23,12 @@ export async function handleAddProduct(
       errors: validatedFields.error.flatten().fieldErrors,
     };
   }
-  const dataSend = { ...validatedFields.data };
+  const dataSend = {
+    ...validatedFields.data,
+  };
   // 3. Insert the user call an Auth Library's API
   const data = await createData<"", typeof dataSend>({
-    endpoint: "/product",
+    endpoint: "/work",
     data: dataSend,
   });
   // 4. Handle the response from the API
@@ -34,5 +41,5 @@ export async function handleAddProduct(
       },
     };
   }
-  redirect("/products");
+  redirect("/work_share");
 }

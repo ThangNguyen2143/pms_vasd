@@ -27,6 +27,11 @@ function ChangePassForm({ userName }: { userName: string }) {
           className="input input-md"
           name="current_password"
         />
+        {state?.errors?.current_password && (
+          <span className="text-red-500 text-sm">
+            {state.errors.current_password}
+          </span>
+        )}
       </label>
       <label className="floating-label">
         <span>Mật khẩu mới</span>
@@ -36,6 +41,11 @@ function ChangePassForm({ userName }: { userName: string }) {
           className="input input-md"
           name="new_password"
         />
+        {state?.errors?.new_password && (
+          <span className="text-red-500 text-sm">
+            {state.errors.new_password}
+          </span>
+        )}
       </label>
       <div className="flex gap-2">
         <button type="submit" className="btn btn-info">

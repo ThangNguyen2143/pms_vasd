@@ -105,14 +105,66 @@ export type UpdatedPasswordState =
     }
   | undefined;
 export const CreateProductSchema = z.object({
+  project_id: z.number(),
   name: z.string().trim().min(1, "Tên sản phẩm không được để trống"),
   description: z.string().trim().min(1, "Mô tả không được để trống"),
 });
 export type CreateProductState =
   | {
       errors?: {
+        project_id?: string[];
         name?: string[];
         description?: string[];
+      };
+      message?: {
+        message?: string;
+        hint?: string;
+        code?: number;
+      };
+    }
+  | undefined;
+export const CreateProjectSchema = z.object({
+  seft_code: z.string().min(1, "Yêu cầu nhập mã tự đặt"), // mã tự đặt
+  name: z.string().min(1, "Yêu cầu nhập tên dự án"), // tên project
+  description: z.string().min(2, "Nhập mô tả cho dự án"), // mô tả project
+  start_date: z.date(), //thời gian bắt đầu
+  end_date: z.date(), // thời gian kết thúc dự kiến
+});
+export type CreateProjectState =
+  | {
+      errors?: {
+        seft_code?: string[];
+        name?: string[];
+        description?: string[];
+        start_date?: string[];
+        end_date?: string[];
+      };
+      message?: {
+        message?: string;
+        hint?: string;
+        code?: number;
+      };
+    }
+  | undefined;
+export const CreateWorkSchema = z.object({
+  title: z.string().trim().min(1, "Tiêu đề không được để trống"),
+  priority: z.string().trim().min(1, "Mức độ ưu tiên không được để trống"),
+  project_id: z.number(),
+  type: z.string().trim().min(1, "Loại công việc không được để trống"),
+  request_at: z.string(),
+  deadline: z.string(),
+  pic: z.string().trim().min(1, "Người phụ trách không được để trống"),
+});
+export type CreateWorkState =
+  | {
+      errors?: {
+        title?: string[];
+        priority?: string[];
+        project_id?: string[];
+        type?: string[];
+        request_at?: string[];
+        pic?: string[];
+        deadline?: string[];
       };
       message?: {
         message?: string;

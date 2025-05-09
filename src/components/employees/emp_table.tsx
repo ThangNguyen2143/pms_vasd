@@ -73,9 +73,9 @@ function TableItem({
                 id={index + "2" + emp["username"]}
               >
                 <ListofRole
-                  roleOwn={emp[item.code]}
+                  roleOwn={emp.roles}
                   roleList={roleList}
-                  user_code={emp.code}
+                  user_code={emp.accountData.code}
                 />
               </Dialog>
             </td>

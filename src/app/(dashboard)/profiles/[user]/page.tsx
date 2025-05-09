@@ -5,8 +5,11 @@ import { DataResponse, UserDto } from "~/lib/type";
 
 async function ProfileUserPage(props: { params: Promise<{ user: string }> }) {
   const params = await props.params;
-  const endpointUser =
-    "/user/" + encodeBase64({ type: "info", id: decodeBase64(params.user).id });
+  const user = decodeBase64(decodeURIComponent(params.user)) as { id: string };
+  if (!user) {
+    return <div>Không tìm thấy người dùng</div>;
+  }
+  const endpointUser = "/user/" + encodeBase64({ type: "info", id: user.id });
   const userdetail: DataResponse<UserDto> = await fetchData<UserDto>({
     endpoint: endpointUser,
     cache: "no-cache",

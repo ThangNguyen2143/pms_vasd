@@ -1,3 +1,4 @@
+"use client";
 import { ResponseError } from "~/lib/type";
 
 interface ErrorDialogProps {
