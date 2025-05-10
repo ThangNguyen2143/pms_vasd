@@ -30,7 +30,7 @@ export default function TopNav() {
     <div className="navbar bg-base-100 shadow-sm">
       <div className="navbar-start">
         <div className="dropdown">
-          <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
+          <div tabIndex={0} role="button" className="btn btn-ghost xl:hidden">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5"
@@ -55,18 +55,24 @@ export default function TopNav() {
           </ul>
         </div>
         <Link className="btn btn-ghost text-xl" href="/">
-          <Image src={"/logo_vasd.jpg"} alt="Logo" width={30} height={30} />
+          <Image
+            src={"/logo_vasd.png"}
+            alt="Logo"
+            width={30}
+            height={30}
+            className="relative"
+          />
           <h1>PMS VASD</h1>
         </Link>
       </div>
 
-      <div className="navbar-center hidden lg:flex">
+      <div className="navbar-center hidden xl:flex">
         <ul className="menu menu-horizontal px-1">
           <Navigation role={user.role} />
         </ul>
       </div>
       <div className="navbar-end">
-        <label className="swap swap-rotate">
+        <label className="swap swap-rotate hidden md:inline-flex">
           {/* this hidden checkbox controls the state */}
           <input type="checkbox" className="theme-controller" value="dark" />
 

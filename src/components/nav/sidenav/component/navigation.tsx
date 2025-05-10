@@ -18,9 +18,9 @@ export default function Navigation({ role }: { role?: string }) {
         <Link
           href={navigation.href}
           className={clsx(
-            "flex items-center rounded-md px-2 py-1.5 hover:bg-slate-200 dark:hover:bg-slate-800",
+            "flex items-center rounded-md px-2 py-1.5 hover:text-slate-800 hover:bg-slate-200 dark:hover:bg-slate-800",
             pathname === navigation.href
-              ? "bg-slate-200 dark:bg-slate-800"
+              ? "bg-slate-200 dark:bg-slate-800 text-slate-800 dark:text-slate-200"
               : "bg-transparent"
           )}
         >
