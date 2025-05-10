@@ -7,7 +7,7 @@ import {
   UpdatedPasswordSchema,
   UpdatedPasswordState,
 } from "~/lib/definitions";
-import { Contact } from "~/lib/type";
+import { Contact } from "~/lib/types";
 
 export async function HandlerUpdateUser(
   state: UpdatedUserState,

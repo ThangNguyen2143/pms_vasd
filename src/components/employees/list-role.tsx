@@ -1,6 +1,6 @@
 "use client";
 import { useApi } from "~/hooks/use-api";
-import { Contact } from "~/lib/type";
+import { Contact } from "~/lib/types";
 function roleCheck(item: Contact, roleOwn: Contact[]) {
   return roleOwn.find((t) => t.code == item.code) != undefined ? true : false;
 }

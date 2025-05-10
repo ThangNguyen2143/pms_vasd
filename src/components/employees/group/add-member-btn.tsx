@@ -3,7 +3,7 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 import Dialog from "~/components/ui/dialog";
 import { updateData } from "~/lib/api-client";
-import { UserDto } from "~/lib/type";
+import { UserDto } from "~/lib/types";
 interface MemberGroup {
   user_code: string;
   display_name: string;

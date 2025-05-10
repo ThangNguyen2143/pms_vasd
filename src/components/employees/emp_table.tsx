@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AccountType, Contact, FieldDto } from "~/lib/type";
+import { AccountType, Contact, FieldDto } from "~/lib/types";
 import Dialog from "../ui/dialog";
 import StatusBtn from "./status-btn";
 import EditTypeModal from "./edit-type-account";

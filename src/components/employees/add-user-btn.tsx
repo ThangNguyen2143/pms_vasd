@@ -1,7 +1,7 @@
 "use client";
 import { useActionState, useEffect, useState } from "react";
 import { HandlerAddUser } from "./actions";
-import { AccountType } from "~/lib/type";
+import { AccountType } from "~/lib/types";
 import ErrorMessage from "../ui/error-message";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";

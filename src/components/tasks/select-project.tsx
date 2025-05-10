@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useEffect } from "react";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
-import { ProjectDto } from "~/lib/type";
+import { ProjectDto } from "~/lib/types";
 
 function SelectProject() {
   const endpointProject = "/project/" + encodeBase64({ type: "all" });
@@ -19,7 +19,7 @@ function SelectProject() {
     []
   );
   if (!dataProject) return <div className="alert alert-info">Đang tải...</div>;
-  if (errorData?.code !== 200) {
+  if (errorData?.code !== 200 && !dataProject) {
     return <div className="alert alert-error">{errorData?.message}</div>;
   }
   return (

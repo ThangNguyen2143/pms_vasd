@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { FieldDto } from "~/lib/type";
+import { FieldDto } from "~/lib/types";
 import RemoveUserGroup from "./remove-user-group";
 
 function TableItem({

@@ -1,7 +1,7 @@
 "use client";
 import { Cake, Dna, Link, Tag } from "lucide-react";
 import { useActionState, useState } from "react";
-import { UserDto } from "~/lib/type";
+import { UserDto } from "~/lib/types";
 import { HandlerUpdateUser } from "./action";
 
 function MainProfile({ user }: { user: UserDto }) {

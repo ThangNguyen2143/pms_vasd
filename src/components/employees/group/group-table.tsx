@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AccountType, FieldDto, GroupDto } from "~/lib/type";
+import { AccountType, FieldDto, GroupDto } from "~/lib/types";
 import clsx from "clsx";
 import Link from "next/link";
 import { encodeBase64 } from "~/lib/services";

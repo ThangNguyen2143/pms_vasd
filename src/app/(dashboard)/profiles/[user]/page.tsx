@@ -1,7 +1,7 @@
 import MainProfile from "~/components/profile/main-display";
 import { fetchData } from "~/lib/api-client";
 import { decodeBase64, encodeBase64 } from "~/lib/services";
-import { DataResponse, UserDto } from "~/lib/type";
+import { DataResponse, UserDto } from "~/lib/types";
 
 async function ProfileUserPage(props: { params: Promise<{ user: string }> }) {
   const params = await props.params;

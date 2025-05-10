@@ -4,7 +4,7 @@ import { getSession } from "~/lib/session";
 import { cache } from "react";
 import { redirect } from "next/navigation";
 import { encodeBase64 } from "./services";
-import { Contact, UserDto } from "./type";
+import { MenuNav, UserDto } from "./types";
 import { fetchData } from "./api-client";
 
 export const verifySession = cache(async () => {
@@ -36,7 +36,7 @@ export const getUser = cache(async () => {
   }
 });
 export const getMenu = async () => {
-  const res = await fetchData<Contact[]>({
+  const res = await fetchData<MenuNav[]>({
     endpoint: "/system/config/" + encodeBase64({ type: "menu" }),
   });
   if (res.code == 200) {

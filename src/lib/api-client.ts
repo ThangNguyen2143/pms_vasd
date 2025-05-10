@@ -1,6 +1,6 @@
 "use server";
 import "server-only";
-import type { DataResponse } from "./type";
+import type { DataResponse } from "./types";
 
 // Import your existing methods
 import { deleteItem, getItem, postItem, putItem } from "./services"; // Replace with actual import path

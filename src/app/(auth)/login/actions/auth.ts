@@ -4,7 +4,7 @@ import { getMenu } from "~/lib/dal";
 import { SignInFormSchema, FormState } from "~/lib/definitions";
 import { postItem } from "~/lib/services";
 import { createSession, deleteSession } from "~/lib/session";
-import { DataResponse } from "~/lib/type";
+import { DataResponse } from "~/lib/types";
 type SignInRespone = {
   token: string;
   username: string;

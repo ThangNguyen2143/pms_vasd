@@ -1,5 +1,5 @@
 "use client";
-import { ResponseError } from "~/lib/type";
+import { ResponseError } from "~/lib/types";
 
 interface ErrorDialogProps {
   isOpen: boolean;

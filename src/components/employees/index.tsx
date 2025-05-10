@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { encodeBase64, getItem } from "~/lib/services";
 import Emp_Table from "./emp_table";
-import { AccountType, Contact, FieldDto, GroupDto, UserDto } from "~/lib/type";
+import { AccountType, Contact, FieldDto, GroupDto, UserDto } from "~/lib/types";
 import { fetchData } from "~/lib/api-client";
 import Group_Table from "./group/group-table";
 

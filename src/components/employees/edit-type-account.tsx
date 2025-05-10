@@ -2,7 +2,7 @@
 import { useRouter } from "next/navigation";
 import { memo } from "react";
 import { useApi } from "~/hooks/use-api";
-import { AccountType } from "~/lib/type";
+import { AccountType } from "~/lib/types";
 import ErrorMessage from "../ui/error-message";
 interface DataPut {
   user_id: number;

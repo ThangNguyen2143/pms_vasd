@@ -2,7 +2,7 @@
 "use client";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
-import { ProductDto, UserDto } from "~/lib/type";
+import { ProductDto, UserDto } from "~/lib/types";
 import { Activity, Pencil } from "lucide-react";
 import { useEffect, useState } from "react";
 import { deleteData, updateData } from "~/lib/api-client";

@@ -1,6 +1,6 @@
 import {
+  Bug,
   ChartLine,
-  ChartNoAxesCombined,
   FolderKanban,
   ListCheck,
   type LucideIcon,
@@ -48,9 +48,9 @@ export const navigations: Navigation[] = [
     href: "/requirements",
   },
   {
-    icon: ChartNoAxesCombined,
-    name: "Thống kê",
-    href: "/",
+    icon: Bug,
+    name: "Bugs",
+    href: "/bugs",
   },
   {
     icon: Users,

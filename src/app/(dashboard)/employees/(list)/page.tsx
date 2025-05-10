@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import AddUserBtn from "~/components/employees/add-user-btn";
 import { encodeBase64 } from "~/lib/services";
 import { fetchData } from "~/lib/api-client";
-import { AccountType, ResponseError } from "~/lib/type";
+import { AccountType, ResponseError } from "~/lib/types";
 import ErrorMessage from "~/components/ui/error-message";
 
 export const metadata: Metadata = {

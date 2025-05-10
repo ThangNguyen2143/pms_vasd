@@ -4,7 +4,7 @@ import UpdateInfoGroup from "~/components/employees/group/update-info-group";
 import ListofRole from "~/components/employees/list-role";
 import { fetchData } from "~/lib/api-client";
 import { decodeBase64, encodeBase64 } from "~/lib/services";
-import { UserDto } from "~/lib/type";
+import { UserDto } from "~/lib/types/account";
 interface GroupDto {
   group_id: string;
   group_name: string;

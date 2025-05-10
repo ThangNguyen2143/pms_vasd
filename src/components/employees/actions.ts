@@ -7,7 +7,7 @@ import {
   CreateUserSchema,
   CreateUserState,
 } from "~/lib/definitions";
-import { CreateUserDto } from "~/lib/type";
+import { CreateUserDto } from "~/lib/types";
 
 export async function HandlerAddUser(
   state: CreateUserState,
