@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ResponseError } from "~/lib/type";
+import { ResponseError } from "~/lib/types";
 
 export function useApiError() {
   const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false);

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useApiError } from "./use-api-error";
 import { fetchData, createData, updateData } from "~/lib/api-client";
-import { DataResponse } from "~/lib/type";
+import { DataResponse } from "~/lib/types";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function useApi<T, D = any>() {

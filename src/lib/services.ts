@@ -1,8 +1,8 @@
 import { decode, encode } from "base-64";
 import { verifySession } from "./dal";
-import { DataResponse } from "./type";
+import { DataResponse } from "./types";
 
-const DOMAIN = process.env.DOMAIN || "http://192.168.1.200:5149/api";
+const DOMAIN = process.env.DOMAINLOCAL || "http://192.168.1.200:5149/api";
 export function encodeBase64(obj: object): string {
   return encode(JSON.stringify(obj));
 }

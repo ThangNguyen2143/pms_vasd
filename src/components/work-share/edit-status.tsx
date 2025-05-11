@@ -1,7 +1,7 @@
 "use client";
 import { memo, useState } from "react";
 import { useApi } from "~/hooks/use-api";
-import { WorkStatus } from "~/lib/type";
+import { WorkStatus } from "~/lib/types";
 import ErrorMessage from "../ui/error-message";
 interface DataPut {
   work_id: number;

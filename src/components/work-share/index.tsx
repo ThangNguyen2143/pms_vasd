@@ -6,7 +6,7 @@ import TableWork from "./table-work";
 import AddWorkBtn from "./add-work-btn";
 import { encodeBase64 } from "~/lib/services";
 import { useApi } from "~/hooks/use-api";
-import { Priority, WorkStatus, WorkType } from "~/lib/type";
+import { Priority, WorkStatus, WorkType } from "~/lib/types";
 
 function MainWork() {
   const [projectSelected, setProjectSelect] = useState<number>(0);

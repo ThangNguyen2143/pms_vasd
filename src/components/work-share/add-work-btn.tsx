@@ -1,6 +1,6 @@
 import { useActionState } from "react";
 import Dialog from "../ui/dialog";
-import { Priority, WorkType } from "~/lib/type";
+import { Priority, WorkType } from "~/lib/types";
 import { HandlerAddWork } from "./action";
 
 function AddWorkBtn({

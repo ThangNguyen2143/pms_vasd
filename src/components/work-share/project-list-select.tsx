@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
-import { ProjectDto } from "~/lib/type";
+import { ProjectDto } from "~/lib/types";
 
 function ListProject({
   projectSelected,

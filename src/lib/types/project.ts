@@ -19,7 +19,7 @@ export type ProjectDetailDto = Exclude<ProjectDto, "id"> & {
   create_at: string;
   actual_end_date: string;
   project_members: ProjectMemberDto[];
-  project_logs: ProjectLogDto[];
+  project_log: ProjectLogDto[];
   project_stakeholders: ProjectStakeholderDto[];
   project_group_contacts: ProjectGroupContactDto[];
 };

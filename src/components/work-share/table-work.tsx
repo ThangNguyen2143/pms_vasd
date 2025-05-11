@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
-import { Priority, WorkShareDto, WorkStatus } from "~/lib/type";
+import { Priority, WorkShareDto, WorkStatus } from "~/lib/types";
 import EditStatus from "./edit-status";
 import UpdateWork from "./update-work";
 

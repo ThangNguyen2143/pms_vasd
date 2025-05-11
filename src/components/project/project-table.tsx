@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import { Pencil } from "lucide-react";
+import Link from "next/link";
 import { useEffect } from "react";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
@@ -49,7 +50,13 @@ function ProjectTable() {
                   <td>{item.end_date}</td>
                   <td>{item.status}</td>
                   <td>
-                    <Pencil />
+                    <Link
+                      href={
+                        "/projects/" + encodeBase64({ project_id: item.id })
+                      }
+                    >
+                      <Pencil />
+                    </Link>
                   </td>
                 </tr>
               );
