@@ -7,8 +7,7 @@ This project is designed to manage and streamline processes for PMS_VASD. Follow
 ## Prerequisites
 
 - **Programming Language**: Ensure you have [language] installed (e.g., Python, Node.js, etc.).
-- **Dependencies**: Install required dependencies listed in `package.json` or `requirements.txt`.
-- **Database**: Set up the database as per the configuration in the project.
+- **Dependencies**: Install required dependencies listed in `package.json`.
 
 ## Installation
 
@@ -20,22 +19,27 @@ This project is designed to manage and streamline processes for PMS_VASD. Follow
    ```bash
    cd pms_vasd
    ```
+   OR extract folder pms_vasd.zip and navigate to project.
 3. Install dependencies:
    ```bash
    npm install
    ```
-   or
-   ```bash
-   pip install -r requirements.txt
-   ```
 
 ## Configuration
+
+if you clone repository from git you need:
 
 1. Copy the example configuration file:
    ```bash
    cp .env.example .env
    ```
 2. Update the `.env` file with your environment-specific variables.
+   if you want to config host, try to change
+   "scripts":{
+   ...
+   "start": "next start -H {ip host} -p {port}"
+   ...
+   }
 
 ## Usage
 
@@ -43,11 +47,7 @@ This project is designed to manage and streamline processes for PMS_VASD. Follow
    ```bash
    npm start
    ```
-   or
-   ```bash
-   python app.py
-   ```
-2. Access the application at `http://localhost:3000` (or the specified port).
+2. Access the application at your ip config or default at "http://localhost:3000"
 
 ## Testing
 
@@ -56,16 +56,6 @@ Run the test suite to ensure everything is working:
 ```bash
 npm test
 ```
-
-or
-
-```bash
-pytest
-```
-
-## Deployment
-
-Follow the deployment guide in `DEPLOYMENT.md` for production setup.
 
 ## Contributing
 
