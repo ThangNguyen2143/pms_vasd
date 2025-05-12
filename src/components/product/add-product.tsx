@@ -16,19 +16,19 @@ function AddProductBtn({ project_id }: { project_id: number }) {
   if (project_id === 0) {
     return (
       <label htmlFor="AddGroupDialog" className="btn btn-info disabled">
-        Thêm sản phẩm
+        Thêm phần mềm
       </label>
     );
   }
   return (
     <>
       <label htmlFor="AddGroupDialog" className="btn btn-info">
-        Thêm sản phẩm
+        Thêm phần mềm
       </label>
       <input type="checkbox" id="AddGroupDialog" className="modal-toggle" />
       <div className="modal" role="dialog">
         <div className="modal-box justify-items-center">
-          <h3 className="text-xl font-bold p-4">Thêm sản phẩm mới</h3>
+          <h3 className="text-xl font-bold p-4">Thêm phần mềm mới</h3>
           <form action={action}>
             <input
               type="hidden"
@@ -38,10 +38,10 @@ function AddProductBtn({ project_id }: { project_id: number }) {
             />
             <div className="flex flex-col gap-4 justify-center">
               <label className="input">
-                <span className="label">Tên sản phẩm</span>
+                <span className="label">Tên phần mềm</span>
                 <input
                   type="text"
-                  placeholder="Nhập tên sản phẩm"
+                  placeholder="Nhập tên phần mềm"
                   name="name"
                   min={1}
                 />
@@ -55,7 +55,7 @@ function AddProductBtn({ project_id }: { project_id: number }) {
                 <span className="label">Mô tả</span>
                 <input
                   type="text"
-                  placeholder="Nhập mô tả sản phẩm"
+                  placeholder="Nhập mô tả phần mềm"
                   name="description"
                   className="validator"
                   minLength={2}

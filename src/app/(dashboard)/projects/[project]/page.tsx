@@ -13,8 +13,8 @@ async function ProjectDetailPage(props: {
   if (!project_id) notFound();
   return (
     <div>
-      <div>
-        <h1>Thông tin chi tiết</h1>
+      <div className="mt-3">
+        <h1 className="text-3xl font-bold my-4">Thông tin chi tiết</h1>
       </div>
       <MainDisplayOnProject project_id={project_id} />
     </div>

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+"use client";
 import { AccountType, Contact, FieldDto } from "~/lib/types";
 import Dialog from "../ui/dialog";
 import StatusBtn from "./status-btn";
@@ -6,6 +7,7 @@ import EditTypeModal from "./edit-type-account";
 import ResetPassBtn from "./reset-pass";
 import ListofRole from "./list-role";
 import clsx from "clsx";
+import { useState } from "react";
 
 function TableItem({
   emp,
@@ -70,7 +72,7 @@ function TableItem({
                 title="Cấp quyền tài khoản"
                 typeBtn="ghost"
                 key={"ROLE" + index}
-                id={index + "2" + emp["username"]}
+                id={index + "2" + emp.userid}
               >
                 <ListofRole
                   roleOwn={emp.roles}
@@ -94,7 +96,7 @@ function TableItem({
     </tr>
   );
 }
-async function Emp_Table({
+function Emp_Table({
   empData,
   feildTable,
   typeAccount,
@@ -105,6 +107,7 @@ async function Emp_Table({
   typeAccount?: AccountType[];
   roleList?: Contact[];
 }) {
+  const [findText, setTextFind] = useState("");
   if (!empData) {
     return <div className="alert alert-error">Không có dữ liệu</div>;
   }
@@ -112,31 +115,69 @@ async function Emp_Table({
     roleList = [];
   }
   return (
-    <div className="overflow-x-auto">
-      <table className="table">
-        {/* head */}
-        <thead>
-          <tr>
-            {feildTable.map((item, index) => {
-              return <th key={index}>{item.display}</th>;
-            })}
-          </tr>
-        </thead>
-        <tbody>
-          {empData.map((item, index) => {
-            return (
-              <TableItem
-                emp={item}
-                key={index}
-                feildTable={feildTable}
-                accountType={typeAccount}
-                roleList={roleList}
-              />
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+    <>
+      <div className="flex flex-row justify-between items-center gap-4">
+        <div>
+          <label className="input">
+            <span className="label">Tìm kiếm người dùng</span>
+            <input
+              type="text"
+              placeholder="Nhập tên hoặc email..."
+              value={findText}
+              onChange={(e) => setTextFind(e.target.value)}
+            />
+          </label>
+        </div>
+        <div>
+          <label className="select">
+            <span className="label">Vai trò</span>
+            <select>
+              <option value="">Tất cả</option>
+              {typeAccount &&
+                typeAccount.map((item) => (
+                  <option key={item.code} value={item.code}>
+                    {item.display}
+                  </option>
+                ))}
+            </select>
+          </label>
+        </div>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="table">
+          {/* head */}
+          <thead>
+            <tr>
+              {feildTable.map((item, index) => {
+                return <th key={index}>{item.display}</th>;
+              })}
+            </tr>
+          </thead>
+          <tbody>
+            {empData
+              .filter((item) => {
+                const nameuser = item.userData.display_name as string;
+                const mailuser = item.userData.contact[0].value as string;
+                return (
+                  nameuser.toLowerCase().includes(findText.toLowerCase()) ||
+                  mailuser.toLowerCase().includes(findText.toLowerCase())
+                );
+              })
+              .map((item, index) => {
+                return (
+                  <TableItem
+                    emp={item}
+                    key={index}
+                    feildTable={feildTable}
+                    accountType={typeAccount}
+                    roleList={roleList}
+                  />
+                );
+              })}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }
 

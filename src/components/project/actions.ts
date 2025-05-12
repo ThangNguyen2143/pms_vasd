@@ -1,3 +1,4 @@
+"use server";
 import { redirect } from "next/navigation";
 import { createData } from "~/lib/api-client";
 import { CreateProjectSchema, CreateProjectState } from "~/lib/definitions";

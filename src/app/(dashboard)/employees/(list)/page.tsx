@@ -26,28 +26,7 @@ async function EmployeesPage() {
             <p>Danh sách người dùng</p>
             <AddUserBtn />
           </div>
-          <div className="flex flex-row justify-between items-center gap-4">
-            <div>
-              <label className="input">
-                <span className="label">Tìm kiếm người dùng</span>
-                <input type="text" placeholder="Nhập tên hoặc email..." />
-              </label>
-            </div>
-            <div>
-              <label className="select">
-                <span className="label">Vai trò</span>
-                <select>
-                  <option value="">Tất cả</option>
-                  {getTypeAccount.code === 200 &&
-                    getTypeAccount.value.map((item) => (
-                      <option key={item.code} value={item.code}>
-                        {item.display}
-                      </option>
-                    ))}
-                </select>
-              </label>
-            </div>
-          </div>
+
           <EmployeeTab typeAccount={getTypeAccount.value} />
         </div>
       </div>

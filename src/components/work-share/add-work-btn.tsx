@@ -30,6 +30,7 @@ function AddWorkBtn({
       nameBtn="Thêm công việc"
       typeBtn="primary"
       sizeBox="sm"
+      id="AddWorkBtn"
     >
       <div className="flex flex-col gap-4">
         <form action={action}>
@@ -99,7 +100,12 @@ function AddWorkBtn({
           </fieldset>
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Thời gian ghi nhận</legend>
-            <input type="date" className="input" name="request_at" required />
+            <input
+              type="datetime-local"
+              className="input"
+              name="request_at"
+              required
+            />
             {state?.errors?.request_at && (
               <label className="label text-red-500">
                 {state.errors.request_at}
@@ -108,7 +114,12 @@ function AddWorkBtn({
           </fieldset>
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Hạn chót</legend>
-            <input type="date" className="input" name="deadline" required />
+            <input
+              type="datetime-local"
+              className="input"
+              name="deadline"
+              required
+            />
             {state?.errors?.deadline && (
               <label className="label text-red-500">
                 {state.errors.deadline}
@@ -130,7 +141,7 @@ function AddWorkBtn({
             >
               {pending ? "Đang xử lý..." : "Thêm công việc"}
             </button>
-            <label htmlFor="AddWorkDialog" className="btn">
+            <label htmlFor="AddWorkBtn" className="btn">
               Hủy
             </label>
           </div>

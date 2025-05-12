@@ -9,6 +9,7 @@ import { encodeBase64 } from "~/lib/services";
 function AddUserBtn() {
   const [state, action, pending] = useActionState(HandlerAddUser, undefined);
   const [isOpenErrorDialog, setIsOpenErrorDialog] = useState(false);
+  const [isChangeValue, setChangeValue] = useState(false);
   const {
     data: account_type,
     isLoading,
@@ -20,6 +21,9 @@ function AddUserBtn() {
   const loadTypeAccount = () => {
     getData("/system/config/" + encodeBase64({ type: "account_type" })); // Load account type from API
   };
+  useEffect(() => {
+    setChangeValue(false);
+  }, [state]);
   useEffect(() => {
     if (state?.message) {
       setIsOpenErrorDialog(true); // Show error dialog if there is a message
@@ -51,10 +55,14 @@ function AddUserBtn() {
                   className="validator"
                   pattern="^[\p{L} ]+$"
                   title="Họ và tên không được chứa ký tự đặc biệt"
+                  onKeyDown={() => setChangeValue(true)}
                 />
               </label>
               {state?.errors?.display_name && (
-                <div className="validator-hint text-error">
+                <div
+                  className="validator-hint text-error"
+                  hidden={isChangeValue}
+                >
                   {state.errors.display_name}
                 </div>
               )}
@@ -67,10 +75,14 @@ function AddUserBtn() {
                   className="validator"
                   minLength={4}
                   maxLength={20}
+                  onKeyDown={() => setChangeValue(true)}
                 />
               </label>
               {state?.errors?.username && (
-                <div className="validator-hint text-error">
+                <div
+                  className="validator-hint text-error"
+                  hidden={isChangeValue}
+                >
                   {state.errors.username}
                 </div>
               )}
@@ -95,10 +107,15 @@ function AddUserBtn() {
                   placeholder="Nhập email"
                   name="email"
                   className="validator"
+                  title="Email không hợp lệ"
+                  onKeyDown={() => setChangeValue(true)}
                 />
               </label>
               {state?.errors?.email && (
-                <div className="validator-hint text-error">
+                <div
+                  className="validator-hint text-error"
+                  hidden={isChangeValue}
+                >
                   {state.errors.email}
                 </div>
               )}
@@ -113,10 +130,14 @@ function AddUserBtn() {
                   minLength={10}
                   maxLength={10}
                   title="Id Telegram phải là 10 chữ số"
+                  onKeyDown={() => setChangeValue(true)}
                 />
               </label>
               {state?.errors?.telegram && (
-                <div className="validator-hint text-error">
+                <div
+                  className="validator-hint text-error"
+                  hidden={isChangeValue}
+                >
                   {state.errors.telegram}
                 </div>
               )}
