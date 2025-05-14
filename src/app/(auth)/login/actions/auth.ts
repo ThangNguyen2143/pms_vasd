@@ -1,4 +1,5 @@
 "use server";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getMenu } from "~/lib/dal";
 import { SignInFormSchema, FormState } from "~/lib/definitions";
@@ -59,12 +60,13 @@ export async function signIn(state: FormState, formData: FormData) {
     role: data.account_type,
   });
   const nav = await getMenu();
-  if (nav && data.account_type == "Guess") {
-    // 4.1. If the user is a guest, redirect to the first menu item
-    const guessRoutes: string[] = nav.map((item) => `/${item.code}`);
-    // Check if the user is a guest and redirect accordingly
-    redirect(guessRoutes[0] || "/");
-  }
+  const menuRoutes = nav?.map((item) => `/${item.code}`);
+  const cookie = await cookies();
+  cookie.set("menuRoutes", JSON.stringify(menuRoutes), {
+    path: "/",
+    httpOnly: false,
+  });
+
   // 5. Redirect user
   redirect("/");
 }

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import { useEffect } from "react";
 import { useApi } from "~/hooks/use-api";
@@ -8,13 +9,18 @@ import StatProject from "./stat-project";
 import StakeholderList from "./stakeholder-list";
 import ProjectMemberList from "./project-member-list";
 import ProjectGroupList from "./project-group-list";
+import { toast } from "sonner";
 
 function MainDisplayOnProject({ project_id }: { project_id: number }) {
   const endpointStatus = "/system/config/eyJ0eXBlIjoicHJvamVjdF9zdGF0dXMifQ==";
   const enpointRoles = "/system/config/eyJ0eXBlIjoicHJvamVjdF9yb2xlIn0=";
   const { data, getData: getProject, errorData } = useApi<ProjectDetailDto>();
   const { data: statusList, getData: getStatus } = useApi<ProjectStatus[]>();
-  const { data: roleInProject, getData: getRoleList } = useApi<ProjectRole[]>();
+  const {
+    data: roleInProject,
+    getData: getRoleList,
+    errorData: roleError,
+  } = useApi<ProjectRole[]>();
 
   useEffect(() => {
     const endpoint = "/project/detail/" + encodeBase64({ project_id });
@@ -26,6 +32,7 @@ function MainDisplayOnProject({ project_id }: { project_id: number }) {
     if (!errorData) return <div>Đang tải dữ liệu...</div>;
     else return <div>{errorData.message}</div>;
   }
+  if (roleError) toast.error(roleError.message);
   if (roleInProject) {
     if (data.project_members.length > 0)
       data.project_members.forEach((member) => {
@@ -51,17 +58,17 @@ function MainDisplayOnProject({ project_id }: { project_id: number }) {
           <StakeholderList stakeholder={data.project_stakeholders} />
         </div>
       </div>
-      <div className="flex flex-col md:flex-row">
-        <div className="card rounded-box grow ">
-          <h2 className="text-2xl">Danh sách thành viên dự án</h2>
+      <div className="flex flex-col md:flex-row gap-2">
+        <div className="card rounded-box grow flex-1/2 shadow bg-base-200">
+          <h2 className="text-2xl p-2">Danh sách thành viên dự án</h2>
           <ProjectMemberList
             project_member={data.project_members}
             project_id={data.id}
+            list_role={roleInProject}
           />
         </div>
-        <div className="divider lg:divider-horizontal"></div>
-        <div className="card rounded-box grow ">
-          <h2 className="text-2xl">Danh sách nhóm liên hệ</h2>
+        <div className="card rounded-box grow flex-1/2 shadow bg-base-200">
+          <h2 className="text-2xl p-2">Danh sách nhóm liên hệ</h2>
           <ProjectGroupList
             project_group={data.project_group_contacts}
           ></ProjectGroupList>

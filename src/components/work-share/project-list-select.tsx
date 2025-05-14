@@ -24,14 +24,21 @@ function ListProject({
     const selectedValue = e.target.value;
     setProjectSelect(Number.parseInt(selectedValue));
   };
-  if (errorData)
+  if (errorData) {
+    if (errorData.code == 404)
+      return (
+        <div>
+          <span className="alert alert-info">
+            Bạn chưa được phân vào bất kì dự án nào
+          </span>
+        </div>
+      );
     return (
       <div>
-        <span className="alert alert-error">
-          Lỗi {errorData.code}: {errorData.message}
-        </span>
+        <span className="alert alert-error">{errorData.message}</span>
       </div>
     );
+  }
   return (
     <select
       className="select select-ghost"
@@ -43,6 +50,12 @@ function ListProject({
       </option>
       {projectList ? (
         projectList.map((item, index) => {
+          if (projectList.length == 1)
+            return (
+              <option key={index} value={item.id} defaultChecked>
+                {item.name}
+              </option>
+            );
           return (
             <option key={index} value={item.id}>
               {item.name}

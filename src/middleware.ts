@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 // 1. Specify protected and public routes
 // const protectedRoutes = ["/", "/product", "/project", "/tasks", "/user"];
 const publicRoutes = ["/login"];
-// const guessRoutes: string[] = [];
+const defaultGuessRoute = "/work_share";
 
 export default async function middleware(req: NextRequest) {
   // 2. Check if the current route is public
@@ -13,17 +13,29 @@ export default async function middleware(req: NextRequest) {
   // const session = await getSession();
   const session = req.cookies.get("session")?.value;
   let userId: number | null = null;
+  let role: string | null = null;
+  const guessRoutesCookie = req.cookies.get("menuRoutes")?.value;
+  let guessRoutes: string[] = [];
 
   try {
-    userId = JSON.parse(session || "{}")?.userId;
+    const sessionData = JSON.parse(session || "{}");
+    userId = sessionData.userId;
+    role = sessionData?.role;
   } catch (err) {
     console.error("Invalid session cookie:", err);
+  }
+  try {
+    guessRoutes = JSON.parse(guessRoutesCookie || "[]") || [defaultGuessRoute];
+  } catch (e) {
+    console.error("Failed to parse guessRoutes cookie", e);
   }
   // 4. Redirect to /login if the user is not authenticated
   if (!session && !isPublicRoute) {
     return NextResponse.redirect(new URL("/login", req.nextUrl));
   }
-
+  if (role === "Guess" && !guessRoutes.includes(path)) {
+    return NextResponse.redirect(new URL(defaultGuessRoute, req.nextUrl));
+  }
   // 5. Redirect to /dashboard if the user is authenticated
   if (isPublicRoute && userId) {
     // if (session?.role == "Guess") {
@@ -31,16 +43,7 @@ export default async function middleware(req: NextRequest) {
     // }
     return NextResponse.redirect(new URL("/", req.nextUrl));
   }
-  // if (session?.role == "Guess") {
-  //   const menu = await getMenu();
-  //   if (menu) {
-  //     guessRoutes.push(...menu.map((item) => `/${item.code}`));
-  //   }
-  //   const isGuessRoute = guessRoutes.includes(path);
-  //   if (!isGuessRoute) {
-  //     return NextResponse.redirect(new URL("/404", req.nextUrl));
-  //   }
-  // }
+
   // 6. Allow the request to continue if the user is authenticated
   return NextResponse.next();
 }

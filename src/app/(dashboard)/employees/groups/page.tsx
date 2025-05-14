@@ -1,6 +1,11 @@
-import { GroupTab } from "~/components/employees";
+import GroupTab from "~/components/group";
 import AddGroupBtn from "~/components/employees/add-group-btn";
+import { Metadata } from "next";
 
+export const metadata: Metadata = {
+  title: "Quản lý nhóm",
+  description: "Trang quản lý nhóm trong công ty",
+};
 function GroupPage() {
   return (
     <div className="tabs tabs-box">

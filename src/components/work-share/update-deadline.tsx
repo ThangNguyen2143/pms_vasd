@@ -2,7 +2,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useApi } from "~/hooks/use-api";
-function UpdateWork({
+function UpdateDeadline({
   display,
   work_id,
   onUpdate,
@@ -14,7 +14,7 @@ function UpdateWork({
   const [date, setDate] = useState<string>();
   const { putData, errorData } = useApi<
     "",
-    { work_id: number; update_time: string }
+    { work_id: number; deadline: string }
   >();
   useEffect(() => {
     if (display && !date) {
@@ -37,10 +37,10 @@ function UpdateWork({
     const value = e.target.value;
     await putData("/work/time", {
       work_id: work_id,
-      update_time: value,
+      deadline: value,
     });
     if (errorData)
-      alert("Đã có lỗi xảy ra trong quá trình cập nhật thời gian công việc");
+      alert("Đã có lỗi xảy ra trong quá trình cập nhật deadline công việc");
     else {
       onUpdate(value);
       setDate(value);
@@ -51,7 +51,7 @@ function UpdateWork({
     <div className="flex flex-col gap-4">
       <input
         type="datetime-local"
-        id={work_id + "update"}
+        id={work_id + "deadline"}
         className="input"
         value={date || display || ""}
         onChange={handleChange}
@@ -60,4 +60,4 @@ function UpdateWork({
   );
 }
 
-export default UpdateWork;
+export default UpdateDeadline;

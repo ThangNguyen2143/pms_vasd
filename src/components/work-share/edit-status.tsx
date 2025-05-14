@@ -3,6 +3,8 @@ import { memo, useState } from "react";
 import { useApi } from "~/hooks/use-api";
 import { WorkStatus } from "~/lib/types";
 import ErrorMessage from "../ui/error-message";
+import clsx from "clsx";
+import { status_with_color } from "~/utils/status-with-color";
 interface DataPut {
   work_id: number;
   status: string;
@@ -41,7 +43,16 @@ function EditStatusModal({
   return (
     <>
       <div className="dropdown">
-        <div tabIndex={0} role="button" className="btn m-1">
+        <div
+          tabIndex={0}
+          role="button"
+          className={clsx(
+            "btn m-1",
+            `btn-${status_with_color(
+              statusList.find((st) => st.display == display)?.code || ""
+            )}`
+          )}
+        >
           {isUpdating ? "Đang cập nhật..." : display}
         </div>
         <ul

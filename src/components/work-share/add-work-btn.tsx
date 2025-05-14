@@ -100,12 +100,7 @@ function AddWorkBtn({
           </fieldset>
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Thời gian ghi nhận</legend>
-            <input
-              type="datetime-local"
-              className="input"
-              name="request_at"
-              required
-            />
+            <input type="date" className="input" name="request_at" required />
             {state?.errors?.request_at && (
               <label className="label text-red-500">
                 {state.errors.request_at}
@@ -149,7 +144,7 @@ function AddWorkBtn({
             <div className="alert alert-error shadow-lg mt-4">
               <div>
                 <span>
-                  {"Lỗi: " + state.message.code + " " + state.message.hint}
+                  {"Lỗi: " + state.message.code + " " + state.message.message}
                 </span>
               </div>
             </div>

@@ -8,7 +8,7 @@ import { encodeBase64 } from "~/lib/services";
 import { useApi } from "~/hooks/use-api";
 import { Priority, WorkStatus, WorkType } from "~/lib/types";
 
-function MainWork() {
+function MainWork({ role }: { role?: string }) {
   const [projectSelected, setProjectSelect] = useState<number>(0);
   const { data: statusList, getData: getStatusList } = useApi<WorkStatus[]>();
   const { data: priorityList, getData: getPriority } = useApi<Priority[]>();
@@ -25,6 +25,7 @@ function MainWork() {
         "/system/config/" + encodeBase64({ type: "priority" });
       const endpointTypeWork =
         "/system/config/" + encodeBase64({ type: "work_type" });
+
       await getStatusList(endpointStatus);
       await getPriority(endpointPriority);
       await getTypeWork(endpointTypeWork);
@@ -51,16 +52,21 @@ function MainWork() {
           projectSelected={projectSelected}
           setProjectSelect={setProjectSelect}
         />
-        <AddWorkBtn
-          project_id={projectSelected.toString()}
-          priority={priorityList}
-          typeWork={typeWorkList}
-        />
+        {role == "Guess" || !role ? (
+          ""
+        ) : (
+          <AddWorkBtn
+            project_id={projectSelected.toString()}
+            priority={priorityList}
+            typeWork={typeWorkList}
+          />
+        )}
       </div>
       <TableWork
         project_id={projectSelected}
         priorityList={priorityList}
         statusList={statusList}
+        role={role}
       />
     </div>
   );

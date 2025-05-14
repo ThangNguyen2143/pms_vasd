@@ -1,23 +1,13 @@
-import { EmployeeTab } from "~/components/employees";
+import EmployeeTab from "~/components/employees";
 import type { Metadata } from "next";
 import AddUserBtn from "~/components/employees/add-user-btn";
-import { encodeBase64 } from "~/lib/services";
-import { fetchData } from "~/lib/api-client";
-import { AccountType, ResponseError } from "~/lib/types";
-import ErrorMessage from "~/components/ui/error-message";
 
 export const metadata: Metadata = {
   title: "Quản lý nhân viên",
   description: "Trang quản lý nhân viên",
 };
 
-async function EmployeesPage() {
-  const endpointType =
-    "/system/config/" + encodeBase64({ type: "account_type" });
-  const getTypeAccount = await fetchData<AccountType[]>({
-    endpoint: endpointType,
-    cache: "force-cache",
-  });
+function EmployeesPage() {
   return (
     <div className="tabs tabs-box">
       <div className="border-base-300 bg-base-100 p-10 w-full">
@@ -26,11 +16,9 @@ async function EmployeesPage() {
             <p>Danh sách người dùng</p>
             <AddUserBtn />
           </div>
-
-          <EmployeeTab typeAccount={getTypeAccount.value} />
+          <EmployeeTab />
         </div>
       </div>
-
       <input type="checkbox" id="modal_success" className="modal-toggle" />
       <div className="modal" role="dialog">
         <div className="modal-box">
@@ -41,12 +29,6 @@ async function EmployeesPage() {
           Đóng
         </label>
       </div>
-      {getTypeAccount.code !== 200 ? (
-        <ErrorMessage
-          isOpen={true}
-          errorData={getTypeAccount as unknown as ResponseError}
-        />
-      ) : null}
     </div>
   );
 }

@@ -56,7 +56,7 @@ export default function TopNav() {
         </div>
         <Link className="btn btn-ghost text-xl" href="/">
           <Image
-            src={"/logo_vasd.png"}
+            src={"/vasd_256.png"}
             alt="Logo"
             width={30}
             height={30}

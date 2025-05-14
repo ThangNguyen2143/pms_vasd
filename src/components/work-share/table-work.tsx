@@ -6,15 +6,20 @@ import { encodeBase64 } from "~/lib/services";
 import { Priority, WorkShareDto, WorkStatus } from "~/lib/types";
 import EditStatus from "./edit-status";
 import UpdateWork from "./update-work";
+import UpdateDeadline from "./update-deadline";
+import clsx from "clsx";
+import { status_with_color } from "~/utils/status-with-color";
 
 function TableWork({
   project_id,
   priorityList,
   statusList,
+  role,
 }: {
   project_id: number;
   statusList: WorkStatus[];
   priorityList: Priority[];
+  role?: string;
 }) {
   const {
     data: workList,
@@ -23,10 +28,9 @@ function TableWork({
   } = useApi<WorkShareDto[]>();
   const fetchData = async () => {
     const endpointWork = "/work/" + encodeBase64({ project_id });
-    const result = await getWorkList(endpointWork, "no-cache");
-    console.log("Fetched result:", result);
+    await getWorkList(endpointWork, "no-cache");
   };
-
+  const isGuess = !role || role == "Guess";
   useEffect(() => {
     const endpointWork = "/work/" + encodeBase64({ project_id });
     getWorkList(endpointWork, "reload");
@@ -96,27 +100,54 @@ function TableWork({
                     }
                   </td>
                   <td>
-                    <EditStatus
-                      display={
-                        statusList?.find(
+                    {!isGuess ? (
+                      <EditStatus
+                        display={
+                          statusList?.find(
+                            (status) => status.code === item.status
+                          )?.display ?? ""
+                        }
+                        onUpdated={fetchData}
+                        statusList={statusList}
+                        work_id={item.id}
+                      />
+                    ) : (
+                      <span
+                        className={clsx(
+                          "px-6 badge",
+                          `badge-${status_with_color(item.status)}`
+                        )}
+                      >
+                        {statusList?.find(
                           (status) => status.code === item.status
-                        )?.display ?? ""
-                      }
-                      onUpdated={fetchData}
-                      statusList={statusList}
-                      work_id={item.id}
-                    />
+                        )?.display ?? ""}
+                      </span>
+                    )}
                   </td>
-                  <td className="">
-                    <UpdateWork
-                      display={item.update_at}
-                      work_id={item.id}
-                      onUpdate={fetchData}
-                    />
+                  <td>
+                    {isGuess ? (
+                      item.update_at
+                    ) : (
+                      <UpdateWork
+                        display={item.update_at}
+                        work_id={item.id}
+                        onUpdate={fetchData}
+                      />
+                    )}
                   </td>
                   <td className="px-6 py-4">{item.create_at}</td>
                   <td className="px-6 py-4">{item.request_at}</td>
-                  <td className="px-6 py-4">{item.deadline}</td>
+                  <td>
+                    {isGuess ? (
+                      item.update_at
+                    ) : (
+                      <UpdateDeadline
+                        display={item.deadline}
+                        work_id={item.id}
+                        onUpdate={fetchData}
+                      />
+                    )}
+                  </td>
                   <td className="px-6 py-4">{item.pic}</td>
                 </tr>
               );

@@ -1,37 +1,16 @@
 "use client";
 import ErrorMessage from "./error-message";
 import { useApiError } from "~/hooks/use-api-error";
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { signIn } from "~/app/(auth)/login/actions/auth";
+import { toast } from "sonner";
 
 export default function SignInForm() {
   const { errorData, isErrorDialogOpen, setIsErrorDialogOpen } = useApiError();
-  // const route = useRouter();
   const [state, action, loading] = useActionState(signIn, undefined);
-
-  //   const validatedFields = SignInFormSchema.safeParse({
-  //     username: formData.get("username"),
-  //     password: formData.get("password"),
-  //   });
-  //   if (validatedFields.error)
-  //     state = { errors: validatedFields.error.flatten().fieldErrors };
-  //   else {
-  //     const response: DataResponse<SignInRespone> = await postItem({
-  //       endpoint: "/user/login",
-  //       data: JSON.stringify({ data: validatedFields.data }),
-  //     });
-  //     if (response.code != 200) handleApiError(response);
-  //     else {
-  //       await createSession({
-  //         userId: response.value.userid,
-  //         expires: response.value.expired,
-  //         name: response.value.display,
-  //         token: response.value.token,
-  //       });
-  //       route.refresh();
-  //     }
-  //   }
-  // };
+  useEffect(() => {
+    if (state?.errors.server) toast.info(state?.errors.server?.message);
+  }, [state]);
   return (
     <form action={action}>
       <fieldset className="fieldset w-xs border border-base-300 p-4 rounded-box">

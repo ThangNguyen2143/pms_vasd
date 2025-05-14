@@ -1,10 +1,10 @@
-import AddMemberBtn from "~/components/employees/group/add-member-btn";
-import MemberGroup from "~/components/employees/group/member-group";
-import UpdateInfoGroup from "~/components/employees/group/update-info-group";
+import AddMemberBtn from "~/components/group/add-member-btn";
+import MemberGroup from "~/components/group/member-group";
+import UpdateInfoGroup from "~/components/group/update-info-group";
 import ListofRole from "~/components/employees/list-role";
 import { fetchData } from "~/lib/api-client";
 import { decodeBase64, encodeBase64 } from "~/lib/services";
-import { UserDto } from "~/lib/types/account";
+import { RoleType, UserDto } from "~/lib/types/account";
 interface GroupDto {
   group_id: string;
   group_name: string;
@@ -15,10 +15,7 @@ interface UserInGroup {
   display_name: string;
   date_join: string;
 }
-interface RoleGroup {
-  value: string;
-  code: string;
-}
+
 async function DetailGroupPage(props: {
   params: Promise<{ group: string }>;
   searchParams: Promise<{ [key: string]: string }>;
@@ -36,7 +33,7 @@ async function DetailGroupPage(props: {
     group_name: name,
     group_description: description,
   };
-  const roleRespone = await fetchData<RoleGroup[]>({
+  const roleRespone = await fetchData<RoleType[]>({
     endpoint: "/system/config/eyJ0eXBlIjoicm9sZSJ9",
     cache: "force-cache",
   });
@@ -57,7 +54,7 @@ async function DetailGroupPage(props: {
       type: "role",
       group_id: group.group_id,
     });
-  const roleGroupResponse = await fetchData<RoleGroup[]>({
+  const roleGroupResponse = await fetchData<RoleType[]>({
     endpoint: endpointRoleGroup,
     cache: "no-cache",
   });
