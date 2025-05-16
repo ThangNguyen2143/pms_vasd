@@ -1,3 +1,6 @@
+import { Contact } from "./account";
+import { FileDto } from "./system";
+
 export type TaskDTO = {
   id: number;
   title: string;
@@ -11,7 +14,11 @@ export type TaskDTO = {
   status: string;
 };
 export type Task = Exclude<TaskDTO, "id"> & {
-  name_user: string;
+  taskLogs: TaskLog[];
+  userAssigns?: UserAssignsTask[];
+  taskFiles?: FileDto[];
+  requirementTasks?: RequirementTask[];
+  user_create_name: string;
   product_id: string;
   status_name: string;
 };
@@ -21,4 +28,24 @@ export type Comment = {
   content: string;
   date: string;
   created_by: number;
+};
+export type TaskLog = {
+  id: number;
+  name: string;
+  content: string;
+  date: string;
+};
+export type UserAssignsTask = {
+  user_id: number;
+  name: string;
+  date_assign: string;
+  date_end?: string;
+  date_start?: string;
+  cur_deadLine: string;
+  contact: Contact[];
+};
+
+export type RequirementTask = {
+  requirement_id: number;
+  requirement_title: string;
 };

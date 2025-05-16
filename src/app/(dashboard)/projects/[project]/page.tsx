@@ -11,14 +11,7 @@ async function ProjectDetailPage(props: {
     project_id: number;
   };
   if (!project_id) notFound();
-  return (
-    <div>
-      <div className="mt-3">
-        <h1 className="text-3xl font-bold my-4">Thông tin chi tiết</h1>
-      </div>
-      <MainDisplayOnProject project_id={project_id} />
-    </div>
-  );
+  return <MainDisplayOnProject project_id={project_id} />;
 }
 
 export default ProjectDetailPage;

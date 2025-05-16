@@ -3,7 +3,6 @@ import { TaskDTO, UserDto, WorkStatus } from "~/lib/types";
 import { useApi } from "~/hooks/use-api";
 import { useEffect } from "react";
 import TaskRow from "./task-row";
-import Link from "next/link";
 interface TaskListProps {
   product_id: string;
   externalTaskCreated?: TaskDTO;
@@ -61,16 +60,12 @@ function TaskList({ product_id, externalTaskCreated }: TaskListProps) {
         <tbody>
           {fullTaskList.length > 0 ? (
             fullTaskList.map((task) => (
-              <Link
+              <TaskRow
+                task={task}
+                users={userList || []}
+                statusList={statusList || []}
                 key={task.id}
-                href={"/tasks/" + encodeBase64({ task_id: task.id })}
-              >
-                <TaskRow
-                  task={task}
-                  users={userList || []}
-                  statusList={statusList || []}
-                />
-              </Link>
+              />
             ))
           ) : (
             <tr>

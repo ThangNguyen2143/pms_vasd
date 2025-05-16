@@ -1,11 +1,10 @@
-import { X } from "lucide-react";
-import { ProjectMemberDto, ProjectRole, UserDto } from "~/lib/types";
-import AddMemberProjectBtn from "./add-member-btn";
-import { useApi } from "~/hooks/use-api";
+"use client";
 import { useEffect } from "react";
+import { ProjectMemberDto, ProjectRole, UserDto } from "~/lib/types";
+import { useApi } from "~/hooks/use-api";
+import AddMemberProjectBtn from "./add-member-btn";
 import { encodeBase64 } from "~/lib/services";
-
-function ProjectMemberList({
+export default function ProjectMemberList({
   project_member,
   project_id,
   list_role,
@@ -16,80 +15,61 @@ function ProjectMemberList({
 }) {
   const { getData: getUserList, data: userList } = useApi<UserDto[]>();
 
-  const handleUpdateRole = (role_code: string) => {
-    console.log("Role code", role_code);
-    console.log(project_id);
-  };
   useEffect(() => {
     getUserList("/user/" + encodeBase64({ type: "all" }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  return (
-    <div>
-      {list_role != null ? (
-        <AddMemberProjectBtn
-          listEmployee={userList}
-          memberGroup={project_member}
-          project_id={project_id}
-          list_role={list_role}
-        />
-      ) : (
-        <div className="badge badge-error">Không thể tải dữ liệu</div>
-      )}
-      <div>
-        {project_member && project_member.length != 0 ? (
-          <div>
-            <ul className="list bg-base-100 rounded-box shadow-md">
-              {project_member.map((member) => {
-                return (
-                  <li className="list-row" key={"project_member" + member.id}>
-                    <div>{member.name}</div>
 
-                    <div>
-                      <div
-                        tabIndex={0}
-                        className="collapse border-base-300 border"
-                      >
-                        <div className="collapse-title font-semibold">
-                          Xem quyền
-                        </div>
-                        <div className="collapse-content text-sm">
-                          {member.role.map((r, i) => {
-                            return (
-                              <label
-                                className="label"
-                                key={i + "role" + member.id}
-                              >
-                                <input
-                                  type="checkbox"
-                                  className="checkbox"
-                                  value={r.code + "" + member.id}
-                                  onClick={(e) =>
-                                    handleUpdateRole(e.currentTarget.value)
-                                  }
-                                />
-                                {r.display || r.code}
-                              </label>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                    <button className="btn btn-square btn-ghost">
-                      <X color="#f00" />
-                    </button>
-                  </li>
-                );
-              })}
-            </ul>
-            <div>Tổng: {project_member.length} thành viên</div>
-          </div>
+  return (
+    <div className="bg-base-200 p-4 rounded-lg shadow">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-bold text-primary border-b border-base-content/20 pb-1">
+          👥 Thành viên dự án
+        </h2>
+        {list_role != null ? (
+          <AddMemberProjectBtn
+            listEmployee={userList}
+            memberGroup={project_member}
+            project_id={project_id}
+            list_role={list_role}
+          />
         ) : (
-          <div>Chưa có thành viên nào được thêm</div>
+          <div className="badge badge-error">Không thể tải dữ liệu</div>
         )}
       </div>
+
+      {project_member?.length ? (
+        <div className="space-y-3">
+          {project_member.map((member) => (
+            <div key={member.id} className="bg-base-100 p-3 rounded border">
+              <p>
+                <span className="font-semibold">Họ tên:</span> {member.name}
+              </p>
+              <p>
+                <span className="font-semibold">Vai trò:</span>{" "}
+                {member.role.map((r, i) => (
+                  <span key={i} className="badge badge-info mr-2">
+                    {r.display || r.role_code}
+                  </span>
+                ))}
+              </p>
+              <p>
+                <span className="font-semibold">Ngày tham gia:</span>{" "}
+                {member.date_join}
+              </p>
+              <p>
+                <span className="font-semibold">Người thêm:</span>{" "}
+                {
+                  userList?.find((user) => member.added_by == user.userid)
+                    ?.userData.display_name
+                }
+              </p>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="italic text-sm text-gray-500">Chưa có thành viên nào.</p>
+      )}
     </div>
   );
 }
-
-export default ProjectMemberList;

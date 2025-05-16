@@ -47,13 +47,13 @@ function AddMemberProjectBtn({
     }
   };
   return (
-    <Dialog nameBtn="Thêm thành viên" title="Chọn thành viên" typeBtn="primary">
+    <Dialog nameBtn="+" title="Chọn thành viên" typeBtn="ghost" sizeBox="xl">
       <label className="input">
         <span className="label">Tìm kiếm</span>
         <input type="text" placeholder="Nhập tên" />
       </label>
       {listEmployee ? (
-        <ul className="list rounded-box shadow-md gap-1.5 overflow-y-hidden">
+        <ul className="list rounded-box shadow-md">
           {listEmployee
             .filter((us) => {
               return member.find((mem) => mem.id == us.userid) == undefined;
@@ -62,27 +62,26 @@ function AddMemberProjectBtn({
               return (
                 <li
                   key={user.userid}
-                  className="flex justify-between p-2 bg-base-200 shadow"
+                  className="flex justify-between p-2 bg-base-200 shadow w-full"
                 >
-                  <div>{user.userData.display_name}</div>
-                  {list_role.map((role) => {
-                    return (
-                      <div
-                        className="tooltip"
-                        data-tip={role.description}
-                        key={role.code + user.userid}
-                      >
-                        <label className="label">
-                          <input
-                            type="checkbox"
-                            defaultChecked
-                            className="checkbox"
-                          />
-                          {role.display}
-                        </label>
-                      </div>
-                    );
-                  })}
+                  <div className="flex-1/4">{user.userData.display_name}</div>
+                  <div className="flex gap-2 flex-2/4">
+                    {list_role.map((role) => {
+                      return (
+                        <div
+                          className="tooltip"
+                          data-tip={role.description}
+                          key={role.code + " " + user.userid}
+                        >
+                          <label className="label">
+                            <input type="checkbox" className="checkbox" />
+                            {role.code}
+                          </label>
+                        </div>
+                      );
+                    })}
+                  </div>
+
                   <button
                     onClick={(e) => handleAdd(e.currentTarget.value)}
                     value={user.accountData.code}

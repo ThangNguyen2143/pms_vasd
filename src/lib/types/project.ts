@@ -50,7 +50,8 @@ export type ProjectStakeholderDto = {
   created: string;
 };
 export type ProjectRole = {
-  code: string;
+  code?: string;
+  role_code: string;
   display?: string;
   description?: string;
 };

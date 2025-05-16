@@ -1,5 +1,7 @@
 // components/task/task-row.tsx
 import { Pencil } from "lucide-react";
+import Link from "next/link";
+import { encodeBase64 } from "~/lib/services";
 import { TaskDTO, UserDto, WorkStatus } from "~/lib/types";
 
 interface TaskRowProps {
@@ -27,9 +29,12 @@ export default function TaskRow({ task, users, statusList }: TaskRowProps) {
       </td>
       <td className="px-4 py-2">
         {/* Có thể thêm nút sửa/xoá ở đây */}
-        <button className="btn btn-sm btn-secondary">
+        <Link
+          href={"/tasks/" + encodeBase64({ task_id: task.id })}
+          className="btn btn-sm btn-secondary"
+        >
           <Pencil />
-        </button>
+        </Link>
       </td>
     </tr>
   );

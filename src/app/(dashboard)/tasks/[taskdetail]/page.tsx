@@ -1,13 +1,11 @@
 import { notFound } from "next/navigation";
 import { toast } from "sonner";
-import TaskInfo from "~/components/tasks/task-detail/info-task";
-import TaskAssign from "~/components/tasks/task-detail/task-asgin";
-import TaskComments from "~/components/tasks/task-detail/task-comment";
 import { fetchData } from "~/lib/api-client";
 import { decodeBase64, encodeBase64 } from "~/lib/services";
-import { Comment, Task, TaskDTO, UserDto, WorkStatus } from "~/lib/types";
+import { Comment, Contact, Task, UserDto, WorkStatus } from "~/lib/types";
+import TaskDetailClient from "./task-detail-client";
 async function fetchTaskDetail(task_id: number): Promise<Task> {
-  const res = await fetchData<TaskDTO>({
+  const res = await fetchData<Task>({
     endpoint: "/tasks/detail/" + encodeBase64({ task_id }),
     cache: "default",
   });
@@ -23,14 +21,24 @@ async function fetchTaskDetail(task_id: number): Promise<Task> {
   const statusList = await fetchData<WorkStatus[]>({
     endpoint: "/system/config/eyJ0eXBlIjoidGFza19zdGF0dXMifQ==",
   });
-
+  const asginContactToList = res.value.userAssigns?.map((us) => {
+    const list_contact: Contact[] | undefined = userList.value.find(
+      (s) => s.userid == us.user_id
+    )?.userData.contact;
+    return {
+      ...us,
+      contact: list_contact,
+    };
+  });
   return {
     ...res.value,
-    name_user: userList.value.find((user) => user.userid == res.value.create_by)
-      ?.userData.display_name,
+    user_create_name: userList.value.find(
+      (user) => user.userid == res.value.create_by
+    )?.userData.display_name,
     status_name: statusList.value.find(
       (status) => status.code == res.value.status
     )?.display,
+    userAssigns: asginContactToList,
   } as Task;
 }
 
@@ -50,14 +58,7 @@ async function TaskDetailPage(prop: {
   ) as { task_id: number };
   const task = await fetchTaskDetail(taskdecode.task_id);
   const comments = await fetchComments(taskdecode.task_id);
-  return (
-    <div>
-      <h2>Chi tiết nhiệm vụ</h2>
-      <TaskInfo task={task} />
-      <TaskAssign assignTo={task.name_user} />
-      <TaskComments comments={comments} />
-    </div>
-  );
+  return <TaskDetailClient task={task} comments={comments} />;
 }
 
 export default TaskDetailPage;

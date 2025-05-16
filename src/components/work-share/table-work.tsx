@@ -58,6 +58,7 @@ function TableWork({
           type="radio"
           name="tab_swap"
           className="tab"
+          defaultChecked
           id="overview"
           aria-label="Tổng quan công việc"
         />
