@@ -14,7 +14,7 @@ function TaskComments({
 
   const handleAddComment = () => {
     // API post comment here
-    console.log("Gửi bình luận:", newComment);
+    console.log("Gửi bình luận:", newComment, task_id);
     setNewComment("");
   };
   return (

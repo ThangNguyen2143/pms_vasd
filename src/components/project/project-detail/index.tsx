@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
-import { ProjectDetailDto, ProjectRole, ProjectStatus } from "~/lib/types";
+import { ProjectDetailDto, ProjectRole } from "~/lib/types";
 import ProjectLogs from "./project-logs";
 // import StatProject from "./stat-project";
 import StakeholderList from "./stakeholder-list";
@@ -13,10 +13,10 @@ import { toast } from "sonner";
 import ProjectInfo from "./project-info";
 
 function MainDisplayOnProject({ project_id }: { project_id: number }) {
-  const endpointStatus = "/system/config/eyJ0eXBlIjoicHJvamVjdF9zdGF0dXMifQ==";
+  // const endpointStatus = "/system/config/eyJ0eXBlIjoicHJvamVjdF9zdGF0dXMifQ==";
   const enpointRoles = "/system/config/eyJ0eXBlIjoicHJvamVjdF9yb2xlIn0=";
   const { data, getData: getProject, errorData } = useApi<ProjectDetailDto>();
-  const { data: statusList, getData: getStatus } = useApi<ProjectStatus[]>();
+  // const { data: statusList, getData: getStatus } = useApi<ProjectStatus[]>();
   const {
     data: roleInProject,
     getData: getRoleList,
@@ -26,7 +26,7 @@ function MainDisplayOnProject({ project_id }: { project_id: number }) {
   useEffect(() => {
     const endpoint = "/project/detail/" + encodeBase64({ project_id });
     getProject(endpoint, "reload");
-    getStatus(endpointStatus);
+    // getStatus(endpointStatus);
     getRoleList(enpointRoles);
   }, []);
   if (!data) {

@@ -1,7 +1,8 @@
 "use client";
 import React from "react";
+import { ProjectDetailDto } from "~/lib/types";
 
-export default function ProjectInfo({ info }: { info: any }) {
+export default function ProjectInfo({ info }: { info: ProjectDetailDto }) {
   return (
     <div className="bg-base-200 p-4 rounded-lg shadow">
       <h2 className="text-lg font-bold text-primary border-b pb-2 mb-4">
