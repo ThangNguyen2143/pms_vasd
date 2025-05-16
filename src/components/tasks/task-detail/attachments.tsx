@@ -1,11 +1,11 @@
 "use client";
 import React from "react";
-import { FileTask } from "~/lib/types";
+import { FileDto } from "~/lib/types";
 
 export default function Attachments({
   attachments,
 }: {
-  attachments: FileTask[];
+  attachments: FileDto[];
 }) {
   return (
     <div className="bg-base-200 rounded-lg p-4">
