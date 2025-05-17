@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import { useApiError } from "./use-api-error";
-import { fetchData, createData, updateData } from "~/lib/api-client";
+import {
+  fetchData,
+  createData,
+  updateData,
+  deleteData,
+} from "~/lib/api-client";
 import { DataResponse } from "~/lib/types";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -117,14 +122,50 @@ export function useApi<T, D = any>() {
       setIsLoading(false);
     }
   };
+  const removeData = async (endpoint: string) => {
+    setIsLoading(true);
+    try {
+      const response = await deleteData<T>({ endpoint });
 
+      // Check if the response contains an error code
+      if (response.code != 200) {
+        handleApiError({
+          code: response.code,
+          status: response.status,
+          hint: response.hint || "Error occurred",
+          message: response.message,
+          value: typeof response.value === "string" ? response.value : "",
+        });
+        setData(null);
+        return null;
+      }
+
+      // Success case
+      setData(response.value);
+      return response.value;
+    } catch (error) {
+      console.error("API call failed:", error);
+      handleApiError({
+        code: 500,
+        status: "Error",
+        hint: "Unexpected error",
+        message:
+          error instanceof Error ? error.message : "An unknown error occurred",
+        value: "",
+      });
+      setData(null);
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return {
     data,
     isLoading,
     getData,
     postData,
     putData,
-    // deleteData,
+    removeData,
     errorData,
     isErrorDialogOpen,
     setIsErrorDialogOpen,

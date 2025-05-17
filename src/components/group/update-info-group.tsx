@@ -26,7 +26,7 @@ function UpdateInfoGroup({ group }: { group: GroupInfor }) {
   };
   return (
     <Dialog
-      nameBtn="Sửa thông tin"
+      nameBtn={<>Sửa thông tin</>}
       typeBtn="outline"
       title="Cập nhật thông tin nhóm"
     >

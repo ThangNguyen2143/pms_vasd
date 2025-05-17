@@ -27,7 +27,7 @@ function AddWorkBtn({
   return (
     <Dialog
       title="Thêm công việc mới"
-      nameBtn="Thêm công việc"
+      nameBtn={<>Thêm công việc</>}
       typeBtn="primary"
       sizeBox="sm"
       id="AddWorkBtn"

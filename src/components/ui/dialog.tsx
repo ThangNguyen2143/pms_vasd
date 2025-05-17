@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { ReactElement } from "react";
 
 interface DialogProp {
-  nameBtn: string;
+  nameBtn: ReactElement;
   typeBtn: string;
   title: string;
   id?: string;

@@ -18,7 +18,7 @@ function MainDisplayTask() {
         />
         <p className="text-2xl">Danh sách công việc</p>
         <button className="btn btn-info" onClick={() => setShowModal(true)}>
-          Tạo việc
+          Thêm task
         </button>
       </div>
       <div className="flex flex-row justify-between items-center gap-4">
@@ -40,7 +40,12 @@ function MainDisplayTask() {
       </div>
       <TaskList product_id={selectProduct} key={refreshKey} />
 
-      <dialog className={clsx("modal", showModal ? "modal-open" : "")}>
+      <dialog
+        className={clsx(
+          "modal",
+          showModal && selectProduct != "" ? "modal-open" : ""
+        )}
+      >
         <div className="modal-box">
           <button
             className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
@@ -48,7 +53,7 @@ function MainDisplayTask() {
           >
             ✕
           </button>
-          <h3 className="text-lg">Thêm việc</h3>
+          <h3 className="text-lg">Thêm task</h3>
           <CreateTaskForm
             product_id={selectProduct}
             onSuccess={() => {

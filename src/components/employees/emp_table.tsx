@@ -68,7 +68,7 @@ function TableItem({
             <td key={"-90" + index}>
               {" "}
               <Dialog
-                nameBtn="Chỉnh sửa quyền"
+                nameBtn={<>Chỉnh sửa quyền</>}
                 title="Cấp quyền tài khoản"
                 typeBtn="ghost"
                 key={"ROLE" + index}

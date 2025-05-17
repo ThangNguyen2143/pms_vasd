@@ -1,15 +1,24 @@
+import { Plus } from "lucide-react";
+import { useState } from "react";
 import { ProjectStakeholderDto } from "~/lib/types";
+import AddStakeholderModal from "./modals/add-stakeholder-modal";
 
 function StakeholderList({
+  project_id,
   stakeholder,
 }: {
+  project_id: number;
   stakeholder?: ProjectStakeholderDto[];
 }) {
+  const [showAddStakeholderModal, setShowModal] = useState<boolean>(false);
   return (
     <div className="bg-base-200 p-4 rounded-lg shadow">
-      <h2 className="text-lg font-bold text-primary border-b border-base-content/20 pb-2 mb-4">
-        🤝 Các bên liên quan
-      </h2>
+      <div className="text-primary border-b border-base-content/20 pb-2 mb-4 flex justify-between items-center">
+        <h2 className="text-lg font-bold ">🤝 Các bên liên quan</h2>
+        <button className="btn btn-ghost" onClick={() => setShowModal(true)}>
+          <Plus />
+        </button>
+      </div>
 
       {stakeholder && stakeholder?.length > 0 ? (
         <div className="space-y-3">
@@ -57,6 +66,12 @@ function StakeholderList({
         <p className="italic text-sm text-gray-500">
           Chưa có bên liên quan nào.
         </p>
+      )}
+      {showAddStakeholderModal && (
+        <AddStakeholderModal
+          project_id={project_id}
+          onClose={() => setShowModal(false)}
+        />
       )}
     </div>
   );

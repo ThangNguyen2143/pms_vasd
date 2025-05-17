@@ -40,7 +40,11 @@ function AddMemberBtn({
     }
   };
   return (
-    <Dialog nameBtn="Thêm thành viên" title="Chọn thành viên" typeBtn="primary">
+    <Dialog
+      nameBtn={<>Thêm thành viên</>}
+      title="Chọn thành viên"
+      typeBtn="primary"
+    >
       <label className="input">
         <span className="label">Tìm kiếm</span>
         <input type="text" placeholder="Nhập tên" />

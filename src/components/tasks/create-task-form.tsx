@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 
 function CreateTaskForm({
@@ -24,7 +25,7 @@ function CreateTaskForm({
     };
     const result = await postData("/tasks", data);
     if (result !== null) {
-      alert("Tạo công việc thành công");
+      toast.success("Tạo công việc thành công");
       onSuccess(); // gọi lại TaskList để reload
       setTitle("");
       setDescription("");
@@ -67,7 +68,7 @@ function CreateTaskForm({
         </button>
         <button
           className="btn btn-outline btn-accent"
-          onClick={() => handleReset}
+          onClick={() => handleReset()}
         >
           Làm mới
         </button>

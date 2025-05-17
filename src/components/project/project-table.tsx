@@ -5,18 +5,21 @@ import Link from "next/link";
 import { useEffect } from "react";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
-import { ProjectDto } from "~/lib/types";
+import { ProjectDto, ProjectStatus } from "~/lib/types";
 
 function ProjectTable() {
   const endpointProject = "/project/" + encodeBase64({ type: "all" });
+  const endpointStatus = "/system/config/eyJ0eXBlIjoicHJvamVjdF9zdGF0dXMifQ==";
   const {
     getData: getListProject,
     data: projectList,
     errorData: projectErrorData,
   } = useApi<ProjectDto[]>();
+  const { data: statusList, getData: getStatus } = useApi<ProjectStatus[]>();
   useEffect(() => {
     async function fetchData() {
       await getListProject(endpointProject, "no-cache");
+      await getStatus(endpointStatus);
     }
     fetchData();
   }, []);
@@ -48,7 +51,11 @@ function ProjectTable() {
                   <td>{item.description}</td>
                   <td>{item.start_date}</td>
                   <td>{item.end_date}</td>
-                  <td>{item.status}</td>
+                  <td>
+                    {statusList
+                      ? statusList.find((st) => st.code == item.status)?.display
+                      : item.status}
+                  </td>
                   <td>
                     <Link
                       href={

@@ -6,6 +6,7 @@ import { ProductDto, UserDto } from "~/lib/types";
 import { Activity, Pencil } from "lucide-react";
 import { useEffect, useState } from "react";
 import { deleteData, updateData } from "~/lib/api-client";
+import { toast } from "sonner";
 
 function reshapeData(data: ProductDto[] | null, userData: UserDto[] | null) {
   if (!data || !userData) {
@@ -66,7 +67,7 @@ function ProductTable({ project_id }: { project_id: number }) {
     await putData("/product/status", { id: id_product, status: "active" });
     if (!errorUpdateStatus) getProduct(endpointProduct);
     else {
-      alert("cập nhật trạng thái thất bại");
+      toast.error("cập nhật trạng thái thất bại");
     }
   };
 
