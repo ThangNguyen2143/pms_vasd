@@ -17,7 +17,7 @@ export default function Attachments({
       ) : (
         <ul className="list-disc list-inside space-y-1">
           {attachments.map((file, idx) => (
-            <li key={idx}>{file.file_name}</li>
+            <li key={idx}>{file.fileName}</li>
           ))}
         </ul>
       )}

@@ -1,5 +1,3 @@
-import { FileDto } from "./system";
-
 export type RequirementDto = {
   id: number;
   title: string;
@@ -16,7 +14,7 @@ export type RequirementDetail = Exclude<RequirementDto, "id"> & {
   product_id: string;
   tags: string[];
   requesters: RequestersInfo;
-  requirementFiles: FileDto[];
+  requirementFiles: RequirementFile[];
   requirementLogs: RequirementLog[];
   status: string;
 };
@@ -31,4 +29,31 @@ export type RequirementLog = {
   name: string;
   content: string;
   date: string;
+};
+export type RequirementStatus = {
+  code: string;
+  description: string;
+  allow_transit?: string[];
+};
+export type RequirementType = {
+  code: string;
+  display: string;
+  description: string;
+};
+export type RequirementCritreia = {
+  code: string;
+  title: string;
+  description: string;
+  weight: number;
+  scale: RatingRequired[];
+};
+export type RatingRequired = {
+  code: string;
+  display: string;
+  value: number;
+};
+export type RequirementFile = {
+  file_id: number;
+  file_name: string;
+  file_type: string;
 };

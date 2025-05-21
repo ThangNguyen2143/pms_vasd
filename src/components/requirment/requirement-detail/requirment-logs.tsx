@@ -14,7 +14,7 @@ export default function RequirmentLogs({
       {logs.length > 0 ? (
         logs.map((log) => (
           <div
-            key={log.id}
+            key={log.id + " " + log.date}
             className="bg-base-100 p-3 mb-2 rounded border-l-4 border-info"
           >
             <p>

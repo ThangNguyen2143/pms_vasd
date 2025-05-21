@@ -1,21 +1,76 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
+import { toast } from "sonner";
+import { useApi } from "~/hooks/use-api";
+import { prepareCompressedBase64File } from "~/utils/file-to-base64";
 
 export default function AddAttachmentModal({
   onClose,
+  onUpdate,
+  requirement_id,
 }: {
   onClose: () => void;
+  onUpdate: () => Promise<void>;
+  requirement_id: number;
 }) {
+  const [file, setFile] = useState<File | null>();
+  const { putData, errorData, isLoading } = useApi<
+    "",
+    {
+      id: number;
+      files: {
+        fileName: string;
+        contentType: string;
+        fileData: string; // Base64
+      };
+    }
+  >();
+  const handleAddFile = async () => {
+    if (!file) return;
+    const dataSend = {
+      id: requirement_id,
+      files: await prepareCompressedBase64File(file),
+    };
+    await putData("/requirements/file", dataSend);
+    if (errorData) toast.error(errorData.message);
+    else {
+      toast.success("Xử lý thành công");
+      await onUpdate();
+      onClose();
+    }
+  };
   return (
     <div className="modal modal-open">
       <div className="modal-box">
-        <h3 className="font-bold text-lg">Sửa thông tin yêu cầu</h3>
-        <div className="py-4">Form nhập thông tin (TODO)</div>
+        <h3 className="font-bold text-lg ">Thêm tệp đính kèm</h3>
+
+        <input
+          type="file"
+          className="file-input file-input-primary mt-4"
+          name="fileSend"
+          placeholder="Chọn tệp đính kèm"
+          onChange={(e) =>
+            setFile(
+              e.target.files && e.target.files[0] ? e.target.files[0] : null
+            )
+          }
+        />
+
         <div className="modal-action">
           <button className="btn btn-ghost" onClick={onClose}>
             Đóng
           </button>
-          <button className="btn btn-primary">Lưu</button>
+          <button
+            className="btn btn-primary"
+            onClick={handleAddFile}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <span className="loading loading-spinner"></span>
+            ) : (
+              "Lưu"
+            )}
+          </button>
         </div>
       </div>
     </div>

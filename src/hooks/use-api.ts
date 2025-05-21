@@ -17,10 +17,7 @@ export function useApi<T, D = any>() {
   const { handleApiError, errorData, isErrorDialogOpen, setIsErrorDialogOpen } =
     useApiError();
 
-  const getData = async (
-    endpoint: string,
-    cache: RequestCache = "force-cache"
-  ) => {
+  const getData = async (endpoint: string, cache: RequestCache = "default") => {
     setIsLoading(true);
     try {
       const response = await fetchData<T>({ endpoint, cache });
@@ -162,6 +159,7 @@ export function useApi<T, D = any>() {
   return {
     data,
     isLoading,
+    setData,
     getData,
     postData,
     putData,

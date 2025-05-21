@@ -5,6 +5,7 @@ import { Pencil } from "lucide-react";
 export default function RequesterInfo({
   requester,
   onEdit,
+  location,
 }: {
   requester: {
     requester: string;
@@ -12,6 +13,7 @@ export default function RequesterInfo({
     role: string;
     add_in: string;
   };
+  location?: string;
   onEdit: () => void;
 }) {
   return (
@@ -31,7 +33,8 @@ export default function RequesterInfo({
           <span className="font-bold">Họ tên:</span> {requester.requester}
         </p>
         <p>
-          <span className="font-bold">Đơn vị:</span> #{requester.location_id}
+          <span className="font-bold">Khoa/phòng:</span> #
+          {requester.location_id} {location}
         </p>
         <p>
           <span className="font-bold">Vai trò:</span> {requester.role || "-"}

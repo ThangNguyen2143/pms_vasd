@@ -55,3 +55,10 @@ export type ProjectRole = {
   display?: string;
   description?: string;
 };
+export type ProjectLocation = {
+  id: number;
+  name: string;
+  create_by: number;
+  create_at: string;
+  project_id?: number;
+};

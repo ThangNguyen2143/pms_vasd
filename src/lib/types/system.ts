@@ -27,7 +27,9 @@ export type MenuNav = {
   value: string;
 };
 export type FileDto = {
-  file_id: number;
-  file_name: string;
-  file_type: string;
+  fileName: string;
+  contentType: string;
+  fileData: string;
+  uploadDate: string;
+  upload_by: number;
 };
