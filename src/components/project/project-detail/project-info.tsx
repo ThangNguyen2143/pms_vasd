@@ -1,36 +1,40 @@
 "use client";
-import { Activity, Pencil } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import { Activity, Pencil, X } from "lucide-react";
+import React, { useState } from "react";
 import { ProjectDetailDto, ProjectStatus } from "~/lib/types";
 import UpdateInfoProjectModal from "./modals/update-info-modal";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
+import clsx from "clsx";
+import { status_with_color } from "~/utils/status-with-color";
 
 export default function ProjectInfo({
   info,
   statusList,
+  onUpdate,
 }: {
   info: ProjectDetailDto;
   statusList: ProjectStatus[] | null;
+  onUpdate: () => Promise<void>;
 }) {
   const [showUpdateInfoModal, setShowModal] = useState<boolean>(false);
-  const [statusListShow, setStatusList] = useState<ProjectStatus[]>([]);
-  const [selectStatus, setSelectStatus] = useState("");
+  const [showUpdateStatus, setshowUpdateStatus] = useState(false);
+  const [selectStatus, setSelectStatus] = useState(info.status);
   const { putData, errorData, isLoading } = useApi<
     "",
     { project_id: number; status: string }
   >();
-  useEffect(() => {
-    if (statusList) setStatusList([...statusList]);
-    setSelectStatus(info.status);
-  }, [statusList, info.status]);
   const handlerUpdateStatus = async () => {
     await putData("/project/status", {
       project_id: info.id,
       status: selectStatus,
     });
     if (errorData) toast.error(errorData.message);
-    else toast.success("Cập nhật trạng thái dự án thành công");
+    else {
+      await onUpdate();
+      setshowUpdateStatus(false);
+      toast.success("Cập nhật trạng thái dự án thành công");
+    }
   };
   return (
     <>
@@ -61,6 +65,17 @@ export default function ProjectInfo({
             <span className="font-bold">Kết thúc thực tế:</span>{" "}
             {info.actual_end_date || "-"}
           </p>
+          <p>
+            <span className="font-bold">Trạng thái:</span>
+            <span
+              className={clsx(
+                "badge",
+                `badge-${status_with_color(info.status)}`
+              )}
+            >
+              {statusList?.find((st) => st.code == info.status)?.display}
+            </span>
+          </p>
         </div>
         <div className="flex justify-end gap-1">
           <button
@@ -69,20 +84,26 @@ export default function ProjectInfo({
           >
             <Pencil />
           </button>
-          <div className="collapse w-fit ">
-            <input type="checkbox" />
-            <div className="relative row-start-1 col-start-1 btn btn-outline btn-secondary">
-              <Activity />
-            </div>
-            <div className="collapse-content">
-              <div className="join">
+          <div className="join p-0.75">
+            <label className="join-item swap swap-rotate btn btn-secondary btn-outline">
+              <input
+                type="checkbox"
+                onChange={() => setshowUpdateStatus(!showUpdateStatus)}
+                checked={showUpdateStatus}
+              />
+              <Activity className="swap-off" />
+              <X className="swap-on"></X>
+            </label>
+            {showUpdateStatus && (
+              <>
                 <select
-                  className="select join-item"
+                  className="select join-item max-w-50"
                   onChange={(e) => setSelectStatus(e.target.value)}
                   value={selectStatus}
                 >
-                  {statusListShow.length > 0 &&
-                    statusListShow.map((st) => {
+                  {statusList &&
+                    statusList.length > 0 &&
+                    statusList.map((st) => {
                       if (st.code == info.status)
                         return (
                           <option key={st.code} disabled value={st.code}>
@@ -90,18 +111,14 @@ export default function ProjectInfo({
                           </option>
                         );
                       return (
-                        <option
-                          key={st.code}
-                          value={st.code}
-                          // defaultChecked={st.code == info.status}
-                        >
+                        <option key={st.code} value={st.code}>
                           {st.display}
                         </option>
                       );
                     })}
                 </select>
                 <button
-                  className="btn join-item"
+                  className="btn join-item "
                   onClick={() => handlerUpdateStatus()}
                 >
                   {isLoading ? (
@@ -110,8 +127,8 @@ export default function ProjectInfo({
                     "Cập nhật"
                   )}
                 </button>
-              </div>
-            </div>
+              </>
+            )}
           </div>
         </div>
       </div>

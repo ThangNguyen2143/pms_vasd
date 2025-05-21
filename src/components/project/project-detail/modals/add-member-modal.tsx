@@ -26,8 +26,6 @@ function AddMemberProjectModal({
   onClose: () => void;
   onUpdate: () => Promise<void>;
 }) {
-  const meber: ProjectMemberDto[] = memberGroup || [];
-  const [member, setMember] = useState<ProjectMemberDto[]>(meber);
   const [userSelected, setuserSelected] = useState<number>(0);
   const [roles, setroles] = useState<{ role_code: string }[]>([]);
   const { putData, errorData, isLoading } = useApi<"", AddMemberToProject>();
@@ -45,19 +43,9 @@ function AddMemberProjectModal({
     if (errorData) {
       toast.error(errorData.message);
     } else {
-      toast.success("Thêm thành viên thành công!");
       await onUpdate();
-      setMember([
-        ...member,
-        {
-          id: userSelected,
-          added_by: 0,
-          contacts: [],
-          date_join: Date.now().toString(),
-          name: "",
-          role: [],
-        },
-      ]);
+      toast.success("Thêm thành viên thành công!");
+      onClose();
     }
   };
   return (
@@ -79,7 +67,9 @@ function AddMemberProjectModal({
             {listEmployee ? (
               listEmployee
                 .filter((us) => {
-                  return member.find((mem) => mem.id == us.userid) == undefined;
+                  return (
+                    memberGroup?.find((mem) => mem.id == us.userid) == undefined
+                  );
                 })
                 .map((user) => {
                   return (

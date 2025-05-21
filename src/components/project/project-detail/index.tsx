@@ -69,7 +69,11 @@ function MainDisplayOnProject({ project_id }: { project_id: number }) {
     <div className="p-6 max-w-7xl mx-auto grid md:grid-cols-3 gap-6">
       {/* Left column (2/3 width) */}
       <div className="md:col-span-2 flex flex-col gap-6">
-        <ProjectInfo info={data} statusList={statusList} />
+        <ProjectInfo
+          info={data}
+          statusList={statusList}
+          onUpdate={async () => await fetchDataProject()}
+        />
         <ProjectLogs project_log={data.project_log} />
         <ProjectGroupList
           project_id={data.id}

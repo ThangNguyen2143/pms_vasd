@@ -100,7 +100,7 @@ export default function ProjectMemberList({
           project_id={project_id}
           list_role={list_role}
           onClose={() => setshowModalAdd(false)}
-          onUpdate={onUpdate}
+          onUpdate={async () => await onUpdate()}
         />
       )}
       {updateRoleMember && list_role && (
