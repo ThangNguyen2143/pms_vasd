@@ -1,7 +1,7 @@
 import {
   Bug,
   ChartLine,
-  FolderKanban,
+  FolderSearch,
   ListCheck,
   type LucideIcon,
   NotebookPen,
@@ -23,11 +23,6 @@ export const siteConfig = {
 
 export const navigations: Navigation[] = [
   {
-    icon: FolderKanban,
-    name: "Phần mềm",
-    href: "/products",
-  },
-  {
     icon: Projector,
     name: "Dự án",
     href: "/projects",
@@ -46,6 +41,11 @@ export const navigations: Navigation[] = [
     icon: NotebookPen,
     name: "Ghi nhận yêu cầu",
     href: "/requirements",
+  },
+  {
+    icon: FolderSearch,
+    name: "Test case",
+    href: "/testcase",
   },
   {
     icon: Bug,
