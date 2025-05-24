@@ -20,7 +20,7 @@ interface DataSend {
   assign_to: number;
   deadline: string;
 }
-export default function AssignBugModal({
+export default function ReTestBugAssignModal({
   bug_id,
   onClose,
   onUpdate,
@@ -42,19 +42,24 @@ export default function AssignBugModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const userWithRole = users?.map((us) => ({
-    user_id: us.userid,
-    display:
-      us.userData.display_name + " (" + us.accountData.account_type + ")",
-  }));
+  const userWithRole = users
+    ?.filter(
+      (us) =>
+        us.accountData.account_type == "Support" ||
+        us.accountData.account_type == "Dev"
+    )
+    .map((us) => ({
+      user_id: us.userid,
+      display:
+        us.userData.display_name + " (" + us.accountData.account_type + ")",
+    }));
   const handleSubmit = async () => {
     const data = {
       bug_id,
       assign_to: selectUser,
       deadline,
     };
-    const re = await postData("/bugs/assign", data);
-    console.log(data);
+    const re = await postData("/bugs/retesting", data);
     if (!re) return;
     else {
       const email = re.contact.find((ct) => ct.code == "email")?.value;

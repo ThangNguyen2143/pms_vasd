@@ -3,46 +3,46 @@ import { Pencil, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
-import { Priority } from "~/lib/types";
-interface PriorityProps {
+import { BugSeverity } from "~/lib/types";
+interface SeverityProps {
   bug_id: number;
-  priority: string;
+  severity: string;
   onUpdate: () => Promise<void>;
 }
 
-function UpdatePriorytyComponent({
+function UpdateSeverityComponent({
   bug_id,
-  priority,
+  severity,
   onUpdate,
-}: PriorityProps) {
-  const [selectPriority, setSelectPriority] = useState<string>(priority);
-  const [showUpdatePriority, setshowUpdatePriority] = useState(false);
+}: SeverityProps) {
+  const [selectSeverity, setSelectSeverity] = useState<string>(severity);
+  const [showUpdateSeverity, setshowUpdateSeverity] = useState(false);
   const {
-    data: priorityList,
-    getData: getPriority,
-    errorData: errorPriority,
-  } = useApi<Priority[]>();
+    data: peverityList,
+    getData: getSeverity,
+    errorData: errorSeverity,
+  } = useApi<BugSeverity[]>();
   const { putData, isLoading, errorData } = useApi<
     "",
-    { bug_id: number; priority: string }
+    { bug_id: number; severity: string }
   >();
   useEffect(() => {
-    getPriority("/system/config/eyJ0eXBlIjoicHJpb3JpdHkifQ==", "default");
+    getSeverity("/system/config/eyJ0eXBlIjoiYnVnX3NldmVyaXR5In0=", "default");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {
     if (errorData) toast.error(errorData.message);
   }, [errorData]);
-  const handlerUpdatePriority = async () => {
+  const handlerUpdateSeverity = async () => {
     const dataSend = {
       bug_id,
-      priority: selectPriority,
+      severity: selectSeverity,
     };
-    const re = await putData("/bugs/priority", dataSend);
+    const re = await putData("/bugs/severity", dataSend);
     if (re != "") return;
     else {
       toast.success("Cập nhật mức độ ưu tiên thành công");
-      setshowUpdatePriority(false);
+      setshowUpdateSeverity(false);
       await onUpdate();
     }
   };
@@ -51,24 +51,24 @@ function UpdatePriorytyComponent({
       <label className="join-item swap swap-rotate btn btn-secondary btn-sm btn-ghost">
         <input
           type="checkbox"
-          onChange={() => setshowUpdatePriority(!showUpdatePriority)}
-          checked={showUpdatePriority}
+          onChange={() => setshowUpdateSeverity(!showUpdateSeverity)}
+          checked={showUpdateSeverity}
         />
         <Pencil className="swap-off" />
         <X className="swap-on"></X>
       </label>
-      {showUpdatePriority && (
+      {showUpdateSeverity && (
         <>
           <select
             className="select join-item select-sm max-w-20"
-            onChange={(e) => setSelectPriority(e.target.value)}
-            value={selectPriority}
+            onChange={(e) => setSelectSeverity(e.target.value)}
+            value={selectSeverity}
           >
-            {!errorPriority &&
-              priorityList &&
-              priorityList.length > 0 &&
-              priorityList.map((st) => {
-                if (st.code == priority)
+            {!errorSeverity &&
+              peverityList &&
+              peverityList.length > 0 &&
+              peverityList.map((st) => {
+                if (st.code == severity)
                   return (
                     <option key={st.code} disabled value={st.code}>
                       {st.display}
@@ -83,7 +83,7 @@ function UpdatePriorytyComponent({
           </select>
           <button
             className="btn join-item btn-sm"
-            onClick={() => handlerUpdatePriority()}
+            onClick={() => handlerUpdateSeverity()}
           >
             {isLoading ? (
               <span className="loading loading-spinner loading-xs"></span>
@@ -97,4 +97,4 @@ function UpdatePriorytyComponent({
   );
 }
 
-export default UpdatePriorytyComponent;
+export default UpdateSeverityComponent;

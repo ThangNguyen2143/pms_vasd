@@ -55,7 +55,7 @@ export default function RequirementInfo({
     else {
       toast.success("Cập nhật trạng thái thành công");
       setshowUpdateStatus(false);
-      onUpdate();
+      await onUpdate();
     }
   };
   if (errorStatus) toast.error(errorStatus.message);

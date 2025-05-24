@@ -10,6 +10,7 @@ export type BugDto = {
   dead_line?: string;
 };
 export type BugDetail = {
+  id: number;
   title: string;
   description: string;
   priority: string;
