@@ -8,9 +8,15 @@ interface TaskRowProps {
   task: TaskDTO;
   users: UserDto[];
   statusList: WorkStatus[];
+  product_id: string;
 }
 
-export default function TaskRow({ task, users, statusList }: TaskRowProps) {
+export default function TaskRow({
+  task,
+  users,
+  statusList,
+  product_id,
+}: TaskRowProps) {
   const creator = users.find((u) => u.userid === task.create_by);
   const statusDisplay = statusList.find((s) => s.code === task.status)?.display;
 
@@ -30,7 +36,7 @@ export default function TaskRow({ task, users, statusList }: TaskRowProps) {
       <td className="px-4 py-2">
         {/* Có thể thêm nút sửa/xoá ở đây */}
         <Link
-          href={"/tasks/" + encodeBase64({ task_id: task.id })}
+          href={"/tasks/" + encodeBase64({ task_id: task.id, product_id })}
           className="btn btn-sm btn-secondary"
         >
           <Pencil />

@@ -1,5 +1,5 @@
 import { Contact } from "./account";
-import { FileDto } from "./system";
+import { RequirementFile } from "./requirment";
 
 export type TaskDTO = {
   id: number;
@@ -14,9 +14,10 @@ export type TaskDTO = {
   status: string;
 };
 export type Task = Exclude<TaskDTO, "id"> & {
+  task_id: number;
   taskLogs: TaskLog[];
   userAssigns?: UserAssignsTask[];
-  taskFiles?: FileDto[];
+  taskFiles?: RequirementFile[];
   requirementTasks?: RequirementTask[];
   user_create_name: string;
   product_id: string;
@@ -42,7 +43,7 @@ export type UserAssignsTask = {
   date_end?: string;
   date_start?: string;
   cur_deadLine: string;
-  contact: Contact[];
+  contact?: Contact[];
 };
 
 export type RequirementTask = {

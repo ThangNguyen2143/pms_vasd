@@ -73,6 +73,8 @@ function RequirementsClient() {
   useEffect(() => {
     getUserList("/user/" + encodeBase64({ type: "all" }));
     getProjectJoin("/system/config/eyJ0eXBlIjoicHJvamVjdCJ9", "default");
+    const saved = sessionStorage.getItem("projectSelected");
+    if (saved) setprojectSelect(parseInt(saved));
   }, []);
   useEffect(() => {
     if (projectSelect != 0) {
@@ -111,6 +113,7 @@ function RequirementsClient() {
         });
         if (erroLocation?.code == 404) locationCache[projectSelect] = [];
       }
+      sessionStorage.setItem("projectSelected", projectSelect.toString());
     }
   }, [projectSelect]);
   useEffect(() => {

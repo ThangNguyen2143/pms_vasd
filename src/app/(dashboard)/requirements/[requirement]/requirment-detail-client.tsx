@@ -13,12 +13,15 @@ import EvaluateRequirementModal from "~/components/requirment/modals/evaluate-re
 import {
   ProjectLocation,
   RequirementDetail,
+  RequirementNote,
   RequirementType,
 } from "~/lib/types";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { notFound } from "next/navigation";
 import ErrorMessage from "~/components/ui/error-message";
+import NoteRequirment from "~/components/requirment/requirement-detail/note-requirement";
+import { toast } from "sonner";
 
 export default function RequirementDetailClient({
   requirement_id,
@@ -42,12 +45,28 @@ export default function RequirementDetailClient({
     isErrorDialogOpen,
     setIsErrorDialogOpen,
   } = useApi<RequirementDetail>();
+  const {
+    data: note_requirment,
+    getData: getNote,
+    errorData: errorNote,
+  } = useApi<RequirementNote[]>();
   const updateRequirement = async () => {
     await getRequirement(endpoint, "reload");
   };
+  const updateNote = async () => {
+    await getNote(
+      "/requirements/note/" + encodeBase64({ requirement_id }),
+      "reload"
+    );
+  };
   useEffect(() => {
     getRequirement(endpoint, "default");
+    getNote(
+      "/requirements/note/" + encodeBase64({ requirement_id }),
+      "default"
+    );
   }, []);
+  if (errorNote) if (errorNote.code != 404) toast.error(errorNote.message);
   if (!requirement) {
     if (errorRequired)
       if (errorRequired.code == 404) notFound();
@@ -60,41 +79,54 @@ export default function RequirementDetailClient({
     return <span className="loading loading-infinity loading-xl"></span>;
   } else {
     return (
-      <div className="p-6 max-w-6xl mx-auto grid md:grid-cols-2 gap-6 bg-base-100 rounded-xl shadow mt-2">
-        <div className="md:col-span-2 text-center mb-4">
+      <div className="p-6 max-w-6xl mx-auto flex flex-col md:flex-row gap-6">
+        <div className="w-full text-center mb-4 md:hidden">
           <h2 className="text-2xl font-bold text-primary">
             📝 Chi tiết Yêu cầu Người Dùng
           </h2>
         </div>
-
-        <RequirementInfo
-          info={{
-            ...requirement,
-            type:
-              typeList?.find((type) => type.code == requirement.type)
-                ?.display || requirement.type,
-          }}
-          onEdit={() => setShowEditRequirementModal(true)}
-          onUpdate={async () => await updateRequirement()}
-        />
-        <RequesterInfo
-          requester={requirement.requesters}
-          location={
-            locations.find(
-              (local) => local.id == requirement.requesters.location_id
-            )?.name
-          }
-          onEdit={() => setShowEditRequesterModal(true)}
-        />
-        <Attachments
-          files={requirement.requirementFiles || []}
-          onAdd={() => setShowAddAttachmentModal(true)}
-        />
-        <RequirmentLogs logs={requirement.requirementLogs || []} />
-        <StatusTag
-          onEvaluate={() => setShowEvaluateModal(true)}
-          requirement_id={requirement.id}
-        />
+        <div className="flex flex-1 flex-col gap-6 min-w-0">
+          <div className="hidden md:block">
+            <h2 className="text-2xl font-bold text-primary">
+              📝 Chi tiết Yêu cầu Người Dùng
+            </h2>
+          </div>
+          <RequirementInfo
+            info={{
+              ...requirement,
+              type:
+                typeList?.find((type) => type.code == requirement.type)
+                  ?.display || requirement.type,
+            }}
+            onEdit={() => setShowEditRequirementModal(true)}
+            onUpdate={async () => await updateRequirement()}
+          />
+          <StatusTag
+            onEvaluate={() => setShowEvaluateModal(true)}
+            requirement_id={requirement.id}
+          />
+          <NoteRequirment
+            comments={note_requirment || []}
+            onUpdate={updateNote}
+            requirement_id={requirement_id}
+          />
+        </div>
+        <div className="flex w-full md:w-1/3 flex-col gap-6">
+          <RequesterInfo
+            requester={requirement.requesters}
+            location={
+              locations.find(
+                (local) => local.id == requirement.requesters.location_id
+              )?.name
+            }
+            onEdit={() => setShowEditRequesterModal(true)}
+          />
+          <Attachments
+            files={requirement.requirementFiles || []}
+            onAdd={() => setShowAddAttachmentModal(true)}
+          />
+          <RequirmentLogs logs={requirement.requirementLogs || []} />
+        </div>
 
         {/* MODALS */}
         {showEditRequirementModal && (

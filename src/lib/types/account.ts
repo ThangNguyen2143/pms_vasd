@@ -1,5 +1,5 @@
 export type UserDto = {
-  userid?: number;
+  userid: number;
   userData: {
     display_name: string;
     birthday: string;

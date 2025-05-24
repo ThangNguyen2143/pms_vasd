@@ -33,3 +33,10 @@ export type FileDto = {
   uploadDate: string;
   upload_by: number;
 };
+export type ResopnseInfor = {
+  action: string;
+  list_contacts: {
+    email: string[];
+    telegram: string[];
+  };
+};

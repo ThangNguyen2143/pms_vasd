@@ -1,3 +1,5 @@
+import { RequirementFile } from "./requirment";
+
 export type BugDto = {
   product_id: string;
   bug_id: number;
@@ -22,7 +24,7 @@ export type BugDetail = {
   reporter_name: string;
   reported_at: string;
   assignInfo?: BugAssign;
-  bugFiles: [];
+  bugFiles: RequirementFile[];
   bugLogs: BugLog[];
   status: string;
   reTestingBug: [];
@@ -47,4 +49,11 @@ export type BugSeverity = {
   code: string;
   display: string;
   hint: string;
+};
+export type BugComment = {
+  id: number;
+  comment: string;
+  user_id: number;
+  user_name: string;
+  date: string;
 };

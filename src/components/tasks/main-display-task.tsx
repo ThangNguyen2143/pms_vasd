@@ -16,7 +16,6 @@ function MainDisplayTask() {
           setProductSelect={setSelectProduct}
           productSelected={selectProduct}
         />
-        <p className="text-2xl">Danh sách công việc</p>
         <button className="btn btn-info" onClick={() => setShowModal(true)}>
           Thêm task
         </button>
@@ -46,7 +45,7 @@ function MainDisplayTask() {
           showModal && selectProduct != "" ? "modal-open" : ""
         )}
       >
-        <div className="modal-box">
+        <div className="modal-box w-1/4">
           <button
             className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
             onClick={() => setShowModal(false)}

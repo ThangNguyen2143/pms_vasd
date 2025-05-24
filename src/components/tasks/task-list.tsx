@@ -65,6 +65,7 @@ function TaskList({ product_id, externalTaskCreated }: TaskListProps) {
                 users={userList || []}
                 statusList={statusList || []}
                 key={task.id}
+                product_id={product_id}
               />
             ))
           ) : (

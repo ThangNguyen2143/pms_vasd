@@ -66,7 +66,6 @@ export function useApi<T, D = any>() {
         setData(null);
         return null;
       }
-
       // Success case
       setData(response.value);
       return response.value;

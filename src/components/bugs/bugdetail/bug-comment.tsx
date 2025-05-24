@@ -1,45 +1,53 @@
 "use client";
 import { Send } from "lucide-react";
-import { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
-import { Comment, ResopnseInfor } from "~/lib/types";
+import { BugComment } from "~/lib/types";
 
-function TaskComments({
+interface ResponseNotify {
+  action: string;
+  content: {
+    bug_id: number;
+    bug_name: string;
+    message: string;
+  };
+
+  contact: {
+    email: string;
+    telegram: string;
+  }[];
+}
+export default function BugComments({
+  bug_id,
   comments,
-  task_id,
-  onUpdate,
+  updateComment,
 }: {
-  comments?: Comment[];
-  task_id: number;
-  onUpdate: () => Promise<void>;
+  bug_id: number;
+  comments: BugComment[];
+  updateComment: () => Promise<void>;
 }) {
   const [newComment, setNewComment] = useState("");
   const {
     data: inforNotify,
     postData,
-    isLoading,
     errorData,
-  } = useApi<ResopnseInfor, { task_id: number; content: string }>();
-  useEffect(() => {
-    if (errorData) toast.error(errorData.message);
-  }, [errorData]);
+  } = useApi<ResponseNotify, { bug_id: number; comment: string }>();
   const handleAddComment = async () => {
     // API post comment here
     const data = {
-      task_id,
-      content: newComment,
+      bug_id,
+      comment: newComment,
     };
-    const re = await postData("/tasks/comments", data);
+    postData("/bugs/comments", data);
     console.log("Gửi bình luận:", data);
-    if (!re) return;
+    if (errorData) toast.error(errorData.message);
     else {
       console.log(inforNotify);
-      await onUpdate();
+      await updateComment();
       setNewComment("");
     }
   };
-
   return (
     <div className="bg-base-200 rounded-lg p-4">
       <div className="mt-4">
@@ -52,12 +60,12 @@ function TaskComments({
               return (
                 <div className="chat chat-start" key={comment.id}>
                   {/* <div className="chat-header">
-                    {comment.name}
-                    <time className="text-xs opacity-50">{comment.date}</time>
-                  </div> */}
+                 {comment.name}
+                 <time className="text-xs opacity-50">{comment.date}</time>
+               </div> */}
                   <div className="chat-bubble">
-                    <p className="font-bold text-sm">{comment.name}</p>
-                    <p className="text-lg mt-0.5 mx-2">{comment.content}</p>
+                    <p className="font-bold text-sm">{comment.user_name}</p>
+                    <p className="text-lg mt-0.5 mx-2">{comment.comment}</p>
                   </div>
                   <div className="chat-footer">
                     <time className="text-xs opacity-50">{comment.date}</time>
@@ -89,13 +97,8 @@ function TaskComments({
                 className="btn btn-ghost btn-sm rounded-full"
                 onClick={handleAddComment}
                 aria-label="Gửi"
-                disabled={isLoading}
               >
-                {isLoading ? (
-                  <span className="loading loading-spinner loading-sm"></span>
-                ) : (
-                  <Send />
-                )}
+                <Send />
               </button>
             </div>
           </div>
@@ -104,5 +107,3 @@ function TaskComments({
     </div>
   );
 }
-
-export default TaskComments;

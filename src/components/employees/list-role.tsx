@@ -1,4 +1,5 @@
 "use client";
+import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 import { Contact } from "~/lib/types";
 function roleCheck(item: Contact, roleOwn: Contact[]) {
@@ -39,8 +40,8 @@ function ListofRole({
       else if (group_id)
         await putData("/group/role", { role_code, type: "grant", group_id });
     }
-    if (errorData)
-      window.alert("Lỗi " + errorData.code + " " + errorData.message);
+    if (errorData) toast.error(errorData.message);
+    else toast.success("Xử lý thành công");
   };
   return (
     <div>

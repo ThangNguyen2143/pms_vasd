@@ -57,3 +57,8 @@ export type RequirementFile = {
   file_name: string;
   file_type: string;
 };
+export type RequirementNote = {
+  user_id: number;
+  note: string;
+  date: string;
+};

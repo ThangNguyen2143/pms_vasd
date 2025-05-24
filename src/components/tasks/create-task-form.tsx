@@ -39,25 +39,35 @@ function CreateTaskForm({
   };
   return (
     <div className="flex flex-col gap-2 p-4 rounded-lg">
-      <input
-        className="input input-bordered"
-        type="text"
-        placeholder="Tiêu đề công việc"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-      />
-      <textarea
-        className="textarea textarea-bordered"
-        placeholder="Mô tả công việc"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-      />
-      <input
-        className="input input-bordered"
-        type="datetime-local"
-        value={deadline}
-        onChange={(e) => setDeadline(e.target.value)}
-      />
+      <fieldset className="fieldset">
+        <legend className="fieldset-legend">Tiêu đề</legend>
+        <input
+          className="input input-bordered"
+          type="text"
+          placeholder="Tiêu đề công việc"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
+      </fieldset>
+      <fieldset className="fieldset">
+        <legend className="fieldset-legend">Mô tả</legend>
+        <textarea
+          className="textarea textarea-bordered"
+          placeholder="Mô tả công việc"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+        />
+      </fieldset>
+      <fieldset className="fieldset">
+        <legend className="fieldset-legend">Deadline</legend>
+        <input
+          className="input input-bordered"
+          type="datetime-local"
+          value={deadline}
+          onChange={(e) => setDeadline(e.target.value)}
+        />
+      </fieldset>
+
       <div className="flex justify-between">
         <button
           className="btn btn-primary"
