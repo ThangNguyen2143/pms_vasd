@@ -31,7 +31,10 @@ export default async function middleware(req: NextRequest) {
   }
   // 4. Redirect to /login if the user is not authenticated
   if (!session && !isPublicRoute) {
-    return NextResponse.redirect(new URL("/login", req.nextUrl));
+    const url = req.nextUrl.clone();
+    url.pathname = "/login";
+    url.searchParams.set("callbackUrl", req.nextUrl.pathname);
+    return NextResponse.redirect(url);
   }
   if (role === "Guess" && !guessRoutes.includes(path)) {
     return NextResponse.redirect(new URL(defaultGuessRoute, req.nextUrl));

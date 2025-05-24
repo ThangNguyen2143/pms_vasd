@@ -70,6 +70,15 @@ export async function signIn(state: FormState, formData: FormData) {
   // 5. Redirect user
   redirect("/");
 }
+export async function setMenuRoute() {
+  const nav = await getMenu();
+  const menuRoutes = nav?.map((item) => `/${item.code}`);
+  const cookie = await cookies();
+  cookie.set("menuRoutes", JSON.stringify(menuRoutes), {
+    path: "/",
+    httpOnly: false,
+  });
+}
 export async function logout() {
   deleteSession();
   redirect("/login");

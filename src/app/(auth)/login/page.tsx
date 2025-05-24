@@ -1,6 +1,9 @@
-import SignInForm from "~/components/ui/signin-form";
+import SignInForm from "./signin-form";
+type SearchParams = Promise<{ [key: string]: string | undefined }>;
+async function LoginPage(props: { searchParams: SearchParams }) {
+  const searchParams = await props.searchParams;
+  const callbackurl = searchParams.callbackUrl;
 
-function LoginPage() {
   return (
     <main className="flex flex-col items-center justify-center min-h-screen p-4 bg-base-100">
       <div
@@ -12,7 +15,7 @@ function LoginPage() {
       >
         <div className="hero-overlay"></div>
         <div className="hero-content text-neutral-content text-center">
-          <SignInForm />
+          <SignInForm callbackUrl={callbackurl} />
         </div>
       </div>
     </main>
