@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 import { Contact } from "~/lib/types";
@@ -28,19 +29,39 @@ function ListofRole({
         role_code: string;
       };
   const { putData, isLoading, errorData } = useApi<"", DataSend>();
+  useEffect(() => {
+    if (errorData) toast.error(errorData.message);
+  }, [errorData]);
   const handlerClick = async (role_code: string, isCheck: boolean) => {
+    let re;
     if (!isCheck) {
       if (user_code)
-        await putData("/user/role", { role_code, type: "revoke", user_code });
+        re = await putData("/user/role", {
+          role_code,
+          type: "revoke",
+          user_code,
+        });
       else if (group_id)
-        await putData("/group/role", { role_code, type: "revoke", group_id });
+        re = await putData("/group/role", {
+          role_code,
+          type: "revoke",
+          group_id,
+        });
     } else {
       if (user_code)
-        await putData("/user/role", { role_code, type: "grant", user_code });
+        re = await putData("/user/role", {
+          role_code,
+          type: "grant",
+          user_code,
+        });
       else if (group_id)
-        await putData("/group/role", { role_code, type: "grant", group_id });
+        re = await putData("/group/role", {
+          role_code,
+          type: "grant",
+          group_id,
+        });
     }
-    if (errorData) toast.error(errorData.message);
+    if (re != "") return;
     else toast.success("Xử lý thành công");
   };
   return (

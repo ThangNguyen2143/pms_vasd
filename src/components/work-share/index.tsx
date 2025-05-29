@@ -6,14 +6,25 @@ import TableWork from "./table-work";
 import AddWorkBtn from "./add-work-btn";
 import { encodeBase64 } from "~/lib/services";
 import { useApi } from "~/hooks/use-api";
-import { Priority, WorkStatus, WorkType } from "~/lib/types";
+import { Priority, WorkShareDto, WorkStatus, WorkType } from "~/lib/types";
 
 function MainWork({ role }: { role?: string }) {
   const [projectSelected, setProjectSelect] = useState<number>(0);
   const { data: statusList, getData: getStatusList } = useApi<WorkStatus[]>();
   const { data: priorityList, getData: getPriority } = useApi<Priority[]>();
   const { data: typeWorkList, getData: getTypeWork } = useApi<WorkType[]>();
-
+  const {
+    data: workList,
+    getData: getWorkList,
+    errorData: errorWorkList,
+    isLoading: loadingWork,
+  } = useApi<WorkShareDto[]>();
+  const fetchData = async () => {
+    const endpointWork =
+      "/work/" + encodeBase64({ project_id: projectSelected });
+    await getWorkList(endpointWork, "no-cache");
+  };
+  const isGuess = !role || role == "Guess";
   useEffect(() => {
     // Lấy projectSelected từ localStorage khi component mount
     const saved = sessionStorage.getItem("projectSelected");
@@ -38,6 +49,12 @@ function MainWork({ role }: { role?: string }) {
       sessionStorage.setItem("projectSelected", projectSelected.toString());
     }
   }, [projectSelected]);
+
+  useEffect(() => {
+    const endpointWork =
+      "/work/" + encodeBase64({ project_id: projectSelected });
+    getWorkList(endpointWork, "reload");
+  }, [projectSelected]);
   if (!statusList || !priorityList || !typeWorkList) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -45,6 +62,7 @@ function MainWork({ role }: { role?: string }) {
       </div>
     );
   }
+
   return (
     <div className="mt-4 flex flex-col gap-4 items-center">
       <div className="container flex justify-between gap-2.5">
@@ -52,22 +70,36 @@ function MainWork({ role }: { role?: string }) {
           projectSelected={projectSelected}
           setProjectSelect={setProjectSelect}
         />
-        {role == "Guess" || !role ? (
+        {isGuess ? (
           ""
         ) : (
           <AddWorkBtn
             project_id={projectSelected.toString()}
             priority={priorityList}
             typeWork={typeWorkList}
+            onSuccess={fetchData}
           />
         )}
       </div>
-      <TableWork
-        project_id={projectSelected}
-        priorityList={priorityList}
-        statusList={statusList}
-        role={role}
-      />
+      {workList ? (
+        <TableWork
+          workList={workList}
+          priorityList={priorityList}
+          statusList={statusList}
+          isGuess={isGuess}
+          onUpdate={() => fetchData()}
+        />
+      ) : loadingWork ? (
+        <span className="loading loading-infinity loading-lg"></span>
+      ) : errorWorkList ? (
+        <div className="flex justify-center items-center h-screen">
+          {errorWorkList.message}
+        </div>
+      ) : (
+        <div className="flex justify-center items-center h-screen">
+          Chưa dự án nào được chọn
+        </div>
+      )}
     </div>
   );
 }

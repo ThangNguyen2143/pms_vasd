@@ -18,7 +18,7 @@ function EditStatusModal({
   display: string;
   statusList: WorkStatus[];
   work_id: number;
-  onUpdated?: () => void;
+  onUpdated: () => void;
 }) {
   const [isUpdating, setIsUpdating] = useState(false);
   const { putData, errorData, isErrorDialogOpen, setIsErrorDialogOpen } =
@@ -28,14 +28,15 @@ function EditStatusModal({
     const selectedType = statusList?.find((item) => item.display === dis);
     if (selectedType) {
       setIsUpdating(true);
-      await putData("/work/status", {
+      const re = await putData("/work/status", {
         work_id: work_id,
         status: selectedType.code,
       }); // Replace with your logic to handle the selected type
-      if (!errorData) {
-        onUpdated?.(); // Gọi callback để cập nhật lại danh sách
+      if (re == "") {
+        onUpdated(); // Gọi callback để cập nhật lại danh sách
       } else {
         setIsErrorDialogOpen(true);
+        return;
       }
       setIsUpdating(false);
     }

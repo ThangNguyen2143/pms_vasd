@@ -109,3 +109,60 @@ export async function downloadGzipBase64File({
     URL.revokeObjectURL(url);
   }
 }
+export async function openGzipBase64FileInNewTab({
+  fileName,
+  contentType,
+  fileData,
+}: {
+  fileName: string;
+  contentType?: string;
+  fileData: string;
+}) {
+  if (contentType !== "application/gzip") {
+    // Nếu không phải gzip thì tạo blob và mở tab
+    const byteCharacters = atob(fileData);
+    const byteArrays = [];
+
+    for (let i = 0; i < byteCharacters.length; i += 512) {
+      const slice = byteCharacters.slice(i, i + 512);
+      const byteNumbers = new Array(slice.length)
+        .fill(0)
+        .map((_, idx) => slice.charCodeAt(idx));
+      byteArrays.push(new Uint8Array(byteNumbers));
+    }
+
+    const blob = new Blob(byteArrays, {
+      type: contentType || "application/octet-stream",
+    });
+    const cleanName = fileName.replace(/\.gz$/, ""); // ✅ Loại bỏ đuôi .gz
+    const url = URL.createObjectURL(blob);
+    const newWindow = window.open(url, "_blank");
+
+    // Xử lý tiêu đề tab nếu mở được
+    if (newWindow && fileName) {
+      newWindow.document.title = cleanName;
+    }
+  } else {
+    // Nếu là gzip → giải nén và mở nội dung
+    const byteCharacters = atob(fileData);
+    const byteArray = new Uint8Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteArray[i] = byteCharacters.charCodeAt(i);
+    }
+
+    if (!("DecompressionStream" in window)) {
+      throw new Error("Trình duyệt không hỗ trợ DecompressionStream");
+    }
+
+    const decompressedStream = new Response(
+      new Blob([byteArray])
+        .stream()
+        .pipeThrough(new DecompressionStream("gzip"))
+    );
+
+    const blob = await decompressedStream.blob();
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
+    URL.revokeObjectURL(url);
+  }
+}

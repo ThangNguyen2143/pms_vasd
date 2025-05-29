@@ -1,13 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-import { Pencil } from "lucide-react";
-import Link from "next/link";
-import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { ProjectDto, ProjectStatus } from "~/lib/types";
 
 function ProjectTable() {
+  const [navigatingId, setNavigatingId] = useState<number | null>(null);
+
+  const router = useRouter();
+
   const endpointProject = "/project/" + encodeBase64({ type: "all" });
   const endpointStatus = "/system/config/eyJ0eXBlIjoicHJvamVjdF9zdGF0dXMifQ==";
   const {
@@ -57,20 +60,35 @@ function ProjectTable() {
                       : item.status}
                   </td>
                   <td>
-                    <Link
-                      href={
-                        "/projects/" + encodeBase64({ project_id: item.id })
-                      }
+                    <button
+                      className="btn btn-sm btn-outline btn-primary"
+                      onClick={() => {
+                        setNavigatingId(item.id);
+                        router.push(
+                          "/projects/" + encodeBase64({ project_id: item.id })
+                        );
+                      }}
+                      disabled={navigatingId !== null}
                     >
-                      <Pencil />
-                    </Link>
+                      {navigatingId === item.id ? (
+                        <span className="loading loading-spinner loading-sm" />
+                      ) : (
+                        " Chi Tiết"
+                      )}
+                    </button>
                   </td>
                 </tr>
               );
             })
           ) : (
             <tr>
-              <td colSpan={6}>{projectErrorData?.message}</td>
+              <td colSpan={7} className="text-center py-4">
+                <span className="alert alert-error justify-center">
+                  {projectErrorData?.code == 500
+                    ? "Lỗi server"
+                    : projectErrorData?.message}
+                </span>
+              </td>
             </tr>
           )}
         </tbody>

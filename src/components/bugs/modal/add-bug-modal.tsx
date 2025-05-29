@@ -52,6 +52,9 @@ export default function AddBugModal({
       "force-cache"
     );
   }, []);
+  useEffect(() => {
+    if (errorData) toast.error(errorData.message);
+  }, [errorData]);
   if (!severityList || !priorityList) {
     if (errorSeverity) toast.error(errorSeverity.message);
     if (errorType) toast.error(errorType.message);
@@ -88,10 +91,9 @@ export default function AddBugModal({
       tags,
       severity: severitySelect,
     };
-    console.log(data);
-    await postData("/bugs", data);
+    const re = await postData("/bugs", data);
 
-    if (errorData) toast.error(errorData.message);
+    if (re != "") return;
     else {
       toast.success("Tạo yêu cầu thành công");
       onCreated();

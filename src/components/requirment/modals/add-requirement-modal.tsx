@@ -59,6 +59,9 @@ export default function AddRequirementModal({
       "force-cache"
     );
   }, []);
+  useEffect(() => {
+    if (errorData) toast.error(errorData.message);
+  }, [errorData]);
   if (!typeList) {
     if (errorListType) toast.error(errorListType.message);
     return (
@@ -109,8 +112,8 @@ export default function AddRequirementModal({
       },
     };
 
-    await postData("/requirements", data);
-    if (errorData) toast.error(errorData.message);
+    const re = await postData("/requirements", data);
+    if (re != "") return;
     else {
       toast.success("Tạo yêu cầu thành công");
       await onCreated();

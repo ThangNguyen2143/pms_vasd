@@ -16,7 +16,7 @@ function MainProductTable({ project_id }: { project_id: number }) {
   //   }
   // }, [projectId]);
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-4 p-6 max-w-7xl mx-auto">
       <div className="flex justify-between gap-2">
         <h2 className="text-2xl font-bold">Danh sách phần mềm</h2>
         {/* <LitsProject project_id={projectId} setProjectId={setprojectId} /> */}

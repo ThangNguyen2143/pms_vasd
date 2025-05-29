@@ -1,23 +1,37 @@
 "use client";
-import React from "react";
+import { BadgeInfo } from "lucide-react";
+import React, { useState } from "react";
+import InforTaskRef from "../modal/info-task-ref";
 
 export default function BugLinks({
   taskId,
   testcaseId,
+  task_name,
+  testcase_name,
 }: {
   taskId: number | null;
   testcaseId: number | null;
+  task_name: string | null;
+  testcase_name: string | null;
 }) {
+  const [showTaskModal, setshowTaskModal] = useState(false);
+
   return (
     <div className="bg-base-200 p-4 rounded-lg">
       <h3 className="text-lg font-semibold text-primary mb-2">🔗 Liên kết</h3>
       <div className="space-y-1">
         <p>
           <strong>Task #:</strong>{" "}
-          {taskId ? (
-            <a className="link text-blue-500" href={`/tasks/${taskId}`}>
-              {taskId}
-            </a>
+          {task_name ? (
+            <>
+              {task_name}{" "}
+              <span
+                onClick={() => setshowTaskModal(true)}
+                className="badge badge-info badge-outline"
+              >
+                <BadgeInfo />
+              </span>
+            </>
           ) : (
             <span className="italic text-gray-500">Chưa liên kết</span>
           )}
@@ -26,13 +40,19 @@ export default function BugLinks({
           <strong>TestCase #:</strong>{" "}
           {testcaseId ? (
             <a className="link text-blue-500" href={`/testcases/${testcaseId}`}>
-              {testcaseId}
+              {testcase_name}
             </a>
           ) : (
             <span className="italic text-gray-500">Chưa liên kết</span>
           )}
         </p>
       </div>
+      {showTaskModal && taskId && (
+        <InforTaskRef
+          task_id={taskId}
+          onClose={() => setshowTaskModal(false)}
+        />
+      )}
     </div>
   );
 }

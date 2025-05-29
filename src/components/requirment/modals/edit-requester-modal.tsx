@@ -1,8 +1,7 @@
 "use client";
-import { Plus } from "lucide-react";
-import React, { useState } from "react";
+
+import React, { useEffect, useState } from "react";
 import { ProjectLocation, RequirementDetail } from "~/lib/types";
-import AddLocationModal from "./add-location-modal";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 
@@ -36,8 +35,10 @@ export default function EditRequesterModal({
     requiredInfor.requesters.location_id
   );
   const [role, setRole] = useState(requiredInfor.requesters.role);
-  const [showAddLocationModal, setShowAddLocationModal] = useState(false);
   const { putData, errorData, isLoading } = useApi<"", DataUpdateRequester>();
+  useEffect(() => {
+    if (errorData) toast.error(errorData.message);
+  }, [errorData]);
   const handleSubmit = async () => {
     if (
       nameRequireter == requiredInfor.requesters.requester &&
@@ -56,8 +57,8 @@ export default function EditRequesterModal({
         name: nameRequireter,
       },
     };
-    await putData("/requirements/requester", dataSend);
-    if (errorData) toast.error(errorData.message);
+    const re = await putData("/requirements/requester", dataSend);
+    if (re != "") return;
     else {
       toast.success("Cập nhật thành công");
       await onUpdate();
@@ -70,42 +71,34 @@ export default function EditRequesterModal({
         <div className="modal-box">
           <h3 className="font-bold text-lg">Sửa thông tin người yêu cầu</h3>
           <div className="flex flex-col gap-2 p-4">
-            <div className="join w-full">
-              <label className="select join-item w-full">
-                <span className="label">Khoa/phòng</span>
-                <select
-                  name="division"
-                  value={loacationSelect}
-                  onChange={(e) =>
-                    setLoacationSelect(Number.parseInt(e.target.value))
-                  }
-                >
-                  <option value="" disabled>
-                    Chọn khoa/phòng
-                  </option>
-                  {location.length > 0 ? (
-                    location.map((local) => {
-                      return (
-                        <option
-                          value={local.id}
-                          key={"locationUpdate" + local.id}
-                        >
-                          {local.name}
-                        </option>
-                      );
-                    })
-                  ) : (
-                    <option value="">Chưa có khoa phòng nào</option>
-                  )}
-                </select>
-              </label>
-              <div
-                className="label tooltip join-item btn"
-                data-tip={"Thêm khoa/phòng mới"}
+            <label className="select w-full">
+              <span className="label">Khoa/phòng</span>
+              <select
+                name="division"
+                value={loacationSelect}
+                onChange={(e) =>
+                  setLoacationSelect(Number.parseInt(e.target.value))
+                }
               >
-                <Plus onClick={() => setShowAddLocationModal(true)}></Plus>
-              </div>
-            </div>
+                <option value="" disabled>
+                  Chọn khoa/phòng
+                </option>
+                {location.length > 0 ? (
+                  location.map((local) => {
+                    return (
+                      <option
+                        value={local.id}
+                        key={"locationUpdate" + local.id}
+                      >
+                        {local.name}
+                      </option>
+                    );
+                  })
+                ) : (
+                  <option value="">Chưa có khoa phòng nào</option>
+                )}
+              </select>
+            </label>
 
             <label className="input w-full">
               <span className="label flex-1/3">Người yêu cầu</span>
@@ -148,12 +141,6 @@ export default function EditRequesterModal({
           </div>
         </div>
       </div>
-      {showAddLocationModal && (
-        <AddLocationModal
-          onClose={() => setShowAddLocationModal(false)}
-          project_id={project_id}
-        />
-      )}
     </>
   );
 }

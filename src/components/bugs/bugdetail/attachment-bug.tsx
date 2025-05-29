@@ -1,11 +1,11 @@
 "use client";
-import { Paperclip } from "lucide-react";
+import { ExternalLink, Paperclip } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { FileDto, RequirementFile } from "~/lib/types";
-import { downloadGzipBase64File } from "~/utils/file-to-base64";
+import { openGzipBase64FileInNewTab } from "~/utils/file-to-base64";
 
 export default function BugAttachments({
   files,
@@ -22,7 +22,7 @@ export default function BugAttachments({
 
     const res = await getData("/bugs/file/" + encodeBase64({ file_id }));
     if (res) {
-      await downloadGzipBase64File(res);
+      await openGzipBase64FileInNewTab(res);
     } else {
       toast.error("Tải file thất bại hoặc không tìm thấy file.");
     }
@@ -50,7 +50,7 @@ export default function BugAttachments({
           {files.map((f) => (
             <li
               key={f.file_id}
-              className="file bg-base-100 p-2 rounded border-l-4 border-neutral"
+              className="bg-base-100 p-2 rounded border-l-4 border-neutral flex items-center"
             >
               📎 {f.file_name.replace(".gz", "")}{" "}
               {loadingMap[f.file_id] ? (
@@ -60,7 +60,7 @@ export default function BugAttachments({
                   className="link text-blue-500 hover:underline cursor-pointer"
                   onClick={() => handleDownfile(f.file_id)}
                 >
-                  Tải về
+                  <ExternalLink />
                 </span>
               )}
             </li>

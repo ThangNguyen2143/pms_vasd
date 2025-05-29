@@ -1,8 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useApi } from "~/hooks/use-api";
-import { prepareCompressedBase64File } from "~/utils/file-to-base64";
+import { useUploadFile } from "~/hooks/use-upload-file";
 
 export default function AddAttachmentModal({
   onClose,
@@ -14,31 +13,25 @@ export default function AddAttachmentModal({
   requirement_id: number;
 }) {
   const [file, setFile] = useState<File | null>();
-  const { putData, errorData, isLoading } = useApi<
-    "",
-    {
-      id: number;
-      files: {
-        fileName: string;
-        contentType: string;
-        fileData: string; // Base64
-      };
-    }
-  >();
+
+  const { isUploading, uploadError, uploadFile } = useUploadFile("put");
   const handleAddFile = async () => {
     if (!file) return;
-    const dataSend = {
-      id: requirement_id,
-      files: await prepareCompressedBase64File(file),
-    };
-    await putData("/requirements/file", dataSend);
-    if (errorData) toast.error(errorData.message);
-    else {
-      toast.success("Xử lý thành công");
-      await onUpdate();
-      onClose();
-    }
+    const re = await uploadFile({
+      file,
+      uploadUrl: "/project/requirement/file",
+      meta: { id: requirement_id },
+    });
+    if (re?.value != "") return;
+    await onUpdate();
+    toast.success("Tệp đính kèm đã được thêm thành công");
+    onClose();
   };
+  useEffect(() => {
+    if (uploadError) {
+      toast.error(uploadError);
+    }
+  }, [uploadError]);
   return (
     <div className="modal modal-open">
       <div className="modal-box">
@@ -63,9 +56,9 @@ export default function AddAttachmentModal({
           <button
             className="btn btn-primary"
             onClick={handleAddFile}
-            disabled={isLoading}
+            disabled={isUploading}
           >
-            {isLoading ? (
+            {isUploading ? (
               <span className="loading loading-spinner"></span>
             ) : (
               "Lưu"

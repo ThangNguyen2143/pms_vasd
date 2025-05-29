@@ -72,7 +72,9 @@ function TaskList({ product_id, externalTaskCreated }: TaskListProps) {
             <tr>
               <td colSpan={6} className="text-center py-4">
                 {errorData
-                  ? errorData.message
+                  ? errorData.code === 500
+                    ? "Lỗi máy chủ, vui lòng thử lại sau"
+                    : errorData.message
                   : product_id == ""
                   ? "Chưa chọn phần mềm nào"
                   : "Đang tải..."}

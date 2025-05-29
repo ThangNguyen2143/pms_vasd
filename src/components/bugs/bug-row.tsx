@@ -8,9 +8,10 @@ import { status_with_color } from "~/utils/status-with-color";
 
 interface BugRowProps {
   bug: BugDto;
+  product_id: string;
 }
 
-export default function BugRow({ bug }: BugRowProps) {
+export default function BugRow({ bug, product_id }: BugRowProps) {
   return (
     <tr className="hover:bg-gray-50 dark:hover:bg-gray-700">
       <td className="px-4 py-2">{bug.bug_id}</td>
@@ -28,7 +29,7 @@ export default function BugRow({ bug }: BugRowProps) {
       <td className="px-4 py-2">
         {/* Có thể thêm nút sửa/xoá ở đây */}
         <Link
-          href={"/bugs/" + encodeBase64({ bug_id: bug.bug_id })}
+          href={"/bugs/" + encodeBase64({ bug_id: bug.bug_id, product_id })}
           className="btn btn-sm btn-secondary"
         >
           <Pencil />

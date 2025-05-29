@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { Contact, UserDto } from "~/lib/types";
-import { sendEmail, sendTelegram } from "~/utils/send-notify";
+import { sendEmail } from "~/utils/send-notify";
 
 interface ResponseNotify {
   action: string;
@@ -22,10 +22,12 @@ interface DataSend {
 }
 export default function AssignBugModal({
   bug_id,
+  product_id,
   onClose,
   onUpdate,
 }: {
   bug_id: number;
+  product_id: string;
   onUpdate: () => Promise<void>;
   onClose: () => void;
 }) {
@@ -58,26 +60,27 @@ export default function AssignBugModal({
     if (!re) return;
     else {
       const email = re.contact.find((ct) => ct.code == "email")?.value;
-      const tele = re.contact.find((ct) => ct.code == "telegram")?.value;
+      // const tele = re.contact.find((ct) => ct.code == "telegram")?.value;
       const content = {
         id: re.content.bug_id,
         name: re.content.bug_name,
         massage: re.content.message,
       };
       const link =
-        window.location.origin + "/bugs/" + encodeBase64({ bug_id }) ||
-        "https://pm.vasd.vn/";
+        window.location.origin +
+          "/bugs/" +
+          encodeBase64({ bug_id, product_id }) || "https://pm.vasd.vn/";
       if (email)
         sendEmail(content, email, "Thông báo", link, "bug")
           .then((mes) => toast(mes.message))
           .catch((e) => toast.error(e));
 
-      if (tele)
-        sendTelegram(content, tele, "Thông báo", link, "bug")
-          .then((re) => {
-            toast.success(re.message);
-          })
-          .catch((err) => toast.error(err));
+      // if (tele)
+      //   sendTelegram(content, tele, "Thông báo", link, "bug")
+      //     .then((re) => {
+      //       toast.success(re.message);
+      //     })
+      //     .catch((err) => toast.error(err));
 
       await onUpdate();
       onClose();

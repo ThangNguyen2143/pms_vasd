@@ -5,8 +5,8 @@ import { encodeBase64 } from "~/lib/services";
 import { ProductDto, UserDto } from "~/lib/types";
 import { Activity, Pencil } from "lucide-react";
 import { useEffect, useState } from "react";
-import { deleteData, updateData } from "~/lib/api-client";
 import { toast } from "sonner";
+import UpdateInfoProductModal from "./update-info-product-modal";
 
 function reshapeData(data: ProductDto[] | null, userData: UserDto[] | null) {
   if (!data || !userData) {
@@ -51,10 +51,20 @@ function ProductTable({ project_id }: { project_id: number }) {
     getUser(endpointUser, "reload");
   }, []);
   useEffect(() => {
+    if (errorUpdateStatus) toast.error(errorUpdateStatus.message);
+  }, [errorUpdateStatus]);
+  useEffect(() => {
     if (project_id != 0) {
       getProduct(endpointProduct, "reload");
     }
   }, [project_id]);
+  const onUpdate = async () => {
+    if (selectedProduct) {
+      await getProduct(endpointProduct, "reload");
+      setEditDialogOpen(false);
+      setSelectedProduct(undefined);
+    }
+  };
   if (project_id == 0) {
     return (
       <div className="alert alert-warning">
@@ -64,10 +74,23 @@ function ProductTable({ project_id }: { project_id: number }) {
   }
 
   const handlderClickActive = async (id_product: string) => {
-    await putData("/product/status", { id: id_product, status: "active" });
-    if (!errorUpdateStatus) getProduct(endpointProduct);
-    else {
-      toast.error("cập nhật trạng thái thất bại");
+    const re = await putData("/product/status", {
+      id: id_product,
+      status: "active",
+    });
+    if (re == "") {
+      toast.success("Cập nhật trạng thái thành công");
+      // Reload danh sách sản phẩm sau khi cập nhật
+      await getProduct(endpointProduct, "reload");
+      // Cập nhật trạng thái của sản phẩm trong danh sách hiện tại
+      const updatedProduct = productList?.find(
+        (product) => product.id === id_product
+      );
+      if (updatedProduct) {
+        updatedProduct.status = "active";
+      }
+    } else {
+      return;
     }
   };
 
@@ -113,7 +136,7 @@ function ProductTable({ project_id }: { project_id: number }) {
                 </td>
                 <td className="flex gap-1">
                   <button
-                    className="btn btn-sm btn-outline"
+                    className="btn btn-sm btn-outline btn-primary"
                     onClick={() =>
                       openEditDialog({
                         id: item.id,
@@ -148,102 +171,11 @@ function ProductTable({ project_id }: { project_id: number }) {
         </tbody>
       </table>
       {isEditDialogOpen && selectedProduct && (
-        <dialog className="modal modal-open">
-          <div className="modal-box">
-            <form method="dialog">
-              {/* if there is a button in form, it will close the modal */}
-              <button
-                className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-                onClick={() => setEditDialogOpen(false)}
-              >
-                ✕
-              </button>
-            </form>
-            <h3 className="font-bold text-lg">Chỉnh sửa sản phẩm</h3>
-
-            <form
-              className="flex flex-col gap-3 mt-4 items-center"
-              onSubmit={async (e) => {
-                e.preventDefault();
-                const form = e.target as HTMLFormElement;
-                const name = (
-                  form.elements.namedItem("name") as HTMLInputElement
-                ).value;
-                const description = (
-                  form.elements.namedItem("description") as HTMLInputElement
-                ).value;
-
-                const updateEndpoint = "/product";
-                const updateBody = {
-                  id: selectedProduct.id,
-                  name,
-                  description,
-                };
-
-                const res = await updateData<ProductDto, typeof updateBody>({
-                  endpoint: updateEndpoint,
-                  data: updateBody,
-                });
-
-                if (res.code === 200) {
-                  await getProduct(endpointProduct); // reload danh sách
-                  setEditDialogOpen(false);
-                } else {
-                  alert("Cập nhật thất bại: " + res.message);
-                }
-              }}
-            >
-              <label className="input">
-                <span className="label">Tên sản phẩm</span>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  className=""
-                  defaultValue={selectedProduct.name}
-                  required
-                />
-              </label>
-
-              <label className="input">
-                <span className="label">Mô tả</span>
-                <input
-                  id="description"
-                  name="description"
-                  defaultValue={selectedProduct.description}
-                  required
-                />
-              </label>
-
-              <div className="modal-action flex justify-between w-full">
-                <button type="submit" className="btn btn-primary">
-                  Cập nhật
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-error"
-                  onClick={async () => {
-                    const deleteEndpoint = `/product/${encodeBase64({
-                      id: selectedProduct.id,
-                    })}`;
-                    const res = await deleteData<ProductDto>({
-                      endpoint: deleteEndpoint,
-                    });
-
-                    if (res.code === 200) {
-                      await getProduct(endpointProduct); // reload danh sách... Còn chưa fix
-                      setEditDialogOpen(false);
-                    } else {
-                      alert("Xóa thất bại: " + res.message);
-                    }
-                  }}
-                >
-                  Xóa sản phẩm
-                </button>
-              </div>
-            </form>
-          </div>
-        </dialog>
+        <UpdateInfoProductModal
+          onClose={() => setEditDialogOpen(false)}
+          onUpdate={onUpdate}
+          product={selectedProduct}
+        />
       )}
     </div>
   );

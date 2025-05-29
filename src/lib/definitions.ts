@@ -25,7 +25,7 @@ export const CreateUserSchema = z.object({
   username: z.string().trim().min(1, "Tên tài khoản không được để trống"),
   account_type: z.enum(["Support", "Admin", "Dev"]),
   email: z.string().trim().email("Email không hợp lệ"),
-  telegram: z.string().trim().min(1, "Telegram không được để trống"),
+  telegram: z.string().trim(),
 });
 export type CreateUserState =
   | {

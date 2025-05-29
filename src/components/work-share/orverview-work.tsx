@@ -1,22 +1,38 @@
+// components/OverviewWork.tsx
+"use client";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  Title,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler,
+} from "chart.js";
+import { Bar, Pie, Radar } from "react-chartjs-2";
 import React from "react";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend, Title } from "chart.js";
-import { Pie } from "react-chartjs-2";
 import { Priority, WorkShareDto, WorkStatus } from "~/lib/types";
 
-ChartJS.register(ArcElement, Tooltip, Legend, Title);
+ChartJS.register(
+  ArcElement,
+  Tooltip,
+  Legend,
+  Title,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  RadialLinearScale,
+  PointElement,
+  LineElement,
+  Filler
+);
 
-// export const data = {
-//   labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-//   datasets: [
-//     {
-//       label: "# of Votes",
-//       data: [12, 19, 3, 5, 2, 3],
-//       borderWidth: 1,
-//     },
-//   ],
-// };
-
-function OverviewWork({
+export default function OverviewWork({
   priorityList,
   statusList,
   dataRaw,
@@ -25,70 +41,112 @@ function OverviewWork({
   statusList: WorkStatus[];
   dataRaw: WorkShareDto[] | null;
 }) {
-  const labelsPie = statusList.map((st) => st.display);
-  const dataFeild = priorityList.map((priority) => {
-    let data: number[];
-    if (dataRaw) {
-      const groupPriotity = dataRaw.filter((d) => d.priority == priority.code);
-      data = statusList.map((st) => {
-        return groupPriotity.filter((g) => g.status == st.code).length;
-      });
-    } else data = [];
+  if (!dataRaw) return <p>Không có dữ liệu</p>;
+
+  // === DATA ===
+  const statusLabels = statusList.map((s) => s.display);
+  const priorityLabels = priorityList.map((p) => p.display);
+
+  // Đếm số lượng công việc theo trạng thái
+  const statusCounts = statusList.map(
+    (s) => dataRaw.filter((w) => w.status === s.code).length
+  );
+
+  // Đếm số lượng công việc theo mức độ ưu tiên
+  const priorityCounts = priorityList.map(
+    (p) => dataRaw.filter((w) => w.priority === p.code).length
+  );
+
+  // Biểu đồ radar: mỗi priority là 1 line, theo các status
+  const radarDatasets = priorityList.map((prio) => {
+    const counts = statusList.map(
+      (st) =>
+        dataRaw.filter((w) => w.priority === prio.code && w.status === st.code)
+          .length
+    );
     return {
-      code: priority.code,
-      data,
+      label: prio.display,
+      data: counts,
+      fill: true,
     };
   });
-  const data = (priority_code: string) => {
-    const datafield = dataFeild.find((f) => f.code == priority_code);
-    return {
-      labels: labelsPie,
-      datasets: [
-        {
-          label: "Số lượng: ",
-          data: datafield ? datafield.data : [],
-          backgroundColor: [
-            "rgba(0, 255, 255, 0.2)",
-            "rgba(0, 102, 204, 0.2)",
-            "rgba(255, 51, 51, 0.2)",
-            "rgba(255, 255, 0, 0.2)",
-            "rgba(0, 220, 0, 0.2)",
-            "rgba(160,160,160, 0.2)",
-            "rgba(255, 99, 132, 0.2)",
-          ],
-        },
-      ],
-    };
+
+  // === CHART OPTIONS & DATA ===
+
+  const barData = {
+    labels: statusLabels,
+    datasets: [
+      {
+        label: "Số lượng",
+        data: statusCounts,
+        backgroundColor: "rgba(54, 162, 235, 0.6)",
+      },
+    ],
   };
+
+  const pieData = {
+    labels: priorityLabels,
+    datasets: [
+      {
+        label: "Số lượng",
+        data: priorityCounts,
+        backgroundColor: [
+          "#FF6384",
+          "#FFCE56",
+          "#36A2EB",
+          "#4BC0C0",
+          "#9966FF",
+        ],
+      },
+    ],
+  };
+
+  const radarData = {
+    labels: statusLabels,
+    datasets: radarDatasets,
+  };
+
   return (
-    <div className="container grid grid-cols-5 shadow">
-      {priorityList.map((prio, i) => {
-        const dt = data(prio.code);
-        if (dt.datasets[0].data.length == 0)
-          return (
-            <div className="h-[250px] w-full" key={i + "nochart"}>
-              <p>{prio.display}</p>
-              <p className="text-wrap">
-                Không có công việc nào ở mức độ ưu tiên này
-              </p>
-            </div>
-          );
-        else
-          return (
-            <div className="h-[250px] w-full" key={i + "char"}>
-              <Pie
-                data={dt}
-                options={{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: { title: { text: prio.display, display: true } },
-                }}
-              />
-            </div>
-          );
-      })}
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="h-[300px] w-full">
+        <Bar
+          data={barData}
+          options={{
+            responsive: true,
+            indexAxis: "y",
+            plugins: {
+              title: { display: true, text: "Trạng thái công việc" },
+              legend: { display: false },
+            },
+          }}
+        />
+      </div>
+      <div className="h-[300px] w-full">
+        <Pie
+          data={pieData}
+          options={{
+            responsive: true,
+            plugins: {
+              title: { display: true, text: "Độ ưu tiên" },
+              legend: { position: "right" },
+            },
+          }}
+        />
+      </div>
+      <div className="md:col-span-2 h-[400px] w-full flex justify-center items-center">
+        <Radar
+          data={radarData}
+          options={{
+            responsive: true,
+            plugins: {
+              title: {
+                display: true,
+                text: "Tương quan trạng thái & ưu tiên",
+              },
+            },
+          }}
+        />
+      </div>
     </div>
   );
 }
-
-export default OverviewWork;

@@ -94,7 +94,31 @@ function SelectProject({
     nameProject + " của " + nameProduct
   );
 
-  if (!dataProject) return <div className="alert alert-info">Đang tải...</div>;
+  if (!dataProject) {
+    if (errorData) {
+      if (errorData.code === 401)
+        return <div className="alert alert-warning">Bạn chưa đăng nhập</div>;
+      if (errorData.code === 403)
+        return (
+          <div className="alert alert-warning">Bạn không có quyền truy cập</div>
+        );
+      if (errorData.code === 404)
+        return <div className="alert alert-error">Không tìm thấy dữ liệu</div>;
+      if (errorData.code === 500)
+        return (
+          <div className="alert alert-error">
+            Lỗi máy chủ, vui lòng thử lại sau
+          </div>
+        );
+      return <div className="alert alert-error">{errorData?.message}</div>;
+    }
+    return (
+      <div className="alert alert-info">
+        Đang tải
+        <span className="loading loading-dots loading-sm"></span>
+      </div>
+    );
+  }
   if (errorData?.code !== 200 && !dataProject)
     return <div className="alert alert-error">{errorData?.message}</div>;
 

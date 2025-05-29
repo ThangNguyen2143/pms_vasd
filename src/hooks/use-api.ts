@@ -16,7 +16,13 @@ export function useApi<T, D = any>() {
   const [isLoading, setIsLoading] = useState(false);
   const { handleApiError, errorData, isErrorDialogOpen, setIsErrorDialogOpen } =
     useApiError();
-
+  /**
+   * Lấy dữ liệu từ API
+   * @description This function fetches data from the API and handles errors.
+   * @param endpoint : Đường dẫn API
+   * @param cache : Cache mode for the request (default is "default")
+   * @returns
+   */
   const getData = async (endpoint: string, cache: RequestCache = "default") => {
     setIsLoading(true);
     try {
@@ -54,7 +60,13 @@ export function useApi<T, D = any>() {
       setIsLoading(false);
     }
   };
-
+  /**
+   * @description Hàm này dùng để gửi dữ liệu đến API
+   * @description This function sends data to the API and handles errors.
+   * @param endpoint : Đường dẫn API
+   * @param data
+   * @returns
+   */
   const postData = async (endpoint: string, data: D) => {
     setIsLoading(true);
     try {
@@ -85,8 +97,13 @@ export function useApi<T, D = any>() {
       setIsLoading(false);
     }
   };
-
-  // Add similar methods for putData and deleteData
+  /**
+   * @description Hàm này dùng để cập nhật dữ liệu đến API
+   * @description This function updates data to the API and handles errors.
+   * @param endpoint : Đường dẫn API
+   * @param data
+   * @returns
+   */
   const putData = async (endpoint: string, data: D) => {
     setIsLoading(true);
     try {
@@ -118,6 +135,12 @@ export function useApi<T, D = any>() {
       setIsLoading(false);
     }
   };
+  /**
+   * @description Hàm này dùng để xóa dữ liệu từ API
+   * @description This function removes data from the API and handles errors.
+   * @param endpoint : Đường dẫn API
+   * @returns
+   */
   const removeData = async (endpoint: string) => {
     setIsLoading(true);
     try {

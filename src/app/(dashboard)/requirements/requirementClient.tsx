@@ -158,15 +158,18 @@ function RequirementsClient() {
     }
     getRequiredList(endpoint, "reload");
   };
-
+  const reloadLocation = async () => {
+    await getLocations(
+      "/project/location/" + encodeBase64({ project_id: projectSelect })
+    );
+  };
   return (
     <main className="flex flex-col gap-4 p-4 items-center">
       <h1 className="text-2xl font-bold">Danh sách yêu cầu</h1>
-
       {!projectList && !errorProjectGet ? (
         <span className="loading loading-dots loading-xl"></span>
       ) : (
-        <div className="flex justify-between shadow">
+        <div className="flex justify-between shadow w-full">
           <div className="flex-1 gap-2">
             <select
               name="project"
@@ -265,9 +268,6 @@ function RequirementsClient() {
               >
                 Thêm yêu cầu
               </button>
-              <button className="btn" onClick={() => setShowAddLocation(true)}>
-                Thêm khoa/phòng
-              </button>
             </div>
           </div>
           <div className="container">
@@ -335,12 +335,7 @@ function RequirementsClient() {
       ) : (
         <div className="alert alert-info">Chưa chọn dự án nào</div>
       )}
-      {showAddLocation && (
-        <AddLocationModal
-          project_id={projectSelect}
-          onClose={() => setShowAddLocation(false)}
-        />
-      )}
+
       {showAddRequirment && (
         <AddRequirementModal
           product_list={productList || []}
@@ -348,6 +343,13 @@ function RequirementsClient() {
           onAddNewLocation={() => setShowAddLocation(true)}
           onClose={() => setShowAddRequirment(false)}
           onCreated={() => onLoadRequire()}
+        />
+      )}
+      {showAddLocation && (
+        <AddLocationModal
+          project_id={projectSelect}
+          onClose={() => setShowAddLocation(false)}
+          onUpdate={async () => await reloadLocation()}
         />
       )}
     </main>

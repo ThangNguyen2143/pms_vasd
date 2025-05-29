@@ -8,11 +8,13 @@ export default function TaskInfo({
   onEdit,
   onLinkRequirement,
   onAssign,
+  hidden_button,
 }: {
   task: Task;
   onEdit: () => void;
   onLinkRequirement: () => void;
   onAssign: () => void;
+  hidden_button?: boolean;
 }) {
   return (
     <div className="bg-base-200 rounded-lg p-4">
@@ -20,23 +22,25 @@ export default function TaskInfo({
         <h3 className="text-lg font-semibold text-primary mb-2">
           📝 Thông tin nhiệm vụ
         </h3>
-        <div className="flex gap-2">
-          <div className="tooltip" data-tip="Chỉnh sửa thông tin">
-            <button onClick={onEdit}>
-              <Pencil />
-            </button>
+        {!hidden_button && (
+          <div className="flex gap-2">
+            <div className="tooltip" data-tip="Chỉnh sửa thông tin">
+              <button onClick={onEdit}>
+                <Pencil />
+              </button>
+            </div>
+            <div className="tooltip" data-tip="Đính kèm yêu cầu liên quan">
+              <button onClick={onLinkRequirement}>
+                <Link2 />
+              </button>
+            </div>
+            <div className="tooltip" data-tip="Giao việc">
+              <button onClick={onAssign}>
+                <UserPlus />
+              </button>
+            </div>
           </div>
-          <div className="tooltip" data-tip="Đính kèm yêu cầu liên quan">
-            <button onClick={onLinkRequirement}>
-              <Link2 />
-            </button>
-          </div>
-          <div className="tooltip" data-tip="Giao việc">
-            <button onClick={onAssign}>
-              <UserPlus />
-            </button>
-          </div>
-        </div>
+        )}
       </div>
       <div className="space-y-2">
         <p>

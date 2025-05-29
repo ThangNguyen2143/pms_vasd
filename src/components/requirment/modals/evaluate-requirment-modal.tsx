@@ -35,6 +35,9 @@ export default function EvaluateRequirementModal({
       "force-cache"
     );
   }, []);
+  useEffect(() => {
+    if (errorData) toast.error(errorData.message);
+  }, [errorData]);
   const handleRadioChange = (code: string, value: string) => {
     setSelectedValues((prev) => ({
       ...prev,
@@ -51,8 +54,8 @@ export default function EvaluateRequirementModal({
         })
       ),
     };
-    await postData("/requirements/assessment", dataaa);
-    if (errorData) toast.error(errorData.message);
+    const re = await postData("/requirements/assessment", dataaa);
+    if (re != "") return;
     else {
       toast.success("Đánh giá thành công");
 

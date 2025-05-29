@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-sync-scripts */
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
@@ -35,6 +36,11 @@ export default function RootLayout({
       >
         {children}
         <Toaster position="top-right" richColors />
+        <script src="https://cdn.jsdelivr.net/npm/frappe-gantt/dist/frappe-gantt.umd.js"></script>
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/frappe-gantt/dist/frappe-gantt.css"
+        />
       </body>
     </html>
   );

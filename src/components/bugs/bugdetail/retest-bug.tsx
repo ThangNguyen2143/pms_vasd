@@ -1,13 +1,53 @@
 "use client";
-import React from "react";
+import clsx from "clsx";
+import { CheckCircle } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { useApi } from "~/hooks/use-api";
+import { ReTesingInfo } from "~/lib/types";
 
 export default function ReTestList({
   retests,
   setReTestAssign,
+  bug_id,
+  onUpdate,
 }: {
-  retests: string[];
+  bug_id: number;
+  onUpdate: () => Promise<void>;
+  retests: ReTesingInfo[];
   setReTestAssign: () => void;
 }) {
+  const [confirmDone, setConfirmDone] = useState<string>("");
+  const [retestResult, setRetestResult] = useState(false);
+  const [noteCommit, setNoteCommit] = useState("");
+  const { postData, isLoading, errorData } = useApi<
+    string,
+    { bug_id: number; assign_code: string; note: string; result: boolean }
+  >();
+  const handleConfirmDone = async (
+    code: string,
+    note: string,
+    result: boolean
+  ) => {
+    if (!bug_id) return;
+    const re = await postData("/bugs/retesting/status", {
+      bug_id,
+      note,
+      assign_code: code,
+      result,
+    });
+    if (re != "") return;
+    await onUpdate();
+    setConfirmDone("");
+    setNoteCommit("");
+  };
+  useEffect(() => {
+    if (errorData) {
+      toast.error(
+        "Có lỗi xảy ra khi cập nhật trạng thái: " + errorData.message
+      );
+    }
+  }, [errorData]);
   return (
     <div className="bg-base-200 p-4 rounded-lg">
       <div className="flex justify-between items-center mb-2">
@@ -17,13 +57,86 @@ export default function ReTestList({
         </button>
       </div>
       {retests.length > 0 ? (
-        <ul className="list-disc list-inside">
-          {retests.map((r, idx) => (
-            <li key={idx}>{r}</li>
+        <ul className="list-disc list-inside list">
+          {retests.map((r) => (
+            <li key={r.code} className="list-row p-2">
+              <div className="flex flex-col">
+                <div className="text-sm text-gray-600">{r.assignToName}</div>
+                <div>Hạn chót: {r.deadline}</div>
+              </div>
+              <div>
+                <div
+                  className={clsx(
+                    "badge",
+                    `badge-${r.result ? "success" : "error"}`
+                  )}
+                >
+                  {r.result ? "Đạt" : "Không đạt"}
+                </div>
+                <div className="shadow">{r.note}</div>
+              </div>
+              {!r.note && (
+                <div
+                  className="tooltip tooltip-left"
+                  data-tip="Hoàn tất re-test"
+                >
+                  <button
+                    className="btn"
+                    onClick={() => setConfirmDone(r.code)}
+                  >
+                    <CheckCircle />
+                  </button>
+                </div>
+              )}
+            </li>
           ))}
         </ul>
       ) : (
         <p className="italic text-gray-500">Chưa có lần re-test nào.</p>
+      )}
+      {confirmDone != "" && (
+        <div>
+          {/* Confirm done have 2 field: input to write note and button confirm */}
+          <div className="mb-2">
+            <input
+              type="checkbox"
+              className="checkbox"
+              checked={retestResult}
+              onChange={() => setRetestResult(!retestResult)}
+            />
+            <label className="label cursor-pointer">
+              <span className="label-text">Kết quả phù hợp</span>
+            </label>
+          </div>
+          <div className="mb-2">
+            <label className="label">
+              <span className="label-text">Ghi chú khi kết thúc:</span>
+            </label>
+            <textarea
+              className="textarea textarea-bordered w-full"
+              placeholder="Nhập ghi chú..."
+              value={noteCommit}
+              onChange={(e) => setNoteCommit(e.target.value)}
+            />
+          </div>
+          <div className="flex justify-end">
+            <button
+              className="btn btn-primary mr-2"
+              onClick={() =>
+                handleConfirmDone(confirmDone, noteCommit, retestResult)
+              }
+              disabled={isLoading}
+            >
+              {isLoading ? "Đang xử lý..." : "Xác nhận"}
+            </button>
+            <button
+              className="btn btn-secondary"
+              onClick={() => setConfirmDone("")}
+            >
+              Hủy
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );

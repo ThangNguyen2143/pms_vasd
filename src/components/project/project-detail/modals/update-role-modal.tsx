@@ -1,5 +1,5 @@
 "use clinet";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 import { ProjectMemberDto, ProjectRole } from "~/lib/types";
@@ -25,6 +25,9 @@ function UpdateRoleModal({
 }) {
   const [roles, setroles] = useState<{ role_code: string }[]>([...member.role]);
   const { putData, errorData, isLoading } = useApi<"", UpdateRole>();
+  useEffect(() => {
+    if (errorData) toast.error(errorData.message);
+  }, [errorData]);
   const handlerAddMember = async () => {
     if (roles.length == 0) {
       toast.warning("Hãy chọn vai trò thành viên");
@@ -35,9 +38,9 @@ function UpdateRoleModal({
       user_id: member.id,
       role: roles,
     };
-    await putData("/project/member/role", data);
-    if (errorData) {
-      toast.error(errorData.message);
+    const re = await putData("/project/member/role", data);
+    if (!re) {
+      return;
     } else {
       toast.success("Xử lý thành công");
       await onUpdate();

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
@@ -7,6 +8,7 @@ import { fetchData } from "~/lib/api-client";
 import { AccountType, RoleType, UserDto } from "~/lib/types";
 import Emp_Table from "./emp_table";
 import { toast } from "sonner";
+import { useApi } from "~/hooks/use-api";
 
 const PAGE_SIZE = 10;
 
@@ -50,50 +52,84 @@ async function assignTypeAccountForData(
 }
 
 function EmployeeTab() {
-  const [employees, setEmployees] = useState<any[]>([]);
-  const [typeAccount, setTypeAccount] = useState<AccountType[]>([]);
-  const [roleList, setRoleList] = useState<RoleType[]>([]);
+  const [employees, setEmployees] = useState<UserDto[]>([]);
+  const [enrichedEmployees, setEnrichedEmployees] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const {
+    data: users,
+    getData: getUsers,
+    errorData: errorUser,
+  } = useApi<UserDto[]>();
 
+  const {
+    data: typeUsers,
+    getData: getUserType,
+    errorData: errorType,
+  } = useApi<AccountType[]>();
+  const {
+    data: roleUsers,
+    getData: getUserRole,
+    errorData: errorRole,
+  } = useApi<RoleType[]>();
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        const endpoint = "/user/" + encodeBase64({ type: "all" });
-        const typeEndpoint =
-          "/system/config/" + encodeBase64({ type: "account_type" });
-        const roleEndpoint = "/system/config/eyJ0eXBlIjoicm9sZSJ9";
-
-        const [userRes, typeRes, roleRes] = await Promise.all([
-          fetchData<UserDto[]>({ endpoint, cache: "no-cache" }),
-          fetchData<AccountType[]>({ endpoint: typeEndpoint }),
-          fetchData<RoleType[]>({
-            endpoint: roleEndpoint,
-            cache: "force-cache",
-          }),
-        ]);
-
-        if (userRes.code !== 200)
-          throw new Error("Không lấy được danh sách người dùng");
-        if (typeRes.code !== 200)
-          throw new Error("Không lấy được loại tài khoản");
-        if (roleRes.code !== 200) throw new Error("Không lấy được vai trò");
-
-        setTypeAccount(typeRes.value);
-        setRoleList(roleRes.value);
-
-        const enrichedData = await assignTypeAccountForData(
-          userRes.value,
-          typeRes.value
-        );
-        setEmployees(enrichedData);
-      } catch (err: any) {
-        toast.error("Lỗi khi tải dữ liệu: " + err.message);
-      }
-    };
-
-    loadData();
+    getUsers("/user/" + encodeBase64({ type: "all" }), "reload");
   }, []);
+  useEffect(() => {
+    if (users) {
+      setEmployees(users);
+      getUserType(
+        "/system/config/" + encodeBase64({ type: "account_type" }),
+        "force-cache"
+      );
+      getUserRole("/system/config/eyJ0eXBlIjoicm9sZSJ9", "force-cache");
+    }
+    if (errorUser)
+      toast.error("Lỗi khi tải dữ liệu người dùng: " + errorUser.message);
+  }, []);
+  useEffect(() => {
+    if (users) {
+      const enrichedData = assignTypeAccountForData(users, typeUsers || []);
+      enrichedData.then((data) => {
+        setEmployees(data);
+      });
+    }
+    if (errorUser) {
+      toast.error("Lỗi khi tải dữ liệu người dùng: " + errorUser.message);
+    }
+    if (errorType) {
+      toast.error("Lỗi khi tải loại tài khoản: " + errorType.message);
+    }
+    if (errorRole) {
+      toast.error("Lỗi khi tải vai trò: " + errorRole.message);
+    }
+  }, [users, typeUsers, errorUser, errorType, errorRole]);
+  useEffect(() => {
+    const enrichUsers = async () => {
+      if (!employees.length || !typeUsers || !roleUsers) return;
 
+      const enriched = await Promise.all(
+        employees.map(async (emp) => {
+          const withRoles = await assignRoleForData(emp);
+          return {
+            ...withRoles,
+            accountData: {
+              ...emp.accountData,
+              account_type:
+                typeUsers.find(
+                  (type) => type.code === emp.accountData.account_type
+                )?.display || emp.accountData.account_type,
+            },
+          };
+        })
+      );
+      setEnrichedEmployees(enriched);
+    };
+    enrichUsers();
+
+    if (errorType)
+      toast.error("Lỗi khi tải loại tài khoản: " + errorType.message);
+    if (errorRole) toast.error("Lỗi khi tải vai trò: " + errorRole.message);
+  }, [employees, typeUsers, roleUsers]);
   const fieldTable = [
     { code: "username", sub: "accountData", display: "Khởi tạo" },
     { code: "display_name", sub: "userData", display: "Họ tên" },
@@ -104,8 +140,8 @@ function EmployeeTab() {
   ];
 
   // Pagination logic
-  const totalPages = Math.ceil(employees.length / PAGE_SIZE);
-  const paginatedData = employees.slice(
+  const totalPages = Math.ceil(enrichedEmployees.length / PAGE_SIZE);
+  const paginatedData = enrichedEmployees.slice(
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
   );
@@ -115,8 +151,8 @@ function EmployeeTab() {
       <Emp_Table
         empData={paginatedData}
         feildTable={fieldTable}
-        typeAccount={typeAccount}
-        roleList={roleList}
+        typeAccount={typeUsers || []}
+        roleList={roleUsers || []}
       />
 
       {/* Pagination Controls */}

@@ -36,6 +36,9 @@ function MainProfile({ user_id }: { user_id: number }) {
       setlistContacts(user.userData.contact);
     }
   }, [user]);
+  useEffect(() => {
+    if (errorData) toast.error(errorData.message);
+  }, [errorData]);
   const handleAddContact = () => {
     setlistContacts([...listContacts, { code: "email", value: "" }]);
   };
@@ -62,9 +65,8 @@ function MainProfile({ user_id }: { user_id: number }) {
         contact: listContacts,
       },
     };
-    await putData("/user/info", dataSend);
-    if (!errorData) toast.success("Cập nhật thông tin thành công");
-    else toast.error(errorData.message);
+    const re = await putData("/user/info", dataSend);
+    if (re == "") toast.success("Cập nhật thông tin thành công");
   };
   return (
     <div className="font-sans antialiased text-gray-900 leading-normal tracking-wider bg-cover">

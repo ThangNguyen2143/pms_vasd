@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 import { ProjectMemberDto, ProjectRole, UserDto } from "~/lib/types";
@@ -29,6 +29,9 @@ function AddMemberProjectModal({
   const [userSelected, setuserSelected] = useState<number>(0);
   const [roles, setroles] = useState<{ role_code: string }[]>([]);
   const { putData, errorData, isLoading } = useApi<"", AddMemberToProject>();
+  useEffect(() => {
+    if (errorData) toast.error(errorData.message);
+  }, [errorData]);
   const handlerAddMember = async () => {
     if (roles.length == 0) {
       toast.warning("Hãy chọn vai trò thành viên");
@@ -39,9 +42,9 @@ function AddMemberProjectModal({
       user_id: userSelected,
       role: roles,
     };
-    await putData("/project/member", data);
-    if (errorData) {
-      toast.error(errorData.message);
+    const re = await putData("/project/member", data);
+    if (re != "") {
+      return;
     } else {
       await onUpdate();
       toast.success("Thêm thành viên thành công!");

@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 function UpdateDeadline({
   display,
@@ -22,7 +23,9 @@ function UpdateDeadline({
       setDate(parsed);
     }
   }, [display]);
-
+  useEffect(() => {
+    if (errorData) toast.error(errorData.message);
+  }, [errorData]);
   const parseDisplayToInputFormat = (value: string) => {
     const parts = value.split(/[/\s:]/); // tách theo /, space và :
     if (parts.length < 6) return "";
@@ -35,13 +38,13 @@ function UpdateDeadline({
   const pad = (val: string | number) => String(val).padStart(2, "0");
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    await putData("/work/time", {
+    const re = await putData("/work/time", {
       work_id: work_id,
       deadline: value,
     });
-    if (errorData)
-      alert("Đã có lỗi xảy ra trong quá trình cập nhật deadline công việc");
+    if (re != "") return;
     else {
+      toast.success("Cập nhật thành công");
       onUpdate(value);
       setDate(value);
     }

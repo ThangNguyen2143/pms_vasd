@@ -1,9 +1,7 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { useApi } from "~/hooks/use-api";
-import { prepareCompressedBase64File } from "~/utils/file-to-base64";
-
+import { useUploadFile } from "~/hooks/use-upload-file";
 export default function AddFileAttachmentModal({
   onClose,
   onUpdate,
@@ -14,31 +12,26 @@ export default function AddFileAttachmentModal({
   bug_id: number;
 }) {
   const [file, setFile] = useState<File | null>();
-  const { postData, errorData, isLoading } = useApi<
-    "",
-    {
-      bug_id: number;
-      files: {
-        fileName: string;
-        contentType: string;
-        fileData: string; // Base64
-      };
-    }
-  >();
+
+  const { isUploading, uploadError, uploadFile } = useUploadFile();
+
   const handleAddFile = async () => {
     if (!file) return;
-    const dataSend = {
-      bug_id,
-      files: await prepareCompressedBase64File(file),
-    };
-    await postData("/bugs/file", dataSend);
-    if (errorData) toast.error(errorData.message);
-    else {
-      toast.success("Xử lý thành công");
-      await onUpdate();
-      onClose();
-    }
+    const re = await uploadFile({
+      file,
+      uploadUrl: "/bugs/file",
+      meta: { bug_id },
+    });
+    if (re?.value != "") return;
+    await onUpdate();
+    toast.success("Tệp đính kèm đã được thêm thành công");
+    onClose();
   };
+  useEffect(() => {
+    if (uploadError) {
+      toast.error(uploadError);
+    }
+  }, [uploadError]);
   return (
     <div className="modal modal-open">
       <div className="modal-box">
@@ -63,9 +56,9 @@ export default function AddFileAttachmentModal({
           <button
             className="btn btn-primary"
             onClick={handleAddFile}
-            disabled={isLoading}
+            disabled={isUploading}
           >
-            {isLoading ? (
+            {isUploading ? (
               <span className="loading loading-spinner"></span>
             ) : (
               "Lưu"

@@ -49,13 +49,19 @@ function BugList({ product_id, externalBugCreated }: BugListProps) {
         <tbody>
           {fullBugList.length > 0 ? (
             fullBugList.map((bug) => (
-              <BugRow key={"bug" + bug.bug_id} bug={bug} />
+              <BugRow
+                key={"bug" + bug.bug_id}
+                bug={bug}
+                product_id={product_id}
+              />
             ))
           ) : (
             <tr>
               <td colSpan={6} className="text-center py-4">
                 {errorData
-                  ? errorData.message
+                  ? errorData.code == 500
+                    ? "Lỗi máy chủ"
+                    : errorData.message
                   : product_id == ""
                   ? "Chưa chọn phần mềm nào"
                   : "Đang tải..."}

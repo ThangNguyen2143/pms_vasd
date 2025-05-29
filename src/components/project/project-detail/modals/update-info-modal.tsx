@@ -43,7 +43,7 @@ function UpdateInfoProjectModal({
       end_date: dateEnd,
     };
     const res = await putData("/project", dataSend);
-    if (res) {
+    if (res == "") {
       toast.success("Cập nhật thông tin thành công");
       onClose();
     } else {

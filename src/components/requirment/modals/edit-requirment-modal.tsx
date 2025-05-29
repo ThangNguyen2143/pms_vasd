@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 import { RequirementDetail, RequirementType } from "~/lib/types";
@@ -36,6 +36,9 @@ export default function EditRequirementModal({
   );
   const [newTag, setNewTag] = useState("");
   const { putData, isLoading, errorData } = useApi<"", DataUpdate>();
+  useEffect(() => {
+    if (errorData) toast.error(errorData.message);
+  }, [errorData]);
   const handleAddTag = () => {
     if (newTag.trim() && !tagsChoose.includes(newTag)) {
       settagsChoose((prev) => [...prev, newTag.trim()]);
@@ -57,8 +60,8 @@ export default function EditRequirementModal({
       tags: tagsChoose,
       title,
     };
-    await putData("/requirements/info", data);
-    if (errorData) toast.error(errorData.message);
+    const re = await putData("/requirements/info", data);
+    if (re != "") return;
     else {
       toast.success("Xử lý thành công");
       await onUpdate();

@@ -16,11 +16,18 @@ import clsx from "clsx";
 import { status_with_color } from "~/utils/status-with-color";
 import AssignBugModal from "~/components/bugs/modal/assign-bug-modal";
 import ReTestBugAssignModal from "~/components/bugs/modal/re-test-assign";
+import LinkTaskOrTestToBugModal from "~/components/bugs/modal/ref-update-modal";
 
-function BugDetailClient({ bug_id }: { bug_id: number }) {
+function BugDetailClient({
+  bug_id,
+  product_id,
+}: {
+  bug_id: number;
+  product_id: string;
+}) {
   const [retestAssign, setRetestAssign] = useState(false);
   const [, setShowUpdateModal] = useState(false);
-  const [, setShowLinkModal] = useState(false);
+  const [showLinkModal, setShowLinkModal] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [showAddFile, setShowAddFile] = useState(false);
   const { data: bugData, getData, isLoading, errorData } = useApi<BugDetail>();
@@ -79,6 +86,7 @@ function BugDetailClient({ bug_id }: { bug_id: number }) {
         <div className="md:col-span-2 space-y-6">
           <BugInfo
             bug={bugData}
+            bug_status={bugStatus || []}
             onAssign={() => setShowAssignModal(true)}
             onEdit={() => setShowUpdateModal(true)}
             onLinkRequirement={() => setShowLinkModal(true)}
@@ -98,12 +106,20 @@ function BugDetailClient({ bug_id }: { bug_id: number }) {
         {/* Right side: Links + Assign + Retest + Logs */}
         <div className="space-y-6">
           <BugLinks
-            taskId={bugData.related_task_id}
-            testcaseId={bugData.test_case_ref_id}
+            taskId={bugData.related_task_id || null}
+            testcaseId={bugData.test_case_ref_id || null}
+            task_name={bugData.related_task_name || null}
+            testcase_name={bugData.test_case_ref || null}
           />
-          <AssignBug assignee={bugData.assignInfo || null} />
+          <AssignBug
+            assignee={bugData.assignInfo || null}
+            bug_id={bug_id}
+            onUpdate={reloadDataBug}
+          />
           <ReTestList
             retests={bugData.reTestingBug || []}
+            bug_id={bug_id}
+            onUpdate={reloadDataBug}
             setReTestAssign={() => setRetestAssign(true)}
           />
           <BugLogs logs={bugData.bugLogs || []} />
@@ -120,6 +136,7 @@ function BugDetailClient({ bug_id }: { bug_id: number }) {
       {showAssignModal && (
         <AssignBugModal
           bug_id={bug_id}
+          product_id={product_id}
           onClose={() => setShowAssignModal(false)}
           onUpdate={reloadDataBug}
         />
@@ -129,6 +146,14 @@ function BugDetailClient({ bug_id }: { bug_id: number }) {
           bug_id={bug_id}
           onClose={() => setRetestAssign(false)}
           onUpdate={reloadDataBug}
+        />
+      )}
+      {showLinkModal && (
+        <LinkTaskOrTestToBugModal
+          bug_id={bug_id}
+          onClose={() => setShowLinkModal(false)}
+          onUpdate={reloadDataBug}
+          product_id={product_id}
         />
       )}
     </div>

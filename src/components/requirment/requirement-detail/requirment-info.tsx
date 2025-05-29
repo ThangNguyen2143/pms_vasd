@@ -45,13 +45,16 @@ export default function RequirementInfo({
       "force-cache"
     );
   }, []);
+  useEffect(() => {
+    if (errorData) toast.error(errorData.message);
+  }, [errorData]);
   const handlerUpdateStatus = async () => {
     const dataSend = {
       id: info.id,
       status: selectStatus,
     };
-    await putData("/requirements/status", dataSend);
-    if (errorData) toast.error(errorData.message);
+    const re = await putData("/requirements/status", dataSend);
+    if (re != "") return;
     else {
       toast.success("Cập nhật trạng thái thành công");
       setshowUpdateStatus(false);

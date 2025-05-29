@@ -1,13 +1,9 @@
 "use server";
-import { redirect } from "next/navigation";
 import { createData } from "~/lib/api-client";
-import { CreateWorkSchema, CreateWorkState } from "~/lib/definitions";
+import { CreateWorkSchema } from "~/lib/definitions";
 
 //Handler add new work
-export async function HandlerAddWork(
-  state: CreateWorkState,
-  formData: FormData
-) {
+export async function HandlerAddWork(formData: FormData) {
   const validatedFields = CreateWorkSchema.safeParse({
     title: formData.get("title"),
     priority: formData.get("priority"),
@@ -34,12 +30,14 @@ export async function HandlerAddWork(
   // 4. Handle the response from the API
   if (data.code !== 200) {
     return {
-      message: {
-        message: data.message,
-        hint: "Gợi ý: " + data.hint,
-        code: data.code,
-      },
+      ok: false,
+      message: data.message,
+      code: data.code,
+      hint: data.hint,
     };
   }
-  redirect("/work_share");
+
+  return {
+    ok: true,
+  };
 }

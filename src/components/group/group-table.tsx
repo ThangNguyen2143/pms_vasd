@@ -65,7 +65,7 @@ function TableItem({
     </tr>
   );
 }
-async function Group_Table({
+function Group_Table({
   groupData,
   feildTable,
   typeAccount,

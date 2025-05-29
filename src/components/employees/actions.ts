@@ -7,7 +7,7 @@ import {
   CreateUserSchema,
   CreateUserState,
 } from "~/lib/definitions";
-import { CreateUserDto } from "~/lib/types";
+import { Contact, CreateUserDto } from "~/lib/types";
 
 export async function HandlerAddUser(
   state: CreateUserState,
@@ -27,21 +27,25 @@ export async function HandlerAddUser(
       errors: validatedFields.error.flatten().fieldErrors,
     };
   }
+  const contact: Contact[] = [];
+  if (validatedFields.data.email) {
+    contact.push({
+      code: "email",
+      value: validatedFields.data.email,
+    });
+  }
+  if (validatedFields.data.telegram) {
+    contact.push({
+      code: "telegram",
+      value: validatedFields.data.telegram,
+    });
+  }
   const dataSend: CreateUserDto = {
     userData: {
       display_name: validatedFields.data.display_name,
       birthday: "2000-01-01",
       gender: "male",
-      contact: [
-        {
-          code: "email",
-          value: validatedFields.data.email,
-        },
-        {
-          code: "telegram",
-          value: validatedFields.data.telegram,
-        },
-      ],
+      contact,
     },
     accountData: {
       username: validatedFields.data.username,

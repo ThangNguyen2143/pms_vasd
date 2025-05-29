@@ -1,6 +1,6 @@
 "use client";
 import { Activity, Pencil, X } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ProjectDetailDto, ProjectStatus } from "~/lib/types";
 import UpdateInfoProjectModal from "./modals/update-info-modal";
 import { toast } from "sonner";
@@ -24,12 +24,15 @@ export default function ProjectInfo({
     "",
     { project_id: number; status: string }
   >();
+  useEffect(() => {
+    if (errorData) toast.error(errorData.message);
+  }, [errorData]);
   const handlerUpdateStatus = async () => {
-    await putData("/project/status", {
+    const re = await putData("/project/status", {
       project_id: info.id,
       status: selectStatus,
     });
-    if (errorData) toast.error(errorData.message);
+    if (re != "") return;
     else {
       await onUpdate();
       setshowUpdateStatus(false);

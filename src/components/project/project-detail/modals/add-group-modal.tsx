@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 interface AddGroupData {
@@ -19,7 +19,9 @@ function AddGroupContactModal({
   const [display, setDisplay] = useState<string>("");
   const [idTelegram, setIdTelegram] = useState<string>("");
   const { putData, errorData, isLoading } = useApi<"", AddGroupData>();
-
+  useEffect(() => {
+    if (errorData) toast.error(errorData.message);
+  }, [errorData]);
   const handlerAddGroupContact = async () => {
     const dataSend = {
       project_id,
@@ -28,11 +30,11 @@ function AddGroupContactModal({
       value: idTelegram,
     };
     const res = await putData("/project/contacts", dataSend);
-    if (res) {
+    if (res == "") {
       toast.success("Cập nhật thông tin thành công");
       onClose();
     } else {
-      if (errorData) toast.error(errorData.message);
+      return;
     }
   };
   return (

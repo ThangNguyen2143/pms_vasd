@@ -15,12 +15,12 @@ export type BugDetail = {
   description: string;
   priority: string;
   severity: string;
-  test_case_ref: null;
-  test_case_ref_id: null;
-  related_task_name: null;
-  related_task_id: null;
+  test_case_ref?: string;
+  test_case_ref_id?: number;
+  related_task_name?: string;
+  related_task_id?: number;
   tags: string[];
-  is_update: false;
+  is_update: boolean;
   reported_by: number;
   reporter_name: string;
   reported_at: string;
@@ -28,7 +28,7 @@ export type BugDetail = {
   bugFiles: RequirementFile[];
   bugLogs: BugLog[];
   status: string;
-  reTestingBug: [];
+  reTestingBug: ReTesingInfo[];
 };
 export type BugLog = {
   id: number;
@@ -37,10 +37,14 @@ export type BugLog = {
   date: string;
 };
 export type BugAssign = {
-  id: number;
-  name: string;
-  date_start: string;
-  date_end: string;
+  assigned_to: number;
+  assigned_name: string;
+  time_start: string;
+  deadline: string;
+  resolution_note: string;
+  resolved_at: string;
+  assign_by: number;
+  assign_by_name: string;
 };
 export type BugStatus = {
   code: string;
@@ -57,4 +61,16 @@ export type BugComment = {
   user_id: number;
   user_name: string;
   date: string;
+};
+export type ReTesingInfo = {
+  code: string;
+  assign_to: number;
+  assignToName: string;
+  assignBy: number;
+  assignByName: string;
+  create_at: string;
+  deadline: string;
+  time_end: string;
+  result: string;
+  note: string;
 };

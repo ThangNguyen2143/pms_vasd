@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { Contact, UserAssignsTask, UserDto } from "~/lib/types";
-import { sendEmail, sendTelegram } from "~/utils/send-notify";
+import { sendEmail } from "~/utils/send-notify";
 
 interface ResponseNotify {
   action: string;
@@ -52,7 +52,7 @@ export default function AssignUserModal({
     if (!re) return;
     else {
       const email = re.contact.find((ct) => ct.code == "email")?.value;
-      const tele = re.contact.find((ct) => ct.code == "telegram")?.value;
+      // const tele = re.contact.find((ct) => ct.code == "telegram")?.value;
       const content = {
         id: re.content.task_id,
         name: re.content.task_name,
@@ -65,14 +65,15 @@ export default function AssignUserModal({
         toast(
           (await sendEmail(content, email, "Thông báo", link, "task")).message
         );
-      if (tele)
-        sendTelegram(content, tele, "Thông báo", link, "task")
-          .then((re) => {
-            toast.success(re.message);
-          })
-          .catch((err) => toast.error(err));
+      // if (tele)
+      //   sendTelegram(content, tele, "Thông báo", link, "task")
+      //     .then((re) => {
+      //       toast.success(re.message);
+      //     })
+      //     .catch((err) => toast.error(err));
 
       await onUpdate();
+      toast.success("xử lí thành công");
       onClose();
     }
   };

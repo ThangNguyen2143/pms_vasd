@@ -34,13 +34,13 @@ function GroupTab() {
       display: "Xóa",
     },
   ];
-  if (errorData?.code !== 200) {
-    return <div className="alert alert-error">{errorData?.message}</div>;
+  if (errorData) {
+    return <div className="alert alert-error">{errorData.message}</div>;
   }
-  if (listGroup)
+  if (listGroup) {
     return <Group_Table groupData={listGroup} feildTable={fieldTable} />;
-  else {
-    <progress className="progress w-56"></progress>;
+  } else {
+    return <div className="text-center">Đang tải dữ liệu...</div>;
   }
 }
 export default GroupTab;
