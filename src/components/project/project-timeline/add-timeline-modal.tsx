@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
+import { ProjectTimeLine } from "~/lib/types";
 
 interface CreateTimeLineData {
   project_id: number; //ID dự án (truyền từ component cha)
@@ -10,6 +11,7 @@ interface CreateTimeLineData {
   description: string; //Mô tả công việc
   start_date: string; // Ngầy bắt đầu
   end_date: string; //Ngày kết thúc
+  parent_id?: number;
   weight: number; //Trọng số (Mức độ quan trọng), kiểu Number. Type input range
   tags: string[]; //Nhãn (Để đánh dấu công việc)
 }
@@ -17,10 +19,12 @@ interface CreateTimeLineData {
 export default function CreateTimelineForm({
   projectId,
   phaseId,
+  timelineList,
   onUpdate,
 }: {
   projectId: number;
   phaseId: number;
+  timelineList: ProjectTimeLine[];
   onUpdate: (phase_id: number) => Promise<void>;
 }) {
   const [name, setName] = useState("");
@@ -29,6 +33,7 @@ export default function CreateTimelineForm({
   const [endDate, setEndDate] = useState("");
   const [weight, setWeight] = useState(1);
   const [tags, setTags] = useState<string[]>([]);
+  const [parent, setParent] = useState<number>();
   const { postData, errorData, isLoading } = useApi<
     string,
     CreateTimeLineData
@@ -45,6 +50,7 @@ export default function CreateTimelineForm({
       description,
       start_date: startDate,
       end_date: endDate,
+      parent_id: parent && parent > 0 ? parent : undefined,
       weight,
       tags,
     };
@@ -57,38 +63,23 @@ export default function CreateTimelineForm({
     setStartDate("");
     setEndDate("");
     setWeight(1);
+    setParent(0);
     setTags([]);
   };
 
   return (
     <div className="p-4 border border-dashed rounded-md bg-base-200 mb-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <input
-          type="text"
-          placeholder="Tên công việc"
-          className="input input-bordered w-full"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Mô tả"
-          className="input input-bordered w-full"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        <input
-          type="datetime-local"
-          className="input input-bordered w-full"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-        />
-        <input
-          type="datetime-local"
-          className="input input-bordered w-full"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-        />
+        <label className="floating-label">
+          <span className="label">Tên công việc</span>
+          <input
+            type="text"
+            placeholder="Tên công việc"
+            className="input input-bordered w-full"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </label>
         <div className="flex gap-2 items-center">
           <label className="label">Trọng số:</label>
           <input
@@ -107,14 +98,72 @@ export default function CreateTimelineForm({
             onChange={(e) => setWeight(Number(e.target.value))}
           />
         </div>
-        <input
-          type="text"
-          placeholder="Nhãn (cách nhau bởi dấu phẩy)"
-          className="input input-bordered w-full"
-          onChange={(e) =>
-            setTags(e.target.value.split(",").map((tag) => tag.trim()))
-          }
-        />
+        <div className="md:col-span-2">
+          <label className="floating-label">
+            <span className="label">Mô tả</span>
+            <textarea
+              placeholder="Mô tả"
+              className="textarea textarea-bordered w-full"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </label>
+        </div>
+
+        <label className="floating-label">
+          <span className="label">Ngày bắt đầu</span>
+          <input
+            type="datetime-local"
+            className="input input-bordered w-full"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
+        </label>
+        <label className="floating-label">
+          <span className="label">Ngày kết thúc</span>
+          <input
+            type="datetime-local"
+            className="input input-bordered w-full"
+            placeholder="Ngày kết thúc"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+          />
+        </label>
+
+        <label className="floating-label">
+          <span className="label">Tags</span>
+          <input
+            type="text"
+            placeholder="Nhãn (cách nhau bởi dấu phẩy)"
+            className="input input-bordered w-full"
+            onChange={(e) =>
+              setTags(e.target.value.split(",").map((tag) => tag.trim()))
+            }
+          />
+        </label>
+        <label className="floating-label">
+          <span className="label">Phụ thuộc</span>
+          <select
+            className="select w-full"
+            title="Timeline cha"
+            defaultValue={""}
+            value={parent}
+            onChange={(e) => setParent(parseInt(e.target.value))}
+          >
+            {timelineList && timelineList.length > 0 ? (
+              <>
+                <option value={0}>Chọn timeline phụ thuộc</option>
+                {timelineList.map((tl) => (
+                  <option key={tl.id + "tl_dep" + phaseId} value={tl.id}>
+                    {tl.name}
+                  </option>
+                ))}
+              </>
+            ) : (
+              <option value="">Chưa có timeline nào</option>
+            )}
+          </select>
+        </label>
       </div>
       <button
         className="btn btn-primary mt-4"

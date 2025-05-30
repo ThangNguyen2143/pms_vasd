@@ -130,6 +130,9 @@ function AddPhaseProjectModal({
             value={newTag}
             className="join-item input"
             onChange={(e) => setNewTag(e.target.value)}
+            onKeyUp={(e) => {
+              if (e.key == "Enter") handleAddTag();
+            }}
             placeholder="Nhập thẻ và nhấn nút Thêm"
           />
           <button

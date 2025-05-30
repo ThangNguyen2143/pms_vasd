@@ -29,6 +29,9 @@ export default function GanttChart({ tasks }: GanttChartProps) {
         ganttInstanceRef.current = new Gantt(ganttRef.current, tasks, {
           view_mode: "Day", // 'Quarter Day', 'Half Day', 'Day', 'Week', 'Month'
           date_format: "YYYY-MM-DD",
+          readonly: true,
+          readonly_dates: true,
+          readonly_progress: true,
         });
       }
     }

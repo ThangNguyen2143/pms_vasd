@@ -60,6 +60,7 @@ export interface WorkOverviewDTO {
 }
 export interface GanttDTO {
   id: number;
+  phase_id: number;
   name: string;
   start: string;
   end: string;

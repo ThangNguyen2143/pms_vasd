@@ -94,6 +94,10 @@ export default function TimelineDetailModal({
     });
     if (re != "") return;
     toast.success("Xử lý thành công");
+    await getTimeLine(
+      "/project/timeline/detail/" + encodeBase64({ timeline_id }),
+      "reload"
+    );
     await updateTimeLineData();
   };
   useEffect(() => {

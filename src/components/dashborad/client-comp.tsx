@@ -37,7 +37,9 @@ export function sortAndMapGanttData(data: GanttDTO[]): GanttTask[] {
     });
 
     // Find and attach related timelines
-    const relatedTimelines = timelineList.filter((t) => t.parent === phase.id);
+    const relatedTimelines = timelineList.filter(
+      (t) => t.phase_id === phase.id
+    );
     for (const timeline of relatedTimelines) {
       result.push({
         id: timeline.id.toString() + "tl",
@@ -45,7 +47,7 @@ export function sortAndMapGanttData(data: GanttDTO[]): GanttTask[] {
         start: timeline.start.split("T")[0],
         end: timeline.end.split("T")[0],
         progress: statusToProgress(timeline.status),
-        dependencies: phase.id.toString(),
+        dependencies: timeline.parent?.toString() + "tl",
         custom_class: "gantt-timeline",
       });
     }
@@ -124,8 +126,9 @@ function ClientDashboardPage() {
       </div>
 
       {/* Gantt Chart */}
-      <GanttChart tasks={sortAndMapGanttData(ganttData || [])} />
-
+      <div className="max-h-1/2">
+        <GanttChart tasks={sortAndMapGanttData(ganttData || [])} />
+      </div>
       {/* Overview Table */}
       {overview && <TotalOverviewTable data={overview} />}
 

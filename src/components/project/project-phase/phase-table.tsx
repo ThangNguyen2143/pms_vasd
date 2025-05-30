@@ -139,6 +139,7 @@ function PhaseProjectTable({
                     projectId={project_id}
                     phaseId={phase.id}
                     onUpdate={() => updateTimeLineData(phase.id)}
+                    timelineList={listTimeLine[phase.id]}
                   />
                 )}
                 {/* Chèn component timeline tại đây */}
@@ -169,6 +170,16 @@ function PhaseProjectTable({
                             {item.weight}
                           </div>
                           <div className="text-sm">{item.status}</div>
+                          {item.parent_id && (
+                            <div className="text-sm italic">
+                              Phụ thuộc:{" "}
+                              {
+                                listTimeLine[phase.id].find(
+                                  (tl) => tl.id == item.parent_id
+                                )?.name
+                              }
+                            </div>
+                          )}
                         </div>
                         <div className="p-2">
                           <button
