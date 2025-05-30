@@ -99,6 +99,7 @@ function BugDetailClient({
           <BugComments
             comments={bugcomments || []}
             bug_id={bug_id}
+            product_id={product_id}
             updateComment={async () => await reloadComment()}
           />
         </div>

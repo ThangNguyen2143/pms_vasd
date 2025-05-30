@@ -42,7 +42,6 @@ export default function SignInForm({ callbackUrl }: { callbackUrl?: string }) {
       endpoint: "/user/login",
       data: JSON.stringify(dataSend),
     });
-    console.log(postResponse);
     if (postResponse.code == 401) toast.info(postResponse.message);
     if (postResponse.code != 200 && postResponse.code != 401)
       toast.error(postResponse.message);

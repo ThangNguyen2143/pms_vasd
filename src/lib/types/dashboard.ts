@@ -37,6 +37,13 @@ export interface summaryTesecase {
   assigned: number;
   done: number;
 }
+export interface progressPercent {
+  phase_id: number;
+  phase_name: string;
+  start_date: string;
+  end_date: string;
+  progress_percent: number;
+}
 export interface OverviewDTO {
   project_name: string;
   start_date: string;
@@ -49,6 +56,7 @@ export interface OverviewDTO {
   bug_summary: summaryBug;
   testcase_summary: summaryTesecase;
   timeline_summary: summaryTimeline;
+  propress_percent: progressPercent[];
 }
 export interface WorkOverviewDTO {
   user_id: number;

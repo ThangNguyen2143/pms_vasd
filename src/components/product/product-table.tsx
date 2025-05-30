@@ -134,7 +134,7 @@ function ProductTable({ project_id }: { project_id: number }) {
                     </span>
                   )}
                 </td>
-                <td className="flex gap-1">
+                <td className="flex gap-1 justify-center items-center">
                   <button
                     className="btn btn-sm btn-outline btn-primary"
                     onClick={() =>

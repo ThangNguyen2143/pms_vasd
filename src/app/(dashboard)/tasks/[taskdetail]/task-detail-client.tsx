@@ -18,6 +18,7 @@ import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { Comment, Task, UserDto, WorkStatus } from "~/lib/types";
 import { status_with_color } from "~/utils/status-with-color";
+import TaskLinks from "~/components/tasks/task-detail/task-link";
 
 export default function TaskDetailClient({
   task_id,
@@ -128,14 +129,14 @@ export default function TaskDetailClient({
           />
           <TaskComments
             comments={comments || undefined}
-            task_id={task_id}
+            task={task}
             onUpdate={reloadComment}
           />
         </div>
 
         {/* Right Section */}
         <div className="space-y-6">
-          {/* Add cái link ref here */}
+          <TaskLinks task_id={task_id} />
           <TaskAssign
             assignTo={userAssignsWithContact}
             task_id={task_id}

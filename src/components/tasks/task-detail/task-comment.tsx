@@ -3,38 +3,57 @@ import { Send } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
-import { Comment, ResopnseInfor } from "~/lib/types";
+import { encodeBase64 } from "~/lib/services";
+import { Comment, ResopnseInfor, Task } from "~/lib/types";
+import { sendEmail } from "~/utils/send-notify";
 
 function TaskComments({
   comments,
-  task_id,
+  task,
   onUpdate,
 }: {
   comments?: Comment[];
-  task_id: number;
+  task: Task;
   onUpdate: () => Promise<void>;
 }) {
   const [newComment, setNewComment] = useState("");
-  const {
-    data: inforNotify,
-    postData,
-    isLoading,
-    errorData,
-  } = useApi<ResopnseInfor, { task_id: number; content: string }>();
+  const { postData, isLoading, errorData } = useApi<
+    ResopnseInfor,
+    { task_id: number; content: string }
+  >();
+
   useEffect(() => {
     if (errorData) toast.error(errorData.message);
   }, [errorData]);
   const handleAddComment = async () => {
     // API post comment here
     const data = {
-      task_id,
+      task_id: task.task_id,
       content: newComment,
     };
     const re = await postData("/tasks/comments", data);
-    console.log("Gửi bình luận:", data);
     if (!re) return;
     else {
-      console.log(inforNotify);
+      const email = re.list_contacts.email;
+      // const tele = re.contact.find((ct) => ct.code == "telegram")?.value;
+      const content = {
+        id: task.task_id,
+        name: task.title,
+        massage: "Có bình luận mới",
+      };
+      const link =
+        window.location.origin +
+          "/tasks/" +
+          encodeBase64({
+            task_id: task.task_id,
+            product_id: task.product_id,
+          }) || "https://pm.vasd.vn/";
+      if (email.length > 0)
+        email.forEach((e) =>
+          sendEmail(content, e, "Thông báo comment mới", link, "task")
+            .then((mes) => toast(mes.message))
+            .catch((e) => toast.error(e))
+        );
       await onUpdate();
       setNewComment("");
     }

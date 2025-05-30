@@ -117,7 +117,7 @@ function DetailPhase({
               ))}
             </p>
             {/* Action as update status, add file attachment, update info*/}
-            <div className="mt-4 mr-3 flex justify-end gap-2">
+            <div className="mt-4 mr-3 flex justify-end gap-2 flex-col sm:flex-row">
               <UpdateStatusPhaseComponent
                 onUpdate={reloadData}
                 phase_id={phase_id}

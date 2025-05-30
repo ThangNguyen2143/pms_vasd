@@ -56,7 +56,6 @@ export default function AssignBugModal({
       deadline,
     };
     const re = await postData("/bugs/assign", data);
-    console.log(data);
     if (!re) return;
     else {
       const email = re.contact.find((ct) => ct.code == "email")?.value;

@@ -30,6 +30,9 @@ export default function NoteRequirment({
       toast.error(errorData.message);
     }
   }, []);
+  useEffect(() => {
+    if (errorNote) toast.error(errorNote.message);
+  }, [errorNote]);
   const userList = users?.map((us) => ({
     id: us.userid,
     name: us.userData.display_name,
@@ -39,10 +42,9 @@ export default function NoteRequirment({
       requirement_id,
       note: newComment,
     };
-    postNote("/requirements/note", data);
-    if (errorNote) {
-      toast.error(errorNote.message);
-      console.log(errorNote);
+    const re = await postNote("/requirements/note", data);
+    if (re != "") {
+      return;
     } else {
       await onUpdate();
       setNewComment("");

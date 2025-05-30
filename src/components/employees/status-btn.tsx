@@ -1,6 +1,7 @@
 "use client";
 import { Lock, LockOpen } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { updateData } from "~/lib/api-client";
 type statusDto = {
   id: number;
@@ -23,11 +24,10 @@ function StatusBtn({
         isActive: !isLocked,
       },
     });
-    console.log(res);
     if (res.code === 200) {
       route.refresh();
     } else {
-      console.error("Failed to update status");
+      toast.error("Failed to update status");
     }
   };
   if (isLocked)

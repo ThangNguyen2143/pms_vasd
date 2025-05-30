@@ -54,10 +54,10 @@ export default function CreateTimelineForm({
       weight,
       tags,
     };
-    console.log(timelineData);
     const re = await postData("/project/timeline", timelineData);
     if (re != "") return;
     await onUpdate(phaseId);
+    toast.success("Xử lý thành công");
     setName("");
     setDescription("");
     setStartDate("");

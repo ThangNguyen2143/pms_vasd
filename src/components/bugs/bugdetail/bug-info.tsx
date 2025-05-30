@@ -29,6 +29,7 @@ export default function BugInfo({
   onLinkRequirement,
   onAssign,
   onUpdate,
+  hiddenButton,
 }: {
   bug: BugInfoProps["bug"];
   bug_status: BugStatus[];
@@ -36,6 +37,7 @@ export default function BugInfo({
   onLinkRequirement: () => void;
   onAssign: () => void;
   onUpdate: () => Promise<void>;
+  hiddenButton?: boolean;
 }) {
   const [selectStatus, setSelectStatus] = useState<string>(bug.status);
   const { putData, isLoading, errorData } = useApi<
@@ -69,57 +71,66 @@ export default function BugInfo({
     <div className="bg-base-200 p-4 rounded-lg">
       <div className="flex justify-between items-center mb-2">
         <h2 className="text-lg font-bold text-primary">🐞 Thông tin Bug</h2>
-        <div className="flex gap-2">
-          <div className="tooltip" data-tip="Chỉnh sửa thông tin">
-            <button onClick={onEdit}>
-              <Pencil />
-            </button>
-          </div>
-          <div className="tooltip" data-tip="Liên kết task, testcase liên quan">
-            <button onClick={onLinkRequirement}>
-              <Link2 />
-            </button>
-          </div>
-          <div className="tooltip" data-tip="Giao việc">
-            <button onClick={onAssign}>
-              <UserPlus />
-            </button>
-          </div>
-          <div className="join">
-            <div className="select join-item select-sm" data-tip="Bug hợp lệ">
-              <select
-                name=""
-                id=""
-                value={selectStatus}
-                onChange={(e) => setSelectStatus(e.target.value)}
-              >
-                <option value="" disabled>
-                  Chọn trạng thái
-                </option>
-                {bug_status.map((status) => (
-                  <option
-                    key={status.code}
-                    value={status.code}
-                    className={`${
-                      status.code === bug.status ? "bg-primary text-white" : ""
-                    }`}
-                    disabled={status.code === bug.status}
-                  >
-                    {status.description}
-                  </option>
-                ))}
-              </select>
+        {!hiddenButton ? (
+          <div className="flex gap-2">
+            <div className="tooltip" data-tip="Chỉnh sửa thông tin">
+              <button onClick={onEdit}>
+                <Pencil />
+              </button>
             </div>
-            <button
-              className="tooltip join-item btn btn-sm"
-              data-tip="Bug không hợp lệ"
-              onClick={handleStatusChange}
-              disabled={isLoading || selectStatus === bug.status}
+            <div
+              className="tooltip"
+              data-tip="Liên kết task, testcase liên quan"
             >
-              Cập nhật
-            </button>
+              <button onClick={onLinkRequirement}>
+                <Link2 />
+              </button>
+            </div>
+            <div className="tooltip" data-tip="Giao việc">
+              <button onClick={onAssign}>
+                <UserPlus />
+              </button>
+            </div>
+            <div className="join">
+              <div className="select join-item select-sm" data-tip="Bug hợp lệ">
+                <select
+                  name=""
+                  id=""
+                  value={selectStatus}
+                  onChange={(e) => setSelectStatus(e.target.value)}
+                >
+                  <option value="" disabled>
+                    Chọn trạng thái
+                  </option>
+                  {bug_status.map((status) => (
+                    <option
+                      key={status.code}
+                      value={status.code}
+                      className={`${
+                        status.code === bug.status
+                          ? "bg-primary text-white"
+                          : ""
+                      }`}
+                      disabled={status.code === bug.status}
+                    >
+                      {status.description}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <button
+                className="tooltip join-item btn btn-sm"
+                data-tip="Bug không hợp lệ"
+                onClick={handleStatusChange}
+                disabled={isLoading || selectStatus === bug.status}
+              >
+                Cập nhật
+              </button>
+            </div>
           </div>
-        </div>
+        ) : (
+          ""
+        )}
       </div>
 
       <div className="space-y-2">
@@ -133,21 +144,29 @@ export default function BugInfo({
           <p>
             <strong>Ưu tiên:</strong> {bug.priority}
           </p>
-          <UpdatePriorytyComponent
-            bug_id={bug.id}
-            onUpdate={onUpdate}
-            priority={bug.priority}
-          />
+          {hiddenButton ? (
+            ""
+          ) : (
+            <UpdatePriorytyComponent
+              bug_id={bug.id}
+              onUpdate={onUpdate}
+              priority={bug.priority}
+            />
+          )}
         </div>
         <div className="flex gap-2">
           <p>
             <strong>Ảnh hưởng:</strong> {bug.severity}
           </p>
-          <UpdateSeverityComponent
-            bug_id={bug.id}
-            onUpdate={onUpdate}
-            severity={bug.severity}
-          />
+          {hiddenButton ? (
+            ""
+          ) : (
+            <UpdateSeverityComponent
+              bug_id={bug.id}
+              onUpdate={onUpdate}
+              severity={bug.severity}
+            />
+          )}
         </div>
 
         <p>

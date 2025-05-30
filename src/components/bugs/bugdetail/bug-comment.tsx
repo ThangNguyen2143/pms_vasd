@@ -1,9 +1,11 @@
 "use client";
 import { Send } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
-import { BugComment } from "~/lib/types";
+import { encodeBase64 } from "~/lib/services";
+import { BugComment, Contact } from "~/lib/types";
+import { sendEmail } from "~/utils/send-notify";
 
 interface ResponseNotify {
   action: string;
@@ -13,37 +15,64 @@ interface ResponseNotify {
     message: string;
   };
 
-  contact: {
-    email: string;
-    telegram: string;
-  }[];
+  contact: Contact[][];
 }
 export default function BugComments({
   bug_id,
+  product_id,
   comments,
   updateComment,
 }: {
   bug_id: number;
+  product_id: string;
   comments: BugComment[];
   updateComment: () => Promise<void>;
 }) {
   const [newComment, setNewComment] = useState("");
-  const {
-    data: inforNotify,
-    postData,
-    errorData,
-  } = useApi<ResponseNotify, { bug_id: number; comment: string }>();
+  const { postData, errorData } = useApi<
+    ResponseNotify,
+    { bug_id: number; comment: string }
+  >();
+  useEffect(() => {
+    if (errorData) toast.error(errorData.message);
+  }, [errorData]);
   const handleAddComment = async () => {
     // API post comment here
     const data = {
       bug_id,
       comment: newComment,
     };
-    postData("/bugs/comments", data);
-    console.log("Gửi bình luận:", data);
-    if (errorData) toast.error(errorData.message);
+    const re = await postData("/bugs/comments", data);
+    if (!re) return;
     else {
-      console.log(inforNotify);
+      const email = re.contact
+        ?.flat()
+        .filter((ct) => ct.code === "email")
+        .map((ct) => ct.value);
+      // const tele = re.contact.find((ct) => ct.code == "telegram")?.value;
+      const content = {
+        id: re.content.bug_id,
+        name: re.content.bug_name,
+        massage: re.content.message,
+      };
+      const link =
+        window.location.origin +
+          "/bugs/" +
+          encodeBase64({ bug_id, product_id }) || "https://pm.vasd.vn/";
+      if (email.length > 0)
+        email.forEach((e) =>
+          sendEmail(content, e, "Thông báo comment", link, "bug")
+            .then((mes) => toast(mes.message))
+            .catch((e) => toast.error(e))
+        );
+
+      // if (tele)
+      //   sendTelegram(content, tele, "Thông báo", link, "bug")
+      //     .then((re) => {
+      //       toast.success(re.message);
+      //     })
+      //     .catch((err) => toast.error(err));
+
       await updateComment();
       setNewComment("");
     }

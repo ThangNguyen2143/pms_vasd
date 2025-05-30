@@ -33,6 +33,12 @@ function ListProject({
           </span>
         </div>
       );
+    if (errorData.code == 500)
+      return (
+        <div>
+          <span className="alert alert-error">Lỗi server</span>
+        </div>
+      );
     return (
       <div>
         <span className="alert alert-error">{errorData.message}</span>

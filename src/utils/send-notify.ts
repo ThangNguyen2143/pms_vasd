@@ -25,7 +25,6 @@ async function sendTelegram(
     endpoint: "/notification/telegram",
     data: JSON.stringify({ message: parseToMessage, chatId: tele_id }),
   });
-  console.log(res);
   if (res.code == 200) return { message: "Đã gửi thông báo telegram" };
   else return { message: "Lỗi gửi thông báo telegram" };
 }
@@ -39,7 +38,7 @@ async function sendEmail(
   const data = {
     receiver_email: email,
     subject: action + ": " + content.name,
-    body: `${type} #[${content.id}] ${content.name} `,
+    body: `${type} #[${content.id}] ${content.name} - ${content.massage} `,
     link,
   };
   const res = await postItem({

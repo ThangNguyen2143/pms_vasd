@@ -48,7 +48,7 @@ export default function StatusPieChart({
     labels,
     datasets: [
       {
-        label: "Tỷ lệ",
+        label: "Số lượng",
         data: values,
         backgroundColor: labels.map(
           (_, i) =>

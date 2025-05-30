@@ -2,7 +2,12 @@
 import { useEffect, useState } from "react";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
-import { GanttDTO, OverviewDTO, WorkOverviewDTO } from "~/lib/types";
+import {
+  GanttDTO,
+  OverviewDTO,
+  progressPercent,
+  WorkOverviewDTO,
+} from "~/lib/types";
 import TotalOverviewTable from "./total-overview-table";
 import StatusPieChartGroup from "./status-pie-chart-group";
 import StaffTabs from "./staff-tab";
@@ -19,37 +24,52 @@ interface GanttTask {
   dependencies?: string;
   custom_class?: string; // dùng để tô màu nếu muốn
 }
-export function sortAndMapGanttData(data: GanttDTO[]): GanttTask[] {
-  const phaseList = data.filter((item) => item.type === "phase");
-  const timelineList = data.filter((item) => item.type === "timeline");
+export function sortAndMapGanttData(
+  data: GanttDTO[],
+  progress_percent_raw: progressPercent[]
+): GanttTask[] {
+  const progress_percent = Array.isArray(progress_percent_raw)
+    ? progress_percent_raw
+    : [];
+  const phaseList = data
+    .filter((item) => item.type === "phase")
+    .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+  const timelineList = data
+    .filter((item) => item.type === "timeline")
+    .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
 
   const result: GanttTask[] = [];
 
   for (const phase of phaseList) {
     // Push phase task
-    result.push({
-      id: phase.id.toString(),
-      name: phase.name,
-      start: phase.start.split("T")[0],
-      end: phase.end.split("T")[0],
-      progress: statusToProgress(phase.status),
-      custom_class: "gantt-phase",
-    });
-
-    // Find and attach related timelines
-    const relatedTimelines = timelineList.filter(
-      (t) => t.phase_id === phase.id
-    );
-    for (const timeline of relatedTimelines) {
+    if (phase.status != "PLANNED") {
+      const progressItem = progress_percent.find(
+        (pp) => pp.phase_id === phase.id
+      );
       result.push({
-        id: timeline.id.toString() + "tl",
-        name: timeline.name,
-        start: timeline.start.split("T")[0],
-        end: timeline.end.split("T")[0],
-        progress: statusToProgress(timeline.status),
-        dependencies: timeline.parent?.toString() + "tl",
-        custom_class: "gantt-timeline",
+        id: phase.id.toString(),
+        name: phase.name,
+        start: phase.start.split("T")[0],
+        end: phase.end.split("T")[0],
+        progress: progressItem?.progress_percent || 0,
+        custom_class: "gantt-phase",
       });
+
+      // Find and attach related timelines
+      const relatedTimelines = timelineList.filter(
+        (t) => t.phase_id === phase.id
+      );
+      for (const timeline of relatedTimelines) {
+        result.push({
+          id: timeline.id.toString() + "tl",
+          name: timeline.name,
+          start: timeline.start.split("T")[0],
+          end: timeline.end.split("T")[0],
+          progress: statusToProgress(timeline.status),
+          dependencies: timeline.parent?.toString() + "tl",
+          custom_class: "gantt-timeline",
+        });
+      }
     }
   }
   return result;
@@ -126,9 +146,16 @@ function ClientDashboardPage() {
       </div>
 
       {/* Gantt Chart */}
-      <div className="max-h-1/2">
-        <GanttChart tasks={sortAndMapGanttData(ganttData || [])} />
-      </div>
+      {overview && (
+        <div className="max-h-1/2">
+          <GanttChart
+            tasks={sortAndMapGanttData(
+              ganttData || [],
+              overview.propress_percent
+            )}
+          />
+        </div>
+      )}
       {/* Overview Table */}
       {overview && <TotalOverviewTable data={overview} />}
 
