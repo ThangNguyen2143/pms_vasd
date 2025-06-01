@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { toast } from "sonner";
 import Dialog from "~/components/ui/dialog";
 import { updateData } from "~/lib/api-client";
 
@@ -21,8 +22,8 @@ function UpdateInfoGroup({ group }: { group: GroupInfor }) {
     };
     const endpoint = "/group";
     const res = await updateData({ endpoint, data });
-    if (res.code != 200) window.alert("Lỗi " + res.code + " " + res.message);
-    else window.alert(res.message);
+    if (res.code != 200) toast.error("Lỗi " + res.code + " " + res.message);
+    else toast.success(res.message);
   };
   return (
     <Dialog
@@ -30,13 +31,13 @@ function UpdateInfoGroup({ group }: { group: GroupInfor }) {
       typeBtn="outline"
       title="Cập nhật thông tin nhóm"
     >
-      <div className="flex flex-col gap-2.5 w-full">
+      <div className="flex flex-col gap-2.5">
         <label className="floating-label">
           <span>Tên nhóm</span>
           <input
             type="text"
             placeholder="Nhập tên nhóm"
-            className="input input-md"
+            className="input input-md w-full"
             required
             value={name}
             onChange={(e) => setName(e.target.value)}
@@ -44,10 +45,9 @@ function UpdateInfoGroup({ group }: { group: GroupInfor }) {
         </label>
         <label className="floating-label">
           <span>Mô tả</span>
-          <input
-            type="text"
+          <textarea
             placeholder="Nhập mô tả nhóm"
-            className="input input-md"
+            className="textarea textarea-md w-full"
             required
             value={description}
             onChange={(e) => setDescription(e.target.value)}

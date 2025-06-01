@@ -1,6 +1,5 @@
 "use client";
 import { Lock, LockOpen } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { updateData } from "~/lib/api-client";
 type statusDto = {
@@ -10,24 +9,26 @@ type statusDto = {
 function StatusBtn({
   isLocked,
   idUser,
+  onUpdate,
 }: {
   isLocked: boolean;
   idUser: number;
+  onUpdate: () => Promise<void>;
 }) {
-  const route = useRouter();
   // const [locked, setIsLocked] = useState(isLocked);
   const handleClick = async () => {
     const res = await updateData<"", statusDto>({
       endpoint: "/user/status",
       data: {
         id: idUser,
-        isActive: !isLocked,
+        isActive: isLocked,
       },
     });
     if (res.code === 200) {
-      route.refresh();
+      toast.success("Xử lý thành công");
+      await onUpdate();
     } else {
-      toast.error("Failed to update status");
+      toast.error(res.message);
     }
   };
   if (isLocked)

@@ -28,6 +28,7 @@ export const getUser = cache(async () => {
       id: user.userid,
       name: user.userData.display_name,
       username: user.accountData.username,
+      code: user.accountData.code,
       role: user.accountData.account_type,
     };
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

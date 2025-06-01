@@ -158,40 +158,50 @@ function PhaseProjectTable({
                       Chưa tạo timeline
                     </div>
                   ) : (
-                    (listTimeLine[phase.id] || []).map((item) => (
-                      <div
-                        key={item.id}
-                        className="flex justify-between items-center bg-base-200 rounded border border-base-300"
-                      >
-                        <div className="p-2 ">
-                          <div className="font-semibold">{item.name}</div>
-                          <div className="text-sm text-gray-500">
-                            {item.date_start} - {item.date_end} | Trọng số:{" "}
-                            {item.weight}
-                          </div>
-                          <div className="text-sm">{item.status}</div>
-                          {item.parent_id && (
-                            <div className="text-sm italic">
-                              Phụ thuộc:{" "}
-                              {
-                                listTimeLine[phase.id].find(
-                                  (tl) => tl.id == item.parent_id
-                                )?.name
-                              }
+                    <>
+                      {(listTimeLine[phase.id] || []).map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex justify-between items-center bg-base-200 rounded border border-base-300"
+                        >
+                          <div className="p-2 ">
+                            <div className="font-semibold">{item.name}</div>
+                            <div className="text-sm text-gray-500">
+                              {item.date_start} - {item.date_end} | Trọng số:{" "}
+                              {item.weight}
                             </div>
-                          )}
+                            <div className="text-sm">{item.status}</div>
+                            {item.parent_id && (
+                              <div className="text-sm italic">
+                                Phụ thuộc:{" "}
+                                {
+                                  listTimeLine[phase.id].find(
+                                    (tl) => tl.id == item.parent_id
+                                  )?.name
+                                }
+                              </div>
+                            )}
+                          </div>
+                          <div className="p-2">
+                            <button
+                              className="tooltip btn btn-info"
+                              data-tip="Chi tiết timeline"
+                              onClick={() => setSelectedTimeline(item.id)}
+                            >
+                              <Info />
+                            </button>
+                          </div>
                         </div>
-                        <div className="p-2">
-                          <button
-                            className="tooltip btn btn-info"
-                            data-tip="Chi tiết timeline"
-                            onClick={() => setSelectedTimeline(item.id)}
-                          >
-                            <Info />
-                          </button>
-                        </div>
-                      </div>
-                    ))
+                      ))}
+                      {selectedTimeline && (
+                        <TimelineDetailModal
+                          timeline_id={selectedTimeline}
+                          onClose={() => setSelectedTimeline(null)}
+                          onUpdate={updateTimeLineData}
+                          timeLineList={listTimeLine[phase.id]}
+                        />
+                      )}
+                    </>
                   )}
                 </div>
 
@@ -200,13 +210,6 @@ function PhaseProjectTable({
             </div>
           </div>
         ))}
-      {selectedTimeline && (
-        <TimelineDetailModal
-          timeline_id={selectedTimeline}
-          onClose={() => setSelectedTimeline(null)}
-          onUpdate={updateTimeLineData}
-        />
-      )}
     </div>
   );
 }

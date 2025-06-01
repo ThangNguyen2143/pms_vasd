@@ -1,19 +1,17 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
-import { Contact } from "~/lib/types";
+import { encodeBase64 } from "~/lib/services";
+import { Contact, RoleType } from "~/lib/types";
 function roleCheck(item: Contact, roleOwn: Contact[]) {
   return roleOwn.find((t) => t.code == item.code) != undefined ? true : false;
 }
 function ListofRole({
-  roleList,
-  roleOwn,
   user_code,
   group_id,
 }: {
-  roleList: Contact[];
-  roleOwn: Contact[];
   user_code?: string;
   group_id?: string;
 }) {
@@ -29,9 +27,48 @@ function ListofRole({
         role_code: string;
       };
   const { putData, isLoading, errorData } = useApi<"", DataSend>();
+  const {
+    data,
+    errorData: errorGetRole,
+    setData: setRole,
+    getData: getRole,
+  } = useApi<RoleType[]>();
+  const {
+    data: roleList,
+    getData: getUserRole,
+
+    errorData: errorRole,
+  } = useApi<RoleType[]>();
+  useEffect(() => {
+    getUserRole("/system/config/eyJ0eXBlIjoicm9sZSJ9", "force-cache");
+  }, []);
+  useEffect(() => {
+    let enpoint: string | undefined = undefined;
+    if (group_id)
+      enpoint =
+        "/group/role/" +
+        encodeBase64({
+          type: "role",
+          group_id,
+        });
+    if (user_code)
+      enpoint =
+        "/user/" +
+        encodeBase64({
+          type: "role",
+          code: user_code,
+        });
+    if (enpoint) getRole(enpoint, "no-store");
+  }, [user_code, group_id]);
   useEffect(() => {
     if (errorData) toast.error(errorData.message);
-  }, [errorData]);
+    if (errorRole) toast.error(errorRole.message);
+    if (errorGetRole) {
+      if (errorGetRole.code == 404) setRole([]);
+      else toast.error(errorGetRole.message);
+    }
+  }, [errorData, errorRole, errorGetRole]);
+
   const handlerClick = async (role_code: string, isCheck: boolean) => {
     let re;
     if (!isCheck) {
@@ -67,27 +104,39 @@ function ListofRole({
   return (
     <div>
       <ul className="list bg-base-100 rounded-box shadow-md">
-        {roleList.map((item, i) => (
-          <li className="list-row" key={"9i" + i}>
-            <div>{item.value}</div>
-            <div className="divider divider-horizontal"></div>
-            {roleOwn ? (
-              <input
-                type="checkbox"
-                className="checkbox"
-                name={item.code}
-                defaultChecked={roleCheck(item, roleOwn)}
-                value={item.code}
-                onClick={(e) =>
-                  handlerClick(e.currentTarget.value, e.currentTarget.checked)
-                }
-                disabled={isLoading}
-              />
-            ) : (
-              <span className="badge badge-error">Không thể tải dữ liệu</span>
-            )}
-          </li>
-        ))}
+        {roleList &&
+          roleList.map((item, i) => (
+            <li className="list-row" key={"9i" + i}>
+              <div>{item.value}</div>
+              <div className="divider divider-horizontal"></div>
+              {data ? (
+                <input
+                  type="checkbox"
+                  className="checkbox"
+                  name={item.code}
+                  defaultChecked={roleCheck(item, data)}
+                  value={item.code}
+                  onClick={(e) =>
+                    handlerClick(e.currentTarget.value, e.currentTarget.checked)
+                  }
+                  disabled={isLoading}
+                />
+              ) : errorGetRole && errorGetRole.code == 404 ? (
+                <input
+                  type="checkbox"
+                  className="checkbox"
+                  name={item.code}
+                  value={item.code}
+                  onClick={(e) =>
+                    handlerClick(e.currentTarget.value, e.currentTarget.checked)
+                  }
+                  disabled={isLoading}
+                />
+              ) : (
+                <span className="badge badge-error">Không thể tải dữ liệu</span>
+              )}
+            </li>
+          ))}
       </ul>
     </div>
   );

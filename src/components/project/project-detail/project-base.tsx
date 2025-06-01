@@ -91,6 +91,7 @@ function ProjectBase({ project_id }: { project_id: number }) {
         <StakeholderList
           stakeholder={data.project_stakeholders}
           project_id={data.id}
+          onUpdate={fetchDataProject}
         />
       </div>
     </div>

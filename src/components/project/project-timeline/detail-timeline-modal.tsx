@@ -4,8 +4,14 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
-import { Contact, ProjectTimeLineDetail, UserDto } from "~/lib/types";
+import {
+  Contact,
+  ProjectTimeLine,
+  ProjectTimeLineDetail,
+  UserDto,
+} from "~/lib/types";
 import { sendEmail } from "~/utils/send-notify";
+import UpdateInfoForm from "./update-info-timeline";
 interface ResponseNotify {
   action: string;
   content: {
@@ -15,16 +21,30 @@ interface ResponseNotify {
   };
   contact: Contact[];
 }
+interface UpdateTimelinneData {
+  project_id: number; //ID dự án (truyền từ component cha)
+  phase_id: number; //ID giai đoạn (truyền từ component cha)
+  name: string; //Tên công việc
+  description: string; //Mô tả công việc
+  start_date: string; // Ngầy bắt đầu
+  end_date: string; //Ngày kết thúc
+  parent_id?: number;
+  weight: number; //Trọng số (Mức độ quan trọng), kiểu Number. Type input range
+  tags: string[]; //Nhãn (Để đánh dấu công việc)
+}
 export default function TimelineDetailModal({
   timeline_id,
+  timeLineList,
   onClose,
   onUpdate,
 }: {
   timeline_id: number;
+  timeLineList: ProjectTimeLine[];
   onClose: () => void;
   onUpdate: (phase_id: number) => Promise<void>;
 }) {
   const [userSelected, setUserSelected] = useState(0);
+  const [updateShow, setupdateShow] = useState(false);
   const {
     getData: getTimeLine,
     data: timeline,
@@ -32,7 +52,7 @@ export default function TimelineDetailModal({
   } = useApi<ProjectTimeLineDetail>();
   const { getData: getUser, data: users } = useApi<UserDto[]>();
   const {
-    putData,
+    putData: assignUser,
     isLoading: loadingPut,
     errorData,
   } = useApi<ResponseNotify, { timeline_id: number; user_id: number }>();
@@ -42,6 +62,12 @@ export default function TimelineDetailModal({
     isLoading: updateLoading,
     errorData: errorUpdateStatus,
   } = useApi<string, { timeline_id: number; status: string }>();
+  const {
+    putData: updateInfoTimeLine,
+    isLoading: loadUpdate,
+    errorData: errorUpdateInfo,
+  } = useApi<string, UpdateTimelinneData>();
+  const { removeData } = useApi<string>();
   useEffect(() => {
     getTimeLine("/project/timeline/detail/" + encodeBase64({ timeline_id }));
     getUser("/user/" + encodeBase64({ type: "all" }));
@@ -50,13 +76,25 @@ export default function TimelineDetailModal({
   const updateTimeLineData = async () => {
     await getTimeLine("/project/timeline/" + encodeBase64({ timeline_id }));
   };
+  const deleteTimeline = async () => {
+    const re = await removeData(
+      "/project/timeline/" + encodeBase64({ timeline_id })
+    );
+    if (re != "") toast.error("Không thể xóa timeline");
+    toast.success("Xử lý thành công");
+    if (timeline) {
+      await onUpdate(timeline?.phase_id);
+
+      onClose();
+    }
+  };
   const handleAssign = async () => {
     if (!timeline) return;
     const dataSend = {
       timeline_id,
       user_id: userSelected,
     };
-    const re = await putData("/project/timeline/assign", dataSend);
+    const re = await assignUser("/project/timeline/assign", dataSend);
     if (re) {
       toast.success("Xử lý thành công");
       const email = re.contact.find((ct) => ct.code == "email")?.value;
@@ -85,7 +123,7 @@ export default function TimelineDetailModal({
 
       await onUpdate(timeline.phase_id);
       await updateTimeLineData();
-    } else return;
+    }
   };
   const handlerUpdateStatus = async (status: string) => {
     const re = await updateStatus("/project/timeline/status", {
@@ -103,7 +141,8 @@ export default function TimelineDetailModal({
   useEffect(() => {
     if (errorData) toast.error(errorData.message);
     if (errorUpdateStatus) toast.error(errorUpdateStatus.message);
-  }, [errorData, errorUpdateStatus]);
+    if (errorUpdateInfo) toast.error(errorUpdateInfo.message);
+  }, [errorData, errorUpdateStatus, errorUpdateInfo]);
   return (
     <dialog className="modal modal-open">
       <div className="modal-box">
@@ -117,6 +156,16 @@ export default function TimelineDetailModal({
           <span className="loading loading-infinity"></span>
         ) : !timeline ? (
           <div className="card-body">Lỗi tải dữ liệu</div>
+        ) : updateShow ? (
+          <UpdateInfoForm
+            onClose={() => setupdateShow(false)}
+            onPut={async (data) => {
+              return await updateInfoTimeLine("/project/timeline", data);
+            }}
+            timelineData={timeline}
+            timelineList={timeLineList}
+            isLoading={loadUpdate}
+          />
         ) : (
           <>
             {/* Badge status */}
@@ -207,6 +256,20 @@ export default function TimelineDetailModal({
               <p>
                 <strong>Tags:</strong> {timeline.info.tags?.join(", ") || "--"}
               </p>
+            </div>
+            <div className="modal-action">
+              <button
+                className="btn btn-outline btn-primary"
+                onClick={() => setupdateShow(true)}
+              >
+                Chỉnh sửa
+              </button>
+              <button
+                className="btn btn-outline btn-error"
+                onClick={deleteTimeline}
+              >
+                Xóa timeline
+              </button>
             </div>
           </>
         )}

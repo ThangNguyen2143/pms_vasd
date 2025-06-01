@@ -33,10 +33,6 @@ async function DetailGroupPage(props: {
     group_name: name,
     group_description: description,
   };
-  const roleRespone = await fetchData<RoleType[]>({
-    endpoint: "/system/config/eyJ0eXBlIjoicm9sZSJ9",
-    cache: "force-cache",
-  });
   const endpointUserGroup =
     "/group/" +
     encodeBase64({
@@ -79,7 +75,10 @@ async function DetailGroupPage(props: {
     },
   ];
   return (
-    <div className="container p-4 justify-center">
+    <div
+      className="container flex items-center flex-col shadow
+    "
+    >
       <div className="p-4 m-2 min-w-96 max-w-5xl flex items-center flex-col">
         <h1 className="p-4 text-2xl">{group.group_name}</h1>
         <p className="p-4 text-xl">Mô tả: {group.group_description}</p>
@@ -116,11 +115,7 @@ async function DetailGroupPage(props: {
             defaultChecked
           />
           <div className="tab-content border-base-300 bg-base-100 p-10">
-            <ListofRole
-              roleOwn={roleGroupResponse.value}
-              roleList={roleRespone.value}
-              group_id={group.group_id}
-            />
+            <ListofRole group_id={group.group_id} />
           </div>
         </div>
       </div>

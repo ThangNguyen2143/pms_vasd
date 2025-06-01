@@ -1,179 +1,143 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { AccountType, Contact, FieldDto } from "~/lib/types";
+import { FieldDto, UserDto } from "~/lib/types";
 import Dialog from "../ui/dialog";
 import StatusBtn from "./status-btn";
 import EditTypeModal from "./edit-type-account";
 import ResetPassBtn from "./reset-pass";
 import ListofRole from "./list-role";
-import clsx from "clsx";
 import { useState } from "react";
+function RenderCell({
+  emp,
+  item,
+  onUpdate,
+}: {
+  emp: UserDto;
+  item: FieldDto;
+  onUpdate: () => Promise<void>;
+}) {
+  const value = item.sub
+    ? (emp as any)[item.sub]?.[item.code]
+    : (emp as any)[item.code];
+
+  switch (item.display) {
+    case "Trạng thái":
+      return (
+        <td className="flex gap-2 items-center">
+          <StatusBtn
+            idUser={(emp as any)[item.code]}
+            isLocked={!emp.accountData.isActive}
+            onUpdate={onUpdate}
+          />
+        </td>
+      );
+
+    case "Vai trò":
+      return (
+        <td>
+          <EditTypeModal role={value} userid={emp.userid} onUpdate={onUpdate} />
+        </td>
+      );
+
+    case "Khởi tạo":
+      return (
+        <td className="flex gap-2 items-center">
+          <ResetPassBtn username={value} onUpdate={onUpdate} />
+        </td>
+      );
+
+    case "Cấp quyền":
+      return (
+        <td>
+          <Dialog
+            nameBtn={<>Chỉnh sửa quyền</>}
+            title="Cấp quyền tài khoản"
+            typeBtn="ghost"
+            id={`ROLE-${emp.userid}`}
+          >
+            <ListofRole user_code={emp.accountData.code} />
+          </Dialog>
+        </td>
+      );
+
+    default:
+      return <td>{value ?? "Lỗi"}</td>;
+  }
+}
 
 function TableItem({
   emp,
   feildTable,
-  accountType,
-  roleList,
+  onUpdate,
 }: {
-  emp: any;
+  emp: UserDto;
   feildTable: FieldDto[];
-  accountType?: any[];
-  roleList: Contact[];
+  onUpdate: () => Promise<void>;
 }) {
   return (
     <tr>
-      {feildTable.map((item, index) => {
-        if (item.display == "Trạng thái" && item.sub) {
-          return (
-            <td key={"-" + index}>
-              <div className={clsx("badge", "badge-info")}>
-                {emp[item.sub][item.code]
-                  ? emp[item.sub][item.code] == "NEW"
-                    ? "NEW"
-                    : "Active"
-                  : "Block"}
-              </div>
-            </td>
-          );
-        } else if (item.display == "Khóa") {
-          return (
-            <td key={"-98"} className="flex gap-2 items-center">
-              <StatusBtn
-                idUser={emp[item.code]}
-                isLocked={
-                  emp.accountData.isActive ? emp.accountData.isActive : false
-                }
-              />
-            </td>
-          );
-        } else if (item.display == "Vai trò" && item.sub) {
-          return (
-            <td key={"0" + index}>
-              <EditTypeModal
-                display={emp[item.sub][item.code]}
-                accountType={accountType}
-                userid={emp.userid}
-              />
-            </td>
-          );
-        } else if (item.display == "Khởi tạo" && item.sub) {
-          // console.log(emp, item.sub, item.code);
-          return (
-            <td key={"-95"} className="flex gap-2 items-center">
-              <ResetPassBtn username={emp[item.sub][item.code]} />
-            </td>
-          );
-        } else if (item.display == "Cấp quyền") {
-          return (
-            <td key={"-90" + index}>
-              {" "}
-              <Dialog
-                nameBtn={<>Chỉnh sửa quyền</>}
-                title="Cấp quyền tài khoản"
-                typeBtn="ghost"
-                key={"ROLE" + index}
-                id={index + "2" + emp.userid}
-              >
-                <ListofRole
-                  roleOwn={emp.roles}
-                  roleList={roleList}
-                  user_code={emp.accountData.code}
-                />
-              </Dialog>
-            </td>
-          );
-        } else if (item.sub)
-          return (
-            <td key={"a" + index}>
-              {emp[item.sub][item.code] ? emp[item.sub][item.code] : "Lỗi"}
-            </td>
-          );
-        else
-          return (
-            <td key={"a" + index}>{emp[item.code] ? emp[item.code] : "Lỗi"}</td>
-          );
-      })}
+      {feildTable.map((item: FieldDto, index: number) => (
+        <RenderCell key={index} emp={emp} item={item} onUpdate={onUpdate} />
+      ))}
     </tr>
   );
 }
+
 function Emp_Table({
   empData,
   feildTable,
-  typeAccount,
-  roleList,
+  onUpdate,
 }: {
-  empData: any[];
+  empData: UserDto[];
   feildTable: FieldDto[];
-  typeAccount?: AccountType[];
-  roleList?: Contact[];
+  onUpdate: () => Promise<void>;
 }) {
   const [findText, setTextFind] = useState("");
+
   if (!empData) {
     return <div className="alert alert-error">Không có dữ liệu</div>;
   }
-  if (!roleList) {
-    roleList = [];
-  }
+
+  const filtered = empData.filter((item) => {
+    const name = item.userData?.display_name?.toLowerCase() || "";
+    const email = item.userData?.contact?.[0]?.value?.toLowerCase() || "";
+    return (
+      name.includes(findText.toLowerCase()) ||
+      email.includes(findText.toLowerCase())
+    );
+  });
+
   return (
     <>
-      <div className="flex flex-row justify-between items-center gap-4">
-        <div>
-          <label className="input">
-            <span className="label">Tìm kiếm người dùng</span>
-            <input
-              type="text"
-              placeholder="Nhập tên hoặc email..."
-              value={findText}
-              onChange={(e) => setTextFind(e.target.value)}
-            />
-          </label>
-        </div>
-        <div>
-          <label className="select">
-            <span className="label">Vai trò</span>
-            <select>
-              <option value="">Tất cả</option>
-              {typeAccount &&
-                typeAccount.map((item) => (
-                  <option key={item.code} value={item.code}>
-                    {item.display}
-                  </option>
-                ))}
-            </select>
-          </label>
-        </div>
+      <div className="flex items-center gap-4">
+        <label className="input">
+          <span className="label">Tìm kiếm người dùng</span>
+          <input
+            type="text"
+            placeholder="Nhập tên hoặc email..."
+            value={findText}
+            onChange={(e) => setTextFind(e.target.value)}
+          />
+        </label>
       </div>
       <div className="overflow-x-auto">
         <table className="table">
-          {/* head */}
           <thead>
             <tr>
-              {feildTable.map((item, index) => {
-                return <th key={index}>{item.display}</th>;
-              })}
+              {feildTable.map((item, index) => (
+                <th key={index}>{item.display}</th>
+              ))}
             </tr>
           </thead>
           <tbody>
-            {empData
-              .filter((item) => {
-                const nameuser = item.userData.display_name as string;
-                const mailuser = item.userData.contact[0].value as string;
-                return (
-                  nameuser.toLowerCase().includes(findText.toLowerCase()) ||
-                  mailuser.toLowerCase().includes(findText.toLowerCase())
-                );
-              })
-              .map((item, index) => {
-                return (
-                  <TableItem
-                    emp={item}
-                    key={index}
-                    feildTable={feildTable}
-                    accountType={typeAccount}
-                    roleList={roleList}
-                  />
-                );
-              })}
+            {filtered.map((emp) => (
+              <TableItem
+                key={emp.userid + "item"}
+                emp={emp}
+                feildTable={feildTable}
+                onUpdate={onUpdate}
+              />
+            ))}
           </tbody>
         </table>
       </div>

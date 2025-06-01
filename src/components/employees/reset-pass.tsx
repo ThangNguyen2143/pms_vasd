@@ -5,7 +5,13 @@ import { updateData } from "~/lib/api-client";
 type resetPwDto = {
   username: string;
 };
-function ResetPassBtn({ username }: resetPwDto) {
+function ResetPassBtn({
+  username,
+  onUpdate,
+}: {
+  username: string;
+  onUpdate: () => Promise<void>;
+}) {
   const handleClick = async () => {
     const res = await updateData<"", resetPwDto>({
       endpoint: "/user/pass/reset",
@@ -14,7 +20,8 @@ function ResetPassBtn({ username }: resetPwDto) {
       },
     });
     if (res.code === 200) {
-      document.getElementById("modal_success")?.click();
+      toast.success(res.message);
+      await onUpdate();
     } else {
       toast.error(res.message);
     }

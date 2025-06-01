@@ -1,16 +1,40 @@
-import { Plus } from "lucide-react";
-import { useState } from "react";
+"use client";
+import { Plus, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { ProjectStakeholderDto } from "~/lib/types";
 import AddStakeholderModal from "./modals/add-stakeholder-modal";
+import { useApi } from "~/hooks/use-api";
+import { encodeBase64 } from "~/lib/services";
+import { getUser } from "~/lib/dal";
+import { toast } from "sonner";
 
 function StakeholderList({
   project_id,
   stakeholder,
+  onUpdate,
 }: {
   project_id: number;
   stakeholder?: ProjectStakeholderDto[];
+  onUpdate: () => Promise<void>;
 }) {
   const [showAddStakeholderModal, setShowModal] = useState<boolean>(false);
+  const { removeData, errorData, isLoading } = useApi<"">();
+  useEffect(() => {
+    if (errorData) toast.error(errorData.message);
+  }, [errorData]);
+  const handlerDelete = async () => {
+    const user = await getUser();
+    if (!user) {
+      toast.error("Lỗi lấy dữ liệu người dùng");
+      return;
+    }
+    const re = await removeData(
+      "/project/stakeholders/" + encodeBase64({ project_id, code: user.code })
+    );
+    if (re != "") return;
+    toast.success("Xóa thành viên liên quan thành công");
+    await onUpdate();
+  };
   return (
     <div className="bg-base-200 p-4 rounded-lg shadow">
       <div className="text-primary border-b border-base-content/20 pb-2 mb-4 flex justify-between items-center">
@@ -59,6 +83,20 @@ function StakeholderList({
                   <span className="italic text-gray-500">Không có liên hệ</span>
                 )}
               </p>
+              <div className="flex justify-end">
+                <button
+                  className="btn-error btn-outline tooltip btn-sm"
+                  data-tip={"Xóa"}
+                  disabled={isLoading}
+                  onClick={handlerDelete}
+                >
+                  {isLoading ? (
+                    <span className="loading loadingspinner"></span>
+                  ) : (
+                    <X />
+                  )}
+                </button>
+              </div>
             </div>
           ))}
         </div>
