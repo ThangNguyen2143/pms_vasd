@@ -1,5 +1,5 @@
 "use client";
-import { Activity, Pencil, X } from "lucide-react";
+import { Pencil, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { ProjectDetailDto, ProjectStatus } from "~/lib/types";
 import UpdateInfoProjectModal from "./modals/update-info-modal";
