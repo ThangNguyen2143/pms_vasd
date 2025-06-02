@@ -37,6 +37,7 @@ export default function RootLayout({
         {children}
         <Toaster position="top-right" richColors />
         <script src="https://cdn.jsdelivr.net/npm/frappe-gantt/dist/frappe-gantt.umd.js"></script>
+        <script src="/scripts/theme-loader.js" />
         <link
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/frappe-gantt/dist/frappe-gantt.css"

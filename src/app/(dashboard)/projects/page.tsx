@@ -1,7 +1,7 @@
 import AddProjectBtn from "~/components/project/add-project-btn";
 import ProjectTable from "~/components/project/project-table";
 
-function ProjectPage() {
+function ProjectsPage() {
   return (
     <main className="flex flex-col gap-4 p-4">
       <div>
@@ -15,4 +15,4 @@ function ProjectPage() {
   );
 }
 
-export default ProjectPage;
+export default ProjectsPage;

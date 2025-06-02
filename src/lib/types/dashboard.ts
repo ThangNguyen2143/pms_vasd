@@ -61,10 +61,10 @@ export interface OverviewDTO {
 export interface WorkOverviewDTO {
   user_id: number;
   user_name: string;
-  tasks: [];
-  bugs: [];
-  bug_retests: [];
-  testcases: [];
+  tasks: TaskDb[];
+  bugs: BugDb[];
+  bug_retests: BugReTest[];
+  testcases: TestDb[];
 }
 export interface GanttDTO {
   id: number;
@@ -77,3 +77,34 @@ export interface GanttDTO {
   type: string;
   weight: number;
 }
+export type TaskDb = {
+  id: number;
+  title: string;
+  status: string;
+  product_id: string;
+  deadline: string;
+};
+export type BugDb = {
+  id: number;
+  title: string;
+  status: string;
+  product_id: string;
+  type: string;
+  deadline: string;
+};
+export type BugReTest = {
+  code: string;
+  title: string;
+  status: string;
+  bug_id: number;
+  product_id: string;
+  type: string;
+  deadline: string;
+};
+export type TestDb = {
+  id: string;
+  title: string;
+  status: string;
+  product_id: string;
+  deadline: string;
+};

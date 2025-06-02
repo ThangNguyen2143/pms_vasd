@@ -1,5 +1,7 @@
 "use client";
+import Link from "next/link";
 import React from "react";
+import { encodeBase64 } from "~/lib/services";
 import { WorkOverviewDTO } from "~/lib/types";
 
 export default function StaffTreeView({ data }: { data: WorkOverviewDTO[] }) {
@@ -40,6 +42,31 @@ function StaffColumn({ user }: { user: WorkOverviewDTO }) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function WorkBox({ title, items }: { title: string; items: any[] }) {
+  let urls: string[] = [];
+  if (title.includes("Task"))
+    urls = items.map(
+      (item) =>
+        `/tasks/${encodeBase64({
+          task_id: item.id,
+          product_id: item.product_id,
+        })}`
+    );
+  else if (title.includes("Bug"))
+    urls = items.map(
+      (item) =>
+        `/bugs/${encodeBase64({
+          bug_id: item.id,
+          product_id: item.product_id,
+        })}`
+    );
+  else if (title.includes("Re-test"))
+    urls = items.map(
+      (item) =>
+        `/bugs/${encodeBase64({
+          bug_id: item.bug_id,
+          product_id: item.product_id,
+        })}`
+    );
   return (
     <div className="bg-base-200 p-2 rounded">
       <h5 className="font-semibold text-sm mb-1">{title}</h5>
@@ -47,7 +74,9 @@ function WorkBox({ title, items }: { title: string; items: any[] }) {
         <ul className="space-y-1 text-xs">
           {items.map((item, idx) => (
             <li key={idx} className="pl-2 border-l-2 border-primary">
-              <p className="font-medium">{item.title || item.name}</p>
+              <Link href={urls[idx] || "/"}>
+                <p className="font-medium">{item.title || item.name}</p>
+              </Link>
               <p className="text-xs text-gray-500">
                 {item.deadline ? `⏳ ${item.deadline}` : ""}{" "}
                 {item.status ? `| 📌 ${item.status}` : ""}
