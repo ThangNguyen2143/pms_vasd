@@ -26,10 +26,15 @@ function TaskComments({
     if (errorData) toast.error(errorData.message);
   }, [errorData]);
   const handleAddComment = async () => {
+    const content = newComment.trim();
+    if (!content || content.length == 0) {
+      toast.info("Chưa nhập kí tự nào");
+      return;
+    }
     // API post comment here
     const data = {
       task_id: task.task_id,
-      content: newComment,
+      content: newComment.trim(),
     };
     const re = await postData("/tasks/comments", data);
     if (!re) return;
@@ -108,7 +113,7 @@ function TaskComments({
                 className="btn btn-ghost btn-sm rounded-full"
                 onClick={handleAddComment}
                 aria-label="Gửi"
-                disabled={isLoading}
+                disabled={isLoading || newComment.trim().length == 0}
               >
                 {isLoading ? (
                   <span className="loading loading-spinner loading-sm"></span>

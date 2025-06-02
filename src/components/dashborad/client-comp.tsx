@@ -8,7 +8,7 @@ import {
   progressPercent,
   WorkOverviewDTO,
 } from "~/lib/types";
-import TotalOverviewTable from "./total-overview-table";
+// import TotalOverviewTable from "./total-overview-table";
 import StatusPieChartGroup from "./status-pie-chart-group";
 import StaffTabs from "./staff-tab";
 import GanttChart from "../ui/gantt-chart";
@@ -193,7 +193,7 @@ function ClientDashboardPage() {
         </div>
       )}
       {/* Overview Table */}
-      {overview && <TotalOverviewTable data={overview} />}
+      {/* {overview && <TotalOverviewTable data={overview} />} */}
 
       {/* Pie Charts */}
       {overview && <StatusPieChartGroup overview={overview} />}

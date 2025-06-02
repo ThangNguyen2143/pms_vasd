@@ -68,32 +68,37 @@ function TaskAssign({
             </ul>
             <div className="join justify-end">
               <button
-                className="btn btn-primary join-item"
+                className="btn btn-primary join-item tooltip"
                 onClick={() => handleSubmit("START")}
+                data-tip={"Bắt đầu"}
               >
                 <CirclePlay />
               </button>
               <button
-                className="btn btn-outline join-item btn-success"
+                className="btn btn-outline join-item btn-success tooltip"
                 onClick={() => handleSubmit("END")}
+                data-tip={"Hoàn thành"}
               >
                 <SquareCheckBig />
               </button>
               <button
-                className="btn btn-outline join-item btn-warning"
+                className="btn btn-outline join-item btn-warning tooltip"
                 onClick={() => handleSubmit("FAILED")}
+                data-tip={"Thất bại"}
               >
                 <OctagonX />
               </button>
               <button
-                className="btn btn-outline join-item btn-accent"
+                className="btn btn-outline join-item btn-accent tooltip"
                 onClick={() => handleSubmit("REOPEN")}
+                data-tip={"Mở lại"}
               >
                 <RotateCcw />
               </button>
               <button
-                className="btn btn-outline join-item btn-error"
+                className="btn btn-outline join-item btn-error tooltip"
                 onClick={() => handleSubmit("CANCELED")}
+                data-tip={"Hủy task"}
               >
                 <BookmarkX />
               </button>
