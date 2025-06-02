@@ -1,3 +1,4 @@
+"use client";
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { FieldDto } from "~/lib/types";
 import RemoveUserGroup from "./remove-user-group";
@@ -39,7 +40,7 @@ function TableItem({
     </tr>
   );
 }
-async function MemberGroup({
+function MemberGroup({
   empData,
   feildTable,
   group_id,

@@ -5,31 +5,25 @@ import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 import { Priority } from "~/lib/types";
 interface PriorityProps {
+  priorityList: Priority[];
   bug_id: number;
   priority: string;
   onUpdate: () => Promise<void>;
 }
 
 function UpdatePriorytyComponent({
+  priorityList,
   bug_id,
   priority,
   onUpdate,
 }: PriorityProps) {
   const [selectPriority, setSelectPriority] = useState<string>(priority);
   const [showUpdatePriority, setshowUpdatePriority] = useState(false);
-  const {
-    data: priorityList,
-    getData: getPriority,
-    errorData: errorPriority,
-  } = useApi<Priority[]>();
   const { putData, isLoading, errorData } = useApi<
     "",
     { bug_id: number; priority: string }
   >();
-  useEffect(() => {
-    getPriority("/system/config/eyJ0eXBlIjoicHJpb3JpdHkifQ==", "default");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+
   useEffect(() => {
     if (errorData) toast.error(errorData.message);
   }, [errorData]);
@@ -64,8 +58,7 @@ function UpdatePriorytyComponent({
             onChange={(e) => setSelectPriority(e.target.value)}
             value={selectPriority}
           >
-            {!errorPriority &&
-              priorityList &&
+            {priorityList &&
               priorityList.length > 0 &&
               priorityList.map((st) => {
                 if (st.code == priority)

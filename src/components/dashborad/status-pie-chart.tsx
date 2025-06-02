@@ -1,9 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import React from "react";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+// Đăng ký các thành phần và plugin
+ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
 
 type SummaryData = {
   [key: string]: number;
@@ -13,26 +16,40 @@ type SummaryData = {
 type StatusPieChartProps = {
   title: string;
   data: SummaryData;
-  colorMap?: Record<string, string>; // Optional custom color
+  colorMap?: Record<string, string>;
+  labelMap?: Record<string, string>;
+};
+type ChartOptions = React.ComponentProps<typeof Pie>["options"] & {
+  plugins: {
+    datalabels: {
+      formatter: (value: number, context: any) => string | null;
+      color: string;
+      font: {
+        weight: string;
+        size: number;
+      };
+    };
+  };
 };
 
 const defaultColors = [
-  "#4ade80", // green
-  "#60a5fa", // blue
-  "#facc15", // yellow
-  "#f87171", // red
-  "#a78bfa", // purple
-  "#34d399", // teal
-  "#fb923c", // orange
-  "#818cf8", // indigo
+  "#4ade80",
+  "#60a5fa",
+  "#facc15",
+  "#f87171",
+  "#a78bfa",
+  "#34d399",
+  "#fb923c",
+  "#818cf8",
 ];
 
 export default function StatusPieChart({
   title,
   data,
   colorMap,
+  labelMap = {},
 }: StatusPieChartProps) {
-  if (!data || !data.total || data.total === 0) {
+  if (!data?.total) {
     return (
       <div className="bg-base-200 p-4 rounded-lg shadow text-center w-full md:w-64">
         <h3 className="font-bold text-lg text-primary mb-2">{title}</h3>
@@ -42,10 +59,11 @@ export default function StatusPieChart({
   }
 
   const labels = Object.keys(data).filter((key) => key !== "total");
+  const translatedLabels = labels.map((label) => labelMap[label] || label);
   const values = labels.map((key) => data[key]);
 
   const pieData = {
-    labels,
+    labels: translatedLabels,
     datasets: [
       {
         label: "Số lượng",
@@ -59,10 +77,58 @@ export default function StatusPieChart({
     ],
   };
 
-  const options = {
+  const options: ChartOptions = {
     plugins: {
       legend: {
-        position: "bottom" as const,
+        display: false,
+      },
+      datalabels: {
+        formatter: (value: number, context: any) => {
+          if (value == 0) return null;
+          const label = context.chart.data.labels[context.dataIndex];
+          const total = context.chart.data.datasets[0].data.reduce(
+            (acc: number, data: number) => acc + data,
+            0
+          );
+          const percentage = Math.round((value / total) * 100);
+          // Chỉ hiển thị nếu phần trăm đủ lớn
+          if (percentage < 20) return `${value} (${percentage}%)`;
+          return `${label}\n${value} (${percentage}%)`;
+        },
+        color: "#fff",
+        font: {
+          weight: "bold",
+          size: 10,
+        },
+        anchor: "center", // Hiển thị ở trung tâm mỗi phần
+        align: "center" as const,
+        offset: 0,
+        padding: {
+          top: 5,
+          bottom: 5,
+          left: 5,
+          right: 5,
+        },
+        display: (context: any) => {
+          // Tự động ẩn label nếu phần quá nhỏ
+          const value = context.dataset.data[context.dataIndex];
+          const total = context.dataset.data.reduce(
+            (acc: number, data: number) => acc + data,
+            0
+          );
+          return value / total > 0.15; // Chỉ hiển thị nếu >15%
+        },
+      },
+      tooltip: {
+        callbacks: {
+          label: (context) => {
+            const label = context.label || "";
+            const value = (context.raw as number) || 0;
+            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+            const percentage = Math.round((value / total) * 100);
+            return `${label}: ${value} (${percentage}%)`;
+          },
+        },
       },
     },
   };

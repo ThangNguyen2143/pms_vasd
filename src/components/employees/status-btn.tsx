@@ -1,5 +1,6 @@
 "use client";
 import { Lock, LockOpen } from "lucide-react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { updateData } from "~/lib/api-client";
 type statusDto = {
@@ -9,13 +10,11 @@ type statusDto = {
 function StatusBtn({
   isLocked,
   idUser,
-  onUpdate,
 }: {
   isLocked: boolean;
   idUser: number;
-  onUpdate: () => Promise<void>;
 }) {
-  // const [locked, setIsLocked] = useState(isLocked);
+  const [locked, setIsLocked] = useState(isLocked);
   const handleClick = async () => {
     const res = await updateData<"", statusDto>({
       endpoint: "/user/status",
@@ -26,23 +25,16 @@ function StatusBtn({
     });
     if (res.code === 200) {
       toast.success("Xử lý thành công");
-      await onUpdate();
+      setIsLocked(!locked);
     } else {
       toast.error(res.message);
     }
   };
-  if (isLocked)
-    return (
-      <button className="btn" onClick={handleClick}>
-        <Lock color="#ff0" />
-      </button>
-    );
-  else
-    return (
-      <button className="btn" onClick={handleClick}>
-        <LockOpen color="#0f0" />
-      </button>
-    );
+  return (
+    <button className="btn" onClick={handleClick}>
+      {locked ? <Lock color="#ff0" /> : <LockOpen color="#0f0" />}
+    </button>
+  );
 }
 
 export default StatusBtn;

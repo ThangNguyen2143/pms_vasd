@@ -94,6 +94,7 @@ function BugDetailClient({
           />
           <BugAttachments
             files={bugData.bugFiles || []}
+            bug_id={bug_id}
             uploadFile={() => setShowAddFile(true)}
           />
           <BugComments

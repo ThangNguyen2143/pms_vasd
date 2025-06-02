@@ -5,13 +5,7 @@ import { updateData } from "~/lib/api-client";
 type resetPwDto = {
   username: string;
 };
-function ResetPassBtn({
-  username,
-  onUpdate,
-}: {
-  username: string;
-  onUpdate: () => Promise<void>;
-}) {
+function ResetPassBtn({ username }: { username: string }) {
   const handleClick = async () => {
     const res = await updateData<"", resetPwDto>({
       endpoint: "/user/pass/reset",
@@ -21,7 +15,6 @@ function ResetPassBtn({
     });
     if (res.code === 200) {
       toast.success(res.message);
-      await onUpdate();
     } else {
       toast.error(res.message);
     }

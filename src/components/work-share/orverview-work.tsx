@@ -17,6 +17,7 @@ import {
 import { Bar, Pie, Radar } from "react-chartjs-2";
 import React from "react";
 import { Priority, WorkShareDto, WorkStatus } from "~/lib/types";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 
 ChartJS.register(
   ArcElement,
@@ -29,7 +30,8 @@ ChartJS.register(
   RadialLinearScale,
   PointElement,
   LineElement,
-  Filler
+  Filler,
+  ChartDataLabels
 );
 
 export default function OverviewWork({
@@ -129,6 +131,45 @@ export default function OverviewWork({
             plugins: {
               title: { display: true, text: "Độ ưu tiên" },
               legend: { position: "right" },
+              datalabels: {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                formatter: (value: number, context: any) => {
+                  if (value == 0) return null;
+                  // const label = context.chart.data.labels[context.dataIndex];
+                  const total = context.chart.data.datasets[0].data.reduce(
+                    (acc: number, data: number) => acc + data,
+                    0
+                  );
+                  const percentage = Math.round((value / total) * 100);
+                  // Chỉ hiển thị nếu phần trăm đủ lớn
+                  if (percentage < 20) return `${value} (${percentage}%)`;
+                  return `${percentage}%`;
+                },
+                color: "#fff",
+                font: {
+                  weight: "bold",
+                  size: 10,
+                },
+                anchor: "center", // Hiển thị ở trung tâm mỗi phần
+                align: "center" as const,
+                offset: 0,
+                padding: {
+                  top: 5,
+                  bottom: 5,
+                  left: 5,
+                  right: 5,
+                },
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                display: (context: any) => {
+                  // Tự động ẩn label nếu phần quá nhỏ
+                  const value = context.dataset.data[context.dataIndex];
+                  const total = context.dataset.data.reduce(
+                    (acc: number, data: number) => acc + data,
+                    0
+                  );
+                  return value / total > 0.15; // Chỉ hiển thị nếu >15%
+                },
+              },
             },
           }}
         />

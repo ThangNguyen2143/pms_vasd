@@ -32,6 +32,7 @@ export default function GanttChart({ tasks }: GanttChartProps) {
           readonly: true,
           readonly_dates: true,
           readonly_progress: true,
+          language: "vi",
         });
       }
     }

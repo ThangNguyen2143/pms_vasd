@@ -3,7 +3,7 @@ import { Link2, Pencil, UserPlus } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import UpdatePriorytyComponent from "../modal/update-priority-btn";
 import UpdateSeverityComponent from "../modal/update-severity-btn";
-import { BugStatus } from "~/lib/types";
+import { BugSeverity, BugStatus, Priority } from "~/lib/types";
 import { useApi } from "~/hooks/use-api";
 import { toast } from "sonner";
 
@@ -44,6 +44,24 @@ export default function BugInfo({
     string,
     { bug_id: number; status: string }
   >();
+  const {
+    data: priorityList,
+    getData: getPriority,
+    errorData: errorPriority,
+  } = useApi<Priority[]>();
+  const {
+    data: severityList,
+    getData: getSeverity,
+    errorData: errorSeverity,
+  } = useApi<BugSeverity[]>();
+  useEffect(() => {
+    getPriority("/system/config/eyJ0eXBlIjoicHJpb3JpdHkifQ==", "force-cache");
+    getSeverity(
+      "/system/config/eyJ0eXBlIjoiYnVnX3NldmVyaXR5In0=",
+      "force-cache"
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const handleStatusChange = async () => {
     const newStatus = selectStatus;
     if (newStatus === bug.status) return; // No change, do nothing
@@ -67,6 +85,8 @@ export default function BugInfo({
       console.error("Error updating bug status:", errorData);
     }
   }, [errorData]);
+  const priority = priorityList?.find((pri) => pri.code == bug.priority);
+  const severity = severityList?.find((ser) => ser.code == bug.severity);
   return (
     <div className="bg-base-200 p-4 rounded-lg">
       <div className="flex justify-between items-center mb-2">
@@ -141,32 +161,34 @@ export default function BugInfo({
           <strong>Mô tả:</strong> {bug.description}
         </p>
         <div className="flex gap-2">
-          <p>
-            <strong>Ưu tiên:</strong> {bug.priority}
+          <p className="tooltip tooltip-bottom" data-tip={priority?.hints}>
+            <strong>Ưu tiên:</strong> {priority?.display || bug.priority}
           </p>
-          {hiddenButton ? (
-            ""
-          ) : (
-            <UpdatePriorytyComponent
-              bug_id={bug.id}
-              onUpdate={onUpdate}
-              priority={bug.priority}
-            />
-          )}
+          {hiddenButton && errorPriority
+            ? ""
+            : priorityList && (
+                <UpdatePriorytyComponent
+                  priorityList={priorityList}
+                  bug_id={bug.id}
+                  onUpdate={onUpdate}
+                  priority={bug.priority}
+                />
+              )}
         </div>
         <div className="flex gap-2">
-          <p>
-            <strong>Ảnh hưởng:</strong> {bug.severity}
+          <p className="tooltip tooltip-bottom" data-tip={severity?.hints}>
+            <strong>Ảnh hưởng:</strong> {severity?.display || bug.severity}
           </p>
-          {hiddenButton ? (
-            ""
-          ) : (
-            <UpdateSeverityComponent
-              bug_id={bug.id}
-              onUpdate={onUpdate}
-              severity={bug.severity}
-            />
-          )}
+          {hiddenButton && errorSeverity
+            ? ""
+            : severityList && (
+                <UpdateSeverityComponent
+                  severityList={severityList}
+                  bug_id={bug.id}
+                  onUpdate={onUpdate}
+                  severity={bug.severity}
+                />
+              )}
         </div>
 
         <p>

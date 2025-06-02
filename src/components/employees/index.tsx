@@ -21,9 +21,6 @@ function EmployeeTab() {
   useEffect(() => {
     if (errorUser) toast.error(errorUser.message);
   }, [errorUser]);
-  const updateTable = async () => {
-    await getUsers("/users/" + encodeBase64({ type: "all" }), "reload");
-  };
   const fieldTable = [
     { code: "username", sub: "accountData", display: "Khởi tạo" },
     { code: "display_name", sub: "userData", display: "Họ tên" },
@@ -34,11 +31,7 @@ function EmployeeTab() {
 
   return (
     <div className="flex flex-col gap-4">
-      <Emp_Table
-        empData={users || []}
-        feildTable={fieldTable}
-        onUpdate={updateTable}
-      />
+      <Emp_Table empData={users || []} feildTable={fieldTable} />
     </div>
   );
 }

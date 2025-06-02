@@ -15,7 +15,7 @@ export type UserDto = {
   };
 };
 export type GroupDto = {
-  group_id?: string;
+  group_id: string;
   group_name: string;
   group_description: string;
   status: string;

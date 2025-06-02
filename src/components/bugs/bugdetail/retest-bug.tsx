@@ -36,6 +36,12 @@ export default function ReTestList({
       assign_code: code,
       result,
     });
+    console.log({
+      bug_id,
+      note,
+      assign_code: code,
+      result,
+    });
     if (re != "") return;
     await onUpdate();
     setConfirmDone("");
@@ -64,18 +70,21 @@ export default function ReTestList({
                 <div className="text-sm text-gray-600">{r.assignToName}</div>
                 <div>Hạn chót: {r.deadline}</div>
               </div>
-              <div>
-                <div
-                  className={clsx(
-                    "badge",
-                    `badge-${r.result ? "success" : "error"}`
-                  )}
-                >
-                  {r.result ? "Đạt" : "Không đạt"}
+              {!r.result == null && (
+                <div>
+                  <div
+                    className={clsx(
+                      "badge",
+                      `badge-${r.result ? "success" : "error"}`,
+                      "text-sm"
+                    )}
+                  >
+                    {r.result ? "Đạt" : "Không đạt"}
+                  </div>
+                  <div className="shadow">{r.note}</div>
                 </div>
-                <div className="shadow">{r.note}</div>
-              </div>
-              {!r.note && (
+              )}
+              {!r.note && r.result == null && (
                 <div
                   className="tooltip tooltip-left"
                   data-tip="Hoàn tất re-test"
@@ -97,16 +106,29 @@ export default function ReTestList({
       {confirmDone != "" && (
         <div>
           {/* Confirm done have 2 field: input to write note and button confirm */}
-          <div className="mb-2">
-            <input
-              type="checkbox"
-              className="checkbox"
-              checked={retestResult}
-              onChange={() => setRetestResult(!retestResult)}
-            />
-            <label className="label cursor-pointer">
-              <span className="label-text">Kết quả phù hợp</span>
-            </label>
+          <div className="mb-2 px-4 flex justify-between">
+            <div className="flex gap-2">
+              <input
+                type="radio"
+                className="radio"
+                name="result"
+                onChange={() => setRetestResult(true)}
+              />
+              <label className="label cursor-pointer">
+                <span className="label-text">Đã fix</span>
+              </label>
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="radio"
+                className="radio"
+                name="result"
+                onChange={() => setRetestResult(false)}
+              />
+              <label className="label">
+                <span className="label-text">Chưa fix</span>
+              </label>
+            </div>
           </div>
           <div className="mb-2">
             <label className="label">

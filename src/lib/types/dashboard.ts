@@ -56,7 +56,7 @@ export interface OverviewDTO {
   bug_summary: summaryBug;
   testcase_summary: summaryTesecase;
   timeline_summary: summaryTimeline;
-  propress_percent: progressPercent[];
+  progress_percent: progressPercent[];
 }
 export interface WorkOverviewDTO {
   user_id: number;

@@ -37,7 +37,7 @@ function TableWork({
           className="tab"
           defaultChecked
           id="overview"
-          aria-label="Tổng quan công việc"
+          aria-label="Tổng quan"
         />
         <div className="tab-content">
           <OverviewWork
@@ -50,7 +50,7 @@ function TableWork({
           type="radio"
           name="tab_swap"
           id="detail"
-          aria-label="Bảng công việc"
+          aria-label="Danh sách"
           className="tab"
         />
         <div className="tab-content">

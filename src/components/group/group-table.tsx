@@ -1,9 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AccountType, FieldDto, GroupDto } from "~/lib/types";
 import clsx from "clsx";
-import Link from "next/link";
-import { encodeBase64 } from "~/lib/services";
 import RemoveGroupBtn from "./remove-group";
+import GroupDetail from "./group-detail";
 
 function TableItem({
   emp,
@@ -19,18 +18,29 @@ function TableItem({
         if (item.display == "Thao tác") {
           return (
             <td key={"-99"}>
-              <Link
-                href={
-                  "/employees/groups/" +
-                  encodeBase64({
-                    group_id: emp.group_id,
-                  }) +
-                  `?group_name=${emp.group_name}&group_description=${emp.group_description}`
-                }
-                className="btn btn-info"
-              >
-                Chi Tiết
-              </Link>
+              <div className="drawer drawer-end">
+                <input
+                  id={`detail-group-drawer-${emp.group_id}`}
+                  type="checkbox"
+                  className="drawer-toggle"
+                />
+                <div className="drawer-content">
+                  <label
+                    htmlFor={`detail-group-drawer-${emp.group_id}`}
+                    className="btn btn-info"
+                  >
+                    Chi tiết
+                  </label>
+                </div>
+                <div className="drawer-side z-40">
+                  <label
+                    htmlFor={`detail-group-drawer-${emp.group_id}`}
+                    aria-label="close sidebar"
+                    className="drawer-overlay"
+                  ></label>
+                  <GroupDetail group={emp} />
+                </div>
+              </div>
             </td>
           );
         } else if (item.display == "Xóa") {

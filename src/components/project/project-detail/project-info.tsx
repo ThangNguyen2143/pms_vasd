@@ -87,15 +87,17 @@ export default function ProjectInfo({
           >
             <Pencil />
           </button>
-          <div className="join p-0.75">
+          <div className="join">
             <label className="join-item swap swap-rotate btn btn-secondary btn-outline">
               <input
                 type="checkbox"
                 onChange={() => setshowUpdateStatus(!showUpdateStatus)}
                 checked={showUpdateStatus}
               />
-              <Activity className="swap-off" />
-              <X className="swap-on"></X>
+              <span className="swap-off">Trạng thái</span>
+              <span className="swap-on tooltip" data-tip={"Đóng"}>
+                <X></X>
+              </span>
             </label>
             {showUpdateStatus && (
               <>

@@ -53,7 +53,7 @@ export type BugStatus = {
 export type BugSeverity = {
   code: string;
   display: string;
-  hint: string;
+  hints: string;
 };
 export type BugComment = {
   id: number;

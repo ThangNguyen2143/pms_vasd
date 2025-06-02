@@ -69,7 +69,9 @@ export async function downloadGzipBase64File({
       byteArrays.push(new Uint8Array(byteNumbers));
     }
 
-    const blob = new Blob(byteArrays, { type: contentType });
+    const blob = new Blob(byteArrays, {
+      type: contentType || "application/octet-stream",
+    });
     const url = URL.createObjectURL(blob);
 
     // Mở hoặc tải về
@@ -83,12 +85,11 @@ export async function downloadGzipBase64File({
   } else {
     // Giải mã base64 → Uint8Array
     const byteCharacters = atob(fileData);
-    const byteNumbers = new Array(byteCharacters.length)
-      .fill(0)
-      .map((_, i) => byteCharacters.charCodeAt(i));
-    const byteArray = new Uint8Array(byteNumbers);
+    const byteArray = new Uint8Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteArray[i] = byteCharacters.charCodeAt(i);
+    }
 
-    // Giải nén bằng DecompressionStream
     if (!("DecompressionStream" in window)) {
       throw new Error("Trình duyệt không hỗ trợ DecompressionStream");
     }

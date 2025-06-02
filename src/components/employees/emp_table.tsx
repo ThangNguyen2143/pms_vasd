@@ -7,15 +7,7 @@ import EditTypeModal from "./edit-type-account";
 import ResetPassBtn from "./reset-pass";
 import ListofRole from "./list-role";
 import { useState } from "react";
-function RenderCell({
-  emp,
-  item,
-  onUpdate,
-}: {
-  emp: UserDto;
-  item: FieldDto;
-  onUpdate: () => Promise<void>;
-}) {
+function RenderCell({ emp, item }: { emp: UserDto; item: FieldDto }) {
   const value = item.sub
     ? (emp as any)[item.sub]?.[item.code]
     : (emp as any)[item.code];
@@ -24,25 +16,21 @@ function RenderCell({
     case "Trạng thái":
       return (
         <td className="flex gap-2 items-center">
-          <StatusBtn
-            idUser={(emp as any)[item.code]}
-            isLocked={!emp.accountData.isActive}
-            onUpdate={onUpdate}
-          />
+          <StatusBtn idUser={emp.userid} isLocked={!emp.accountData.isActive} />
         </td>
       );
 
     case "Vai trò":
       return (
         <td>
-          <EditTypeModal role={value} userid={emp.userid} onUpdate={onUpdate} />
+          <EditTypeModal role={value} userid={emp.userid} />
         </td>
       );
 
     case "Khởi tạo":
       return (
         <td className="flex gap-2 items-center">
-          <ResetPassBtn username={value} onUpdate={onUpdate} />
+          <ResetPassBtn username={value} />
         </td>
       );
 
@@ -68,16 +56,14 @@ function RenderCell({
 function TableItem({
   emp,
   feildTable,
-  onUpdate,
 }: {
   emp: UserDto;
   feildTable: FieldDto[];
-  onUpdate: () => Promise<void>;
 }) {
   return (
     <tr>
       {feildTable.map((item: FieldDto, index: number) => (
-        <RenderCell key={index} emp={emp} item={item} onUpdate={onUpdate} />
+        <RenderCell key={index} emp={emp} item={item} />
       ))}
     </tr>
   );
@@ -86,11 +72,9 @@ function TableItem({
 function Emp_Table({
   empData,
   feildTable,
-  onUpdate,
 }: {
   empData: UserDto[];
   feildTable: FieldDto[];
-  onUpdate: () => Promise<void>;
 }) {
   const [findText, setTextFind] = useState("");
 
@@ -135,7 +119,6 @@ function Emp_Table({
                 key={emp.userid + "item"}
                 emp={emp}
                 feildTable={feildTable}
-                onUpdate={onUpdate}
               />
             ))}
           </tbody>

@@ -1,30 +1,24 @@
 "use client";
-import { memo, useEffect } from "react";
+import { memo, useEffect, useState } from "react";
 import { useApi } from "~/hooks/use-api";
 import { AccountType } from "~/lib/types";
-import ErrorMessage from "../ui/error-message";
 import { encodeBase64 } from "~/lib/services";
 import { toast } from "sonner";
 interface DataPut {
   user_id: number;
   account_type: string;
 }
-function EditTypeModal({
-  role,
-  userid,
-  onUpdate,
-}: {
-  role: string;
-  userid: number;
-  onUpdate: () => Promise<void>;
-}) {
-  const { putData, errorData, isErrorDialogOpen, setIsErrorDialogOpen } =
-    useApi<"", DataPut>();
+function EditTypeModal({ role, userid }: { role: string; userid: number }) {
+  const { putData, errorData } = useApi<"", DataPut>();
   const {
     data: accountType,
     getData: getUserType,
     errorData: errorType,
   } = useApi<AccountType[]>();
+  const [typeTemp, setTypeTemp] = useState(role);
+  useEffect(() => {
+    if (errorData) toast.error(errorData.message);
+  }, [errorData]);
   useEffect(() => {
     getUserType(
       "/system/config/" + encodeBase64({ type: "account_type" }),
@@ -35,36 +29,32 @@ function EditTypeModal({
   useEffect(() => {
     if (errorType) toast.error(errorType.message);
   }, [errorType]);
-  const handleClick = async (dis: string) => {
+  const handleClick = async (code: string) => {
     // Handle click event for account type selection
-    const selectedType = accountType?.find((item) => item.display === dis);
-    if (selectedType) {
-      const data = await putData("/user/account/type", {
-        user_id: userid,
-        account_type: selectedType.code,
-      }); // Replace with your logic to handle the selected type
-      if (data != "") {
-        toast.success("Xử lý thành công");
-        await onUpdate();
-      } else setIsErrorDialogOpen(true); // Show error dialog if there's an error
+    const data = await putData("/user/account/type", {
+      user_id: userid,
+      account_type: code,
+    }); // Replace with your logic to handle the selected type
+    if (data == "") {
+      toast.success("Xử lý thành công");
+      setTypeTemp(code);
     }
   }; // Load account type when component mounts
   return (
     <>
       <div className="dropdown">
         <div tabIndex={0} role="button" className="btn m-1">
-          {accountType?.find((type) => type.code == role)?.display || role}
+          {accountType?.find((type) => type.code == typeTemp)?.display ||
+            typeTemp}
         </div>
         <ul
           tabIndex={0}
           className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
         >
           {accountType?.map((item) => {
-            return item.code !== role ? (
+            return item.code !== typeTemp ? (
               <li key={item.code}>
-                <a onClick={(e) => handleClick(e.currentTarget.innerHTML)}>
-                  {item.display}
-                </a>
+                <a onClick={() => handleClick(item.code)}>{item.display}</a>
               </li>
             ) : (
               <li key={item.code} className="menu-disabled">
@@ -74,11 +64,6 @@ function EditTypeModal({
           })}
         </ul>
       </div>
-      <ErrorMessage
-        errorData={errorData}
-        isOpen={isErrorDialogOpen}
-        onOpenChange={setIsErrorDialogOpen}
-      />
     </>
   );
 }

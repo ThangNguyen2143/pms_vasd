@@ -5,31 +5,25 @@ import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 import { BugSeverity } from "~/lib/types";
 interface SeverityProps {
+  severityList: BugSeverity[];
   bug_id: number;
   severity: string;
   onUpdate: () => Promise<void>;
 }
 
 function UpdateSeverityComponent({
+  severityList,
   bug_id,
   severity,
   onUpdate,
 }: SeverityProps) {
   const [selectSeverity, setSelectSeverity] = useState<string>(severity);
   const [showUpdateSeverity, setshowUpdateSeverity] = useState(false);
-  const {
-    data: peverityList,
-    getData: getSeverity,
-    errorData: errorSeverity,
-  } = useApi<BugSeverity[]>();
   const { putData, isLoading, errorData } = useApi<
     "",
     { bug_id: number; severity: string }
   >();
-  useEffect(() => {
-    getSeverity("/system/config/eyJ0eXBlIjoiYnVnX3NldmVyaXR5In0=", "default");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+
   useEffect(() => {
     if (errorData) toast.error(errorData.message);
   }, [errorData]);
@@ -64,10 +58,9 @@ function UpdateSeverityComponent({
             onChange={(e) => setSelectSeverity(e.target.value)}
             value={selectSeverity}
           >
-            {!errorSeverity &&
-              peverityList &&
-              peverityList.length > 0 &&
-              peverityList.map((st) => {
+            {severityList &&
+              severityList.length > 0 &&
+              severityList.map((st) => {
                 if (st.code == severity)
                   return (
                     <option key={st.code} disabled value={st.code}>

@@ -123,15 +123,15 @@ export default function AddRequirementModal({
 
   return (
     <div className="modal modal-open">
-      <div className="modal-box">
-        <h3 className="font-bold text-lg pb-2">Tạo yêu cầu mới</h3>
-        <div className="flex flex-col gap-2 px-4">
+      <div className="modal-box w-11/12 max-w-7xl max-h-11/12 h-full">
+        <h3 className="font-bold text-lg mb-2">Tạo yêu cầu mới</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 px-4 text-lg">
           <label className="floating-label">
             <span>Phần mềm</span>
             <select
               name="product_id"
               value={productSelect}
-              className="select"
+              className="select w-full"
               onChange={(e) => setproductSelect(e.target.value)}
             >
               <option value="">Chọn phần mềm</option>
@@ -142,31 +142,10 @@ export default function AddRequirementModal({
               ))}
             </select>
           </label>
-
-          <label className="floating-label">
-            <span>Tiêu đề</span>
-            <input
-              type="text"
-              className="input input-neutral"
-              placeholder="Tiêu đề"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </label>
-          <label className="floating-label">
-            <span>Mô tả</span>
-            <input
-              type="text"
-              className="input input-neutral"
-              placeholder="Mô tả"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </label>
           <label className="floating-label">
             <span>Loại yêu cầu</span>
             <select
-              className="select select-neutral"
+              className="select select-neutral w-full"
               value={typeSelected}
               onChange={(e) => setTypeSelected(e.target.value)}
             >
@@ -180,11 +159,31 @@ export default function AddRequirementModal({
               ))}
             </select>
           </label>
+          <label className="floating-label sm:col-span-2">
+            <span>Tiêu đề</span>
+            <input
+              type="text"
+              className="input input-neutral w-full"
+              placeholder="Tiêu đề"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </label>
+          <label className="floating-label sm:col-span-2">
+            <span>Mô tả</span>
+            <textarea
+              className="textarea textarea-neutral w-full h-52"
+              placeholder="Mô tả"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </label>
+
           <label className="floating-label">
             <span>Ngày ghi nhận</span>
             <input
               type="datetime-local"
-              className="input input-neutral"
+              className="input input-neutral w-full"
               placeholder="Ngày ghi nhận"
               value={dateReceive}
               onChange={(e) => setDateReceive(e.target.value)}
@@ -193,7 +192,7 @@ export default function AddRequirementModal({
           <div className="join w-full">
             <input
               type="text"
-              className="input join-item input-neutral"
+              className="input join-item input-neutral w-full"
               value={newTag}
               onChange={(e) => setNewTag(e.target.value)}
               onKeyUp={(e) => {
@@ -224,11 +223,11 @@ export default function AddRequirementModal({
             ))}
           </div>
 
-          <label className="form-control w-full">
+          <label className="flex flex-col w-full sm:col-span-2">
             <span className="label">Khoa/Phòng</span>
-            <div className="flex gap-2">
+            <div className="join">
               <select
-                className="select select-neutral flex-1"
+                className="select select-neutral flex-1 join-item"
                 value={locationId}
                 onChange={(e) => setLocationId(Number(e.target.value))}
               >
@@ -243,7 +242,7 @@ export default function AddRequirementModal({
               </select>
               <button
                 type="button"
-                className="btn btn-outline"
+                className="btn btn-outline join-item"
                 onClick={onAddNewLocation}
               >
                 + Thêm
@@ -257,7 +256,7 @@ export default function AddRequirementModal({
               type="text"
               value={requester}
               placeholder="Người yêu cầu"
-              className="input input-neutral"
+              className="input input-neutral w-full"
               onChange={(e) => setRequester(e.target.value)}
             />
           </label>
@@ -265,7 +264,7 @@ export default function AddRequirementModal({
             <span>Vai trò</span>
             <input
               type="text"
-              className="input input-neutral"
+              className="input input-neutral w-full"
               placeholder="Vai trò"
               value={role}
               onChange={(e) => setRole(e.target.value)}
