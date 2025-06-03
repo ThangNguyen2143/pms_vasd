@@ -56,7 +56,7 @@ export default function NoteRequirment({
   return (
     <div className="bg-base-200 p-4 rounded-lg">
       <h3 className="text-lg font-semibold text-primary mb-2">💬 Bình luận</h3>
-      <div className="space-y-2 mb-4">
+      <div className="space-y-2 mb-4 max-h-96 overflow-auto">
         {comments ? (
           comments.map((comment) => {
             return (
@@ -80,7 +80,7 @@ export default function NoteRequirment({
             );
           })
         ) : (
-          <div className="text-base-200 text-center">Chưa có ghi chú nào</div>
+          <div className="text-base-200 text-center">Chưa có bình luận nào</div>
         )}
       </div>
       <div className="flex items-start gap-2">

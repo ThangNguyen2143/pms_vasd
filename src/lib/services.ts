@@ -9,7 +9,7 @@ export function encodeBase64(obj: object): string {
 export function decodeBase64(str: string): object {
   return JSON.parse(decode(str));
 }
-export async function getItem({
+export async function getItem<T>({
   endpoint,
   cache = "force-cache",
 }: {
@@ -23,7 +23,20 @@ export async function getItem({
       token: session.token,
     },
   });
-  return await result.json();
+  let re: DataResponse<T>;
+  try {
+    re = (await result.json()) as DataResponse<T>;
+    return re;
+  } catch (e) {
+    console.log(e);
+    return {
+      code: 500,
+      message: "Lỗi parse",
+      hint: "",
+      value: "",
+      status: "failed",
+    };
+  }
 }
 export async function postItem({
   endpoint,

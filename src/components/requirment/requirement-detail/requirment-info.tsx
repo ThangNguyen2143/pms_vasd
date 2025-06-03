@@ -74,9 +74,9 @@ export default function RequirementInfo({
             data-tip="Chỉnh sửa"
             onClick={onEdit}
           >
-            <Pencil size={18} />
+            <Pencil />
           </button>
-          <div className="join p-0.75">
+          <div className="join">
             <label className="join-item swap swap-rotate btn btn-secondary btn-sm btn-ghost">
               <input
                 type="checkbox"
@@ -84,7 +84,7 @@ export default function RequirementInfo({
                 checked={showUpdateStatus}
               />
               <Activity className="swap-off" />
-              <X className="swap-on"></X>
+              <X className="swap-on" />
             </label>
             {showUpdateStatus && (
               <>

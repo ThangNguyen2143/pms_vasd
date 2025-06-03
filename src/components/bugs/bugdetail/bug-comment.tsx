@@ -85,7 +85,7 @@ export default function BugComments({
         <h4 className="text-lg font-semibold text-primary mb-2">
           💬 Bình luận
         </h4>
-        <div className="border border-amber-100 shadow">
+        <div className="border border-amber-100 shadow max-h-96 overflow-y-auto">
           {comments ? (
             comments.map((comment) => {
               return (
@@ -113,9 +113,13 @@ export default function BugComments({
         <div className="flex items-start gap-2">
           <div className="avatar avatar-placeholder mt-4">
             <div className="bg-neutral text-neutral-content w-8 rounded-full">
-              <span className="text-lg">
-                {user?.name.slice(user.name.lastIndexOf(" ") + 1)[0] || "VASD"}
-              </span>
+              {user ? (
+                <span className="text-lg">
+                  {user.name.slice(user.name.lastIndexOf(" ") + 1)[0]}
+                </span>
+              ) : (
+                <span className="text-sm">VASD</span>
+              )}
             </div>
           </div>
           <div className="join-vertical mt-4 w-full border-dashed border rounded-2xl p-3">

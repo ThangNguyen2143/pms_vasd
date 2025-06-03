@@ -18,7 +18,7 @@ export async function fetchData<T>({
 }): Promise<DataResponse<T>> {
   try {
     // Use your existing getItem method
-    const response = await getItem({ endpoint, cache });
+    const response = await getItem<T>({ endpoint, cache });
     return response as DataResponse<T>;
   } catch (error) {
     // Handle unexpected errors

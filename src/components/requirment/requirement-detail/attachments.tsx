@@ -1,7 +1,10 @@
 "use client";
-import React, { useState } from "react";
-import { Paperclip } from "lucide-react";
-import { downloadGzipBase64File } from "~/utils/file-to-base64";
+import React, { useEffect, useState } from "react";
+import { Download, ExternalLink, Paperclip } from "lucide-react";
+import {
+  downloadGzipBase64File,
+  openGzipBase64FileInNewTab,
+} from "~/utils/file-to-base64";
 import { useApi } from "~/hooks/use-api";
 import { FileDto } from "~/lib/types";
 import { encodeBase64 } from "~/lib/services";
@@ -14,23 +17,24 @@ export default function Attachments({
   files: { file_id: number; file_name: string; file_type: string }[];
   onAdd: () => void;
 }) {
-  const { getData } = useApi<FileDto>(); // ⚠️ chỉ dùng getData, không dùng state dùng chung
+  const { getData, errorData } = useApi<FileDto>(); // ⚠️ chỉ dùng getData, không dùng state dùng chung
   const [loadingMap, setLoadingMap] = useState<Record<number, boolean>>({}); // trạng thái tải theo file_id
 
-  const handleDownfile = async (file_id: number) => {
+  const handleDownfile = async (file_id: number, type: string) => {
     setLoadingMap((prev) => ({ ...prev, [file_id]: true }));
 
     const res = await getData(
       "/requirements/file/" + encodeBase64({ file_id })
     );
     if (res) {
-      await downloadGzipBase64File(res);
-    } else {
-      toast.error("Tải file thất bại hoặc không tìm thấy file.");
+      if (type == "down") await downloadGzipBase64File(res);
+      else await openGzipBase64FileInNewTab(res);
     }
-
     setLoadingMap((prev) => ({ ...prev, [file_id]: false }));
   };
+  useEffect(() => {
+    if (errorData) toast.error(errorData.message);
+  }, [errorData]);
   return (
     <div className="bg-base-200 p-4 rounded-lg">
       <div className="flex justify-between items-center mb-2">
@@ -56,12 +60,22 @@ export default function Attachments({
               {loadingMap[f.file_id] ? (
                 <span className="loading loading-ball"></span>
               ) : (
-                <span
-                  className="link text-blue-500 hover:underline cursor-pointer"
-                  onClick={() => handleDownfile(f.file_id)}
-                >
-                  Tải về
-                </span>
+                <>
+                  <span
+                    className="btn btn-circle text-blue-500 tooltip"
+                    data-tip="Tải xuống"
+                    onClick={() => handleDownfile(f.file_id, "down")}
+                  >
+                    <Download></Download>
+                  </span>
+                  <span
+                    className="btn btn-circle text-blue-500 tooltip"
+                    data-tip="Mở trong tab mới"
+                    onClick={() => handleDownfile(f.file_id, "open")}
+                  >
+                    <ExternalLink />
+                  </span>
+                </>
               )}
             </li>
           ))}

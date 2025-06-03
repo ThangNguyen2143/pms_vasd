@@ -42,6 +42,14 @@ function WorkBox({ title, items }: { title: string; items: any[] }) {
           product_id: item.product_id,
         })}`
     );
+  else if (title.includes("Testcase"))
+    urls = items.map(
+      (item) =>
+        `/testcase/${encodeBase64({
+          testcase_id: item.tesecase_id,
+          product_id: item.product_id,
+        })}`
+    );
   return (
     <div className="bg-base-100 p-3 rounded shadow border">
       <h4 className="font-semibold text-primary mb-2">{title}</h4>

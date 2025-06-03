@@ -11,7 +11,7 @@ export default function RequirmentLogs({
       <h3 className="text-lg font-semibold text-primary mb-2">
         📜 Nhật ký yêu cầu
       </h3>
-      <div className="flex flex-col-reverse overflow-y-auto max-h-48">
+      <div className="flex flex-col-reverse overflow-y-auto max-h-96">
         {logs.length > 0 ? (
           logs.map((log) => (
             <div

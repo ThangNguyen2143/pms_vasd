@@ -103,6 +103,7 @@ export type BugReTest = {
 };
 export type TestDb = {
   id: string;
+  testcase_id: number;
   title: string;
   status: string;
   product_id: string;
