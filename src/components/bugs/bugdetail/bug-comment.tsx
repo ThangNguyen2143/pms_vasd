@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { BugComment, Contact } from "~/lib/types";
+import { useUser } from "~/providers/user-context";
 import { sendEmail } from "~/utils/send-notify";
 
 interface ResponseNotify {
@@ -28,6 +29,7 @@ export default function BugComments({
   comments: BugComment[];
   updateComment: () => Promise<void>;
 }) {
+  const { user } = useUser();
   const [newComment, setNewComment] = useState("");
   const { postData, errorData } = useApi<
     ResponseNotify,
@@ -111,7 +113,9 @@ export default function BugComments({
         <div className="flex items-start gap-2">
           <div className="avatar avatar-placeholder mt-4">
             <div className="bg-neutral text-neutral-content w-8 rounded-full">
-              <span className="text-lg">A</span>
+              <span className="text-lg">
+                {user?.name.slice(user.name.lastIndexOf(" ") + 1)[0] || "VASD"}
+              </span>
             </div>
           </div>
           <div className="join-vertical mt-4 w-full border-dashed border rounded-2xl p-3">
@@ -125,6 +129,7 @@ export default function BugComments({
               <button
                 className="btn btn-ghost btn-sm rounded-full"
                 onClick={handleAddComment}
+                disabled={newComment.trim().length == 0}
                 aria-label="Gửi"
               >
                 <Send />

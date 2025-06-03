@@ -159,6 +159,7 @@ export default function TaskDetailClient({
           onClose={() => setShowLinkModal(false)}
           product_id={product_id}
           task_id={task_id}
+          linked={task.requirementTasks}
           onUpdate={reloadTaskData}
         />
       )}

@@ -164,7 +164,7 @@ export default function BugInfo({
           <p className="tooltip tooltip-bottom" data-tip={priority?.hints}>
             <strong>Ưu tiên:</strong> {priority?.display || bug.priority}
           </p>
-          {hiddenButton && errorPriority
+          {hiddenButton || errorPriority
             ? ""
             : priorityList && (
                 <UpdatePriorytyComponent
@@ -179,7 +179,7 @@ export default function BugInfo({
           <p className="tooltip tooltip-bottom" data-tip={severity?.hints}>
             <strong>Ảnh hưởng:</strong> {severity?.display || bug.severity}
           </p>
-          {hiddenButton && errorSeverity
+          {hiddenButton || errorSeverity
             ? ""
             : severityList && (
                 <UpdateSeverityComponent

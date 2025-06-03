@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { Comment, ResopnseInfor, Task } from "~/lib/types";
+import { useUser } from "~/providers/user-context";
 import { sendEmail } from "~/utils/send-notify";
 
 function TaskComments({
@@ -16,6 +17,7 @@ function TaskComments({
   task: Task;
   onUpdate: () => Promise<void>;
 }) {
+  const { user } = useUser();
   const [newComment, setNewComment] = useState("");
   const { postData, isLoading, errorData } = useApi<
     ResopnseInfor,
@@ -98,7 +100,13 @@ function TaskComments({
         <div className="flex items-start gap-2">
           <div className="avatar avatar-placeholder mt-4">
             <div className="bg-neutral text-neutral-content w-8 rounded-full">
-              <span className="text-lg">A</span>
+              {user ? (
+                <span className="text-lg">
+                  {user.name.slice(user.name.lastIndexOf(" ") + 1)[0]}
+                </span>
+              ) : (
+                <span className="text-sm">VASD</span>
+              )}
             </div>
           </div>
           <div className="join-vertical mt-4 w-full border-dashed border rounded-2xl p-3">

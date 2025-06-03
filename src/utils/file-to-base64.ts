@@ -12,7 +12,29 @@ export async function compressFileGzip(file: File): Promise<Blob> {
   const compressedBlob = await new Response(compressedStream).blob();
   return compressedBlob;
 }
-
+/**
+ * Hàm xác định loại dữ liệu từ tên tệp
+ * @param fileName : Tên tệp
+ * @returns Loại dữ liệu
+ */
+function getContentTypeFromFileName(fileName: string): string {
+  const extension = fileName.split(".").pop()?.toLowerCase();
+  switch (extension) {
+    case "jpg":
+    case "jpeg":
+      return "image/jpeg";
+    case "png":
+      return "image/png";
+    case "gif":
+      return "image/gif";
+    case "webp":
+      return "image/webp";
+    case "svg":
+      return "image/svg+xml";
+    default:
+      return "application/octet-stream";
+  }
+}
 /**
  * Đọc blob hoặc file thành base64 string (chỉ phần mã hóa).
  */
@@ -119,6 +141,37 @@ export async function openGzipBase64FileInNewTab({
   contentType?: string;
   fileData: string;
 }) {
+  // Xác định loại nội dung dựa trên phần mở rộng tệp nếu contentType không được cung cấp
+  const actualContentType = contentType || getContentTypeFromFileName(fileName);
+
+  // Xử lý hình ảnh (không phải gzip)
+  if (
+    !actualContentType.includes("application/gzip") &&
+    (actualContentType.startsWith("image/") ||
+      actualContentType == "application/pdf")
+  ) {
+    const base64Data = `data:${actualContentType};base64,${fileData}`;
+    const newWindow = window.open("", "_blank");
+    if (newWindow) {
+      newWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>${fileName.replace(/\.gz$/, "")}</title>
+            <style>
+              body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f0f0f0; }
+              img { max-width: 100%; max-height: 100%; object-fit: contain; }
+            </style>
+          </head>
+          <body>
+            <img src="${base64Data}" alt="${fileName}" />
+          </body>
+        </html>
+      `);
+      newWindow.document.close();
+    }
+    return;
+  }
   if (contentType !== "application/gzip") {
     // Nếu không phải gzip thì tạo blob và mở tab
     const byteCharacters = atob(fileData);

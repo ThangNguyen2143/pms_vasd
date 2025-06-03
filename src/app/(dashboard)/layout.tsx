@@ -1,4 +1,5 @@
 import { TopNav } from "~/components/nav";
+import { ProjectProvider } from "~/providers/project-context";
 
 export default async function DashboardLayout({
   children,
@@ -8,7 +9,7 @@ export default async function DashboardLayout({
   return (
     <main className="container mx-auto p-4">
       <TopNav />
-      {children}
+      <ProjectProvider>{children}</ProjectProvider>
     </main>
   );
 }

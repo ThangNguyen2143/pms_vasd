@@ -150,13 +150,15 @@ function ClientDashboardPage() {
         `/dashboard/${encodeBase64({
           type: "overview",
           project_id: projectId,
-        })}`
+        })}`,
+        "no-cache"
       );
       getWorkOverview(
         `/dashboard/${encodeBase64({
           type: "assignment_summary",
           project_id: projectId,
-        })}`
+        })}`,
+        "no-cache"
       );
       getGanttData(
         `/dashboard/${encodeBase64({

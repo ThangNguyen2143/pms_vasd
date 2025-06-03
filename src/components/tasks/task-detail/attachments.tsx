@@ -24,7 +24,6 @@ export default function Attachments({
     setLoadingMap((prev) => ({ ...prev, [file_id]: true }));
 
     const res = await getData("/tasks/file/" + encodeBase64({ file_id }));
-    console.log(res);
     if (res)
       if (type == "down") await downloadGzipBase64File(res);
       else await openGzipBase64FileInNewTab(res);

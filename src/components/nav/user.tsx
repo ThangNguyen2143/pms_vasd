@@ -1,6 +1,5 @@
 "use client";
 import Link from "next/link";
-import { logout } from "~/app/(auth)/login/actions/auth";
 import { encodeBase64 } from "~/lib/services";
 import ChangePassForm from "../profile/change-pass";
 
@@ -8,10 +7,12 @@ function UserIcon({
   id,
   name,
   username,
+  onLogout,
 }: {
   id?: number;
   name: string;
   username: string;
+  onLogout: () => void;
 }) {
   if (!id) return <div className="btn btn-ghost">Đang tải...</div>;
   const userParse = encodeBase64({ id });
@@ -44,7 +45,7 @@ function UserIcon({
             </a>
           </li>
           <li>
-            <a onClick={logout}>Đăng xuất</a>
+            <a onClick={onLogout}>Đăng xuất</a>
           </li>
         </ul>
       </div>

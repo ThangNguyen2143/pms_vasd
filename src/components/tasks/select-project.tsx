@@ -1,12 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-import { useEffect, useState } from "react";
-import { useApi } from "~/hooks/use-api";
-import { encodeBase64 } from "~/lib/services";
-import { ProductDto, ProjectDto } from "~/lib/types";
-interface ProductAndProject extends ProjectDto {
-  product?: ProductDto[];
-}
+import { useEffect } from "react";
+// import { useApi } from "~/hooks/use-api";
+// import { encodeBase64 } from "~/lib/services";
+// import { ProductDto, ProjectDto } from "~/lib/types";
+import { useProject } from "~/providers/project-context";
+
 const LOCAL_STORAGE_KEY = "selectedProductId";
 
 function SelectProject({
@@ -16,10 +15,12 @@ function SelectProject({
   productSelected: string;
   setProductSelect: (product_id: string) => void;
 }) {
-  const endpointProject = "/project/" + encodeBase64({ type: "all" });
-  const { data: dataProject, getData, errorData } = useApi<ProjectDto[]>();
-  const { getData: getProductList } = useApi<ProductDto[]>();
-  const [listSelect, setListSelect] = useState<ProductAndProject[]>([]);
+  const projectContext = useProject();
+  const dataProject = projectContext?.projects;
+  // const endpointProject = "/project/" + encodeBase64({ type: "all" });
+  // const { data: dataProject, getData, errorData } = useApi<ProjectDto[]>();
+  // const { getData: getProductList } = useApi<ProductDto[]>();
+  // const [listSelect, setListSelect] = useState<ProductAndProject[]>([]);
 
   // Lấy lại lựa chọn từ localStorage
   useEffect(() => {
@@ -30,41 +31,41 @@ function SelectProject({
   }, []);
 
   // Lấy dữ liệu project
-  useEffect(() => {
-    if (!dataProject && !errorData) getData(endpointProject, "reload");
-  }, []);
+  // useEffect(() => {
+  //   if (!dataProject && !errorData) getData(endpointProject, "reload");
+  // }, []);
 
   // Lấy danh sách sản phẩm theo từng project
-  useEffect(() => {
-    const fetchAllProducts = async () => {
-      if (dataProject) {
-        const promises = dataProject.map(async (project) => {
-          const endpointProduct =
-            "/product/" + encodeBase64({ type: "all", project_id: project.id });
-          try {
-            const products = await getProductList(endpointProduct, "reload");
-            const activeProducts = products?.filter(
-              (p) => p.status === "active"
-            );
-            return {
-              ...project,
-              product: activeProducts?.length ? activeProducts : undefined,
-            };
-          } catch {
-            return {
-              ...project,
-              product: undefined,
-            };
-          }
-        });
+  // useEffect(() => {
+  //   const fetchAllProducts = async () => {
+  //     if (dataProject) {
+  //       const promises = dataProject.map(async (project) => {
+  //         const endpointProduct =
+  //           "/product/" + encodeBase64({ type: "all", project_id: project.id });
+  //         try {
+  //           const products = await getProductList(endpointProduct, "reload");
+  //           const activeProducts = products?.filter(
+  //             (p) => p.status === "active"
+  //           );
+  //           return {
+  //             ...project,
+  //             product: activeProducts?.length ? activeProducts : undefined,
+  //           };
+  //         } catch {
+  //           return {
+  //             ...project,
+  //             product: undefined,
+  //           };
+  //         }
+  //       });
 
-        const results = await Promise.all(promises);
-        setListSelect(results);
-      }
-    };
+  //       const results = await Promise.all(promises);
+  //       setListSelect(results);
+  //     }
+  //   };
 
-    fetchAllProducts();
-  }, [dataProject]);
+  //   fetchAllProducts();
+  // }, [dataProject]);
 
   // Lưu vào localStorage khi người dùng chọn sản phẩm
   const handleClickProduct = (product_id: string) => {
@@ -73,12 +74,14 @@ function SelectProject({
   };
 
   const findProject = (product_id: string) => {
-    const projectInList = listSelect.find((t) =>
-      t.product?.some((p) => p.id === product_id)
-    );
+    const projectInList = dataProject?.find((project) => {
+      if (project.products)
+        return project.products.some((product) => product.id === product_id);
+      return undefined;
+    });
     if (projectInList) {
       return {
-        product: projectInList.product,
+        product: projectInList.products,
         ...dataProject?.find((project) => projectInList.id === project.id),
       };
     }
@@ -95,23 +98,6 @@ function SelectProject({
   );
 
   if (!dataProject) {
-    if (errorData) {
-      if (errorData.code === 401)
-        return <div className="alert alert-warning">Bạn chưa đăng nhập</div>;
-      if (errorData.code === 403)
-        return (
-          <div className="alert alert-warning">Bạn không có quyền truy cập</div>
-        );
-      if (errorData.code === 404)
-        return <div className="alert alert-error">Không tìm thấy dữ liệu</div>;
-      if (errorData.code === 500)
-        return (
-          <div className="alert alert-error">
-            Lỗi máy chủ, vui lòng thử lại sau
-          </div>
-        );
-      return <div className="alert alert-error">{errorData?.message}</div>;
-    }
     return (
       <div className="alert alert-info">
         Đang tải
@@ -119,9 +105,6 @@ function SelectProject({
       </div>
     );
   }
-  if (errorData?.code !== 200 && !dataProject)
-    return <div className="alert alert-error">{errorData?.message}</div>;
-
   return (
     <div className="dropdown">
       <div tabIndex={0} role="button" className="btn m-1">
@@ -131,12 +114,12 @@ function SelectProject({
         tabIndex={0}
         className="menu dropdown-content bg-base-100 rounded-box z-10 p-2 shadow-sm"
       >
-        {listSelect.map((project) => (
+        {dataProject.map((project) => (
           <li key={project.id}>
             <h2 className="menu-title">{project.name}</h2>
-            {project.product ? (
+            {project.products ? (
               <ul>
-                {project.product.map((product) => (
+                {project.products.map((product) => (
                   <li key={product.id}>
                     <a
                       id={product.id}

@@ -3,30 +3,43 @@ import Link from "next/link";
 import UserIcon from "./user";
 import Image from "next/image";
 import Navigation from "./sidenav/component/navigation";
-import { useEffect, useState } from "react";
-import { getUser } from "~/lib/dal";
+// import { useEffect } from "react";
+// import { getUser } from "~/lib/dal";
 import { logout } from "~/app/(auth)/login/actions/auth";
 import ThemeToggle from "./theme-toggle";
-type userSecurity = {
-  id: number | undefined;
-  name: string;
-  username: string;
-  role: string;
-};
+import { useUser } from "~/providers/user-context";
+import { useRouter } from "next/navigation";
+// type userSecurity = {
+//   id: number | undefined;
+//   name: string;
+//   username: string;
+//   role: string;
+// };
 export default function TopNav() {
-  // const pathname = usePathname();
-  // const title =
-  //   pathname.split("/").slice()[1].replace(/-/g, " ").toUpperCase() || "Home";
-  const [user, setUser] = useState<userSecurity>();
-  useEffect(() => {
-    const temp = async () => {
-      const t = await getUser();
-      if (!t) logout();
-      else setUser(t);
-    };
-    temp();
-  }, []);
+  const router = useRouter();
+  const { user, isAuthenticated, setUser } = useUser(); // Sử dụng hook useUser
 
+  // Kiểm tra đăng nhập và chuyển hướng nếu cần
+  // useEffect(() => {
+  //   const checkAuth = async () => {
+  //     console.log("Kiểm tra xác thực:", isAuthenticated);
+  //     if (!isAuthenticated) {
+  //       // Nếu không đăng nhập, chuyển hướng đến trang login
+  //       router.push("/login");
+  //     }
+  //   };
+
+  //   checkAuth();
+  // }, [isAuthenticated, router]);
+  const handleLogout = async () => {
+    await logout();
+    setUser(null); // Xóa thông tin user khỏi context
+    router.push("/login"); // Chuyển hướng đến trang đăng nhập
+  };
+
+  if (!isAuthenticated) {
+    return <div>Đang chuyển hướng...</div>; // Hoặc hiển thị loading
+  }
   if (!user) return <div>Đang tải</div>;
   return (
     <div className="navbar bg-base-100 shadow-sm">
@@ -75,7 +88,13 @@ export default function TopNav() {
       </div>
       <div className="navbar-end">
         <ThemeToggle />
-        <UserIcon name={user.name} id={user.id} username={user.username} />
+        <UserIcon
+          name={user.name}
+          id={user.userId}
+          username={user.name} // Hoặc thêm username vào User type nếu cần
+          onLogout={handleLogout}
+          // Thêm prop onLogout nếu cần
+        />
       </div>
     </div>
   );

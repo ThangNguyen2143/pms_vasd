@@ -11,6 +11,7 @@ import { postItem } from "~/lib/services";
 import { createSession } from "~/lib/session";
 import { setMenuRoute } from "~/app/(auth)/login/actions/auth";
 import { useRouter } from "next/navigation";
+import { useUser } from "~/providers/user-context";
 type SignInRespone = {
   token: string;
   username: string;
@@ -22,6 +23,7 @@ type SignInRespone = {
 };
 export default function SignInForm({ callbackUrl }: { callbackUrl?: string }) {
   const router = useRouter();
+  const { setUser } = useUser();
   const { errorData, isErrorDialogOpen, setIsErrorDialogOpen } = useApiError();
   // const [state, action, loading] = useActionState(signIn, undefined);
   const [username, setUsername] = useState<string>("");
@@ -47,6 +49,13 @@ export default function SignInForm({ callbackUrl }: { callbackUrl?: string }) {
       toast.error(postResponse.message);
     if (postResponse.value) {
       const data = postResponse?.value;
+      // Cập nhật thông tin người dùng vào context
+      setUser({
+        userId: data.userid,
+        name: data.display,
+        role: data.account_type,
+        expires: data.expired,
+      });
       // 4. Handle the response from the API
       await createSession({
         userId: data.userid,

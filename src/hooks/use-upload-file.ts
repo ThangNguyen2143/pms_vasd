@@ -48,7 +48,7 @@ export function useUploadFile<T = string>(method: "post" | "put" = "post") {
           maxBodyLength: Infinity,
         });
       }
-
+      if (res.data.code !== 200) setUploadError(res.data.message);
       setResponse(res.data);
       return res.data;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

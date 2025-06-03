@@ -10,14 +10,17 @@ export default function Logs({ logs }: { logs: TaskLog[] }) {
       <h3 className="text-lg font-semibold text-primary mb-2">
         📜 Nhật ký nhiệm vụ
       </h3>
-      <div className="space-y-2">
+      <div className="space-y-2 max-h-96 overflow-auto">
         {logs.map((log, idx) => (
           <div
             key={idx}
             className="bg-base-100 p-3 rounded-lg border-l-4 border-secondary"
           >
             <p>
-              <strong>{log.name}</strong> – {log.date}
+              <strong>{log.name}</strong>
+            </p>
+            <p>
+              <i>{log.date}</i>
             </p>
             <p>{log.content}</p>
           </div>

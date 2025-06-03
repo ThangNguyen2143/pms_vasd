@@ -4,6 +4,7 @@ import { compressFileGzip, blobToBase64 } from "./file-to-base64";
 const COMPRESSED_TYPES = [
   "application/pdf",
   "image/png",
+  "image/jpg",
   "image/jpeg",
   "video/mp4",
 ];

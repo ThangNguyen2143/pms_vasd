@@ -16,6 +16,8 @@ export const status_with_color = (status: string) => {
     case "WAITING_REVIEW":
     case "ASSIGNED":
       return "accent";
+    case "ON_HOLD":
+      return "warning";
     default:
       return "ghost";
   }

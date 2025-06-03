@@ -19,7 +19,10 @@ export default function RequirmentLogs({
               className="bg-base-100 p-3 mb-2 rounded border-l-4 border-info"
             >
               <p>
-                <strong>{log.name}</strong> – {log.date}
+                <strong>{log.name}</strong>
+              </p>
+              <p>
+                <i>{log.date}</i>
               </p>
               <p>{log.content}</p>
             </div>

@@ -22,7 +22,7 @@ export default function AddFileAttachmentModal({
       uploadUrl: "/tasks/file",
       meta: { task_id },
     });
-    if (re?.value != "") return;
+    if (re?.code != 200) return;
     toast.success("Tệp đính kèm đã được thêm thành công");
     await onUpdate();
     onClose();

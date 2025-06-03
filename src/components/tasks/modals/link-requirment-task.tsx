@@ -1,72 +1,67 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { DateRange, DayPicker } from "react-day-picker";
+// import { DateRange, DayPicker } from "react-day-picker";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
-import { RequirementDto } from "~/lib/types";
+import { RequirementTask } from "~/lib/types";
 
-let timeout: NodeJS.Timeout;
+// let timeout: NodeJS.Timeout;
 interface DataPut {
   type: string;
   task_id: number;
   requirement_id: number[];
 }
+type LinkRequirement = {
+  id: number;
+  title: string;
+};
 export default function LinkRequirementModal({
   onClose,
   onUpdate,
   product_id,
   task_id,
+  linked,
 }: {
   onClose: () => void;
   onUpdate: () => Promise<void>;
   task_id: number;
   product_id: string;
+  linked?: RequirementTask[];
 }) {
-  const { getData } = useApi<RequirementDto[]>();
-  const [date, setDate] = useState<DateRange | undefined>();
-  const [requirementList, setRequirementList] = useState<RequirementDto[]>([]);
+  const { getData, isLoading: loadData } = useApi<LinkRequirement[]>();
+  // const [date, setDate] = useState<DateRange | undefined>();
+  const [requirementList, setRequirementList] = useState<LinkRequirement[]>([]);
+
   const [selectedRequirementId, setSelectedRequirementId] = useState<number>(0);
   const [linkedRequirements, setLinkedRequirements] = useState<
-    RequirementDto[]
-  >([]);
-  const [loading, setLoading] = useState(false);
+    LinkRequirement[]
+  >(
+    linked?.map((linkRe) => ({
+      id: linkRe.requirement_id,
+      title: linkRe.requirement_title,
+    })) || []
+  );
+  // const [loading, setLoading] = useState(false);
   const { putData, isLoading, errorData } = useApi<string, DataPut>();
   // Gọi API sau 1500ms kể từ khi người dùng thay đổi ngày
   useEffect(() => {
-    setLoading(true);
-    if (date?.from && date?.to) {
-      const from = date.from.toISOString().slice(0, 19).replace("T", " ");
-      const to = date.to.toISOString().slice(0, 19).replace("T", " ");
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        getData(
-          "/requirements/" +
-            encodeBase64({
-              type: "product",
-              product_id,
-              from,
-              to,
-            }),
-          "reload"
-        ).then((res) => {
-          if (Array.isArray(res)) {
-            setLoading(false);
-            setRequirementList(res);
-          } else {
-            setLoading(false);
-            setRequirementList([]);
-          }
-        });
-      }, 1500);
-    } else {
-      setLoading(false);
-      setRequirementList([]);
-    }
+    getData(
+      "/requirements/list/" +
+        encodeBase64({
+          product_id,
+        }),
+      "reload"
+    ).then((res) => {
+      if (Array.isArray(res)) {
+        setRequirementList(res);
+      } else {
+        setRequirementList([]);
+      }
+    });
 
-    return () => clearTimeout(timeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [date]);
+  }, []);
   useEffect(() => {
     if (errorData) toast.error(errorData.message);
   }, [errorData]);
@@ -110,8 +105,7 @@ export default function LinkRequirementModal({
     <div className="modal modal-open">
       <div className="modal-box">
         <h3 className="font-bold text-lg">Liên kết yêu cầu</h3>
-
-        {/* Chọn ngày */}
+        {/*   
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Khoảng thời gian</legend>
           <button popoverTarget="rdp-popover" className="input input-border">
@@ -128,7 +122,7 @@ export default function LinkRequirementModal({
             />
           </div>
         </fieldset>
-        {/* Danh sách yêu cầu nếu có */}
+        
         {loading ? (
           <span className="loading loading-ball"></span>
         ) : (
@@ -139,8 +133,10 @@ export default function LinkRequirementModal({
               Không có yêu cầu nào trong khoảng thời gian đã chọn.
             </p>
           )
+        )} */}
+        {loadData && (
+          <span className="loading loading-infinity loading-xl"></span>
         )}
-
         {requirementList.length > 0 && (
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Yêu cầu</legend>
@@ -169,12 +165,12 @@ export default function LinkRequirementModal({
         {/* Danh sách các yêu cầu đã chọn */}
         {linkedRequirements.length > 0 && (
           <fieldset className="fieldset">
-            <legend className="fieldset-legend">Đã liên kết</legend>
+            <legend className="fieldset-legend">Đã chọn</legend>
             <ul className="space-y-1">
               {linkedRequirements.map((req, index) => (
                 <li
                   key={req.id}
-                  className="flex justify-between items-center bg-gray-100 p-2 rounded"
+                  className="flex justify-between items-center bg-base-100 p-2 rounded"
                 >
                   <span>{req.title}</span>
                   {index > 0 && (
