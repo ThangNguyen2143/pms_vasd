@@ -1,53 +1,73 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import { useUploadFile } from "~/hooks/use-upload-file";
 
 export default function UploadFileModal({
   isOpen,
   onClose,
-  onSubmit,
+  onUpdate,
+  testcase_id,
 }: {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: FormData) => void;
+  onUpdate: () => Promise<void>;
+  testcase_id: number;
 }) {
-  const [file, setFile] = useState<File | null>(null);
+  const [file, setFile] = useState<File | null>();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const { isUploading, uploadError, uploadFile } = useUploadFile();
+  const handleAddFile = async () => {
     if (!file) return;
-
-    const formData = new FormData();
-    formData.append("file", file);
-    onSubmit(formData);
+    const re = await uploadFile({
+      file,
+      uploadUrl: "/testcase/file",
+      meta: { testcase_id },
+    });
+    if (re?.code != 200) return;
+    toast.success("Tệp đính kèm đã được thêm thành công");
+    await onUpdate();
+    onClose();
   };
-
+  useEffect(() => {
+    if (uploadError) {
+      toast.error(uploadError);
+    }
+  }, [uploadError]);
   if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg p-6 w-full max-w-md">
-        <h2 className="text-xl font-bold mb-4">Thêm file đính kèm</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            <div>
-              <label className="block mb-1">Chọn file</label>
-              <input
-                type="file"
-                className="file-input file-input-bordered w-full"
-                onChange={(e) => setFile(e.target.files?.[0] || null)}
-                required
-              />
-            </div>
-          </div>
-          <div className="flex justify-end gap-2 mt-6">
-            <button type="button" className="btn btn-outline" onClick={onClose}>
-              Hủy
-            </button>
-            <button type="submit" className="btn btn-primary">
-              Tải lên
-            </button>
-          </div>
-        </form>
+    <div className="modal modal-open">
+      <div className="modal-box">
+        <h3 className="font-bold text-lg ">Thêm tệp đính kèm</h3>
+
+        <input
+          type="file"
+          className="file-input file-input-primary mt-4"
+          name="fileSend"
+          placeholder="Chọn tệp đính kèm"
+          onChange={(e) =>
+            setFile(
+              e.target.files && e.target.files[0] ? e.target.files[0] : null
+            )
+          }
+        />
+
+        <div className="modal-action">
+          <button className="btn btn-ghost" onClick={onClose}>
+            Đóng
+          </button>
+          <button
+            className="btn btn-primary"
+            onClick={handleAddFile}
+            disabled={isUploading}
+          >
+            {isUploading ? (
+              <span className="loading loading-spinner"></span>
+            ) : (
+              "Lưu"
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );

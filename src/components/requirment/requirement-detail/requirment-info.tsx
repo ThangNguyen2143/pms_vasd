@@ -151,7 +151,8 @@ export default function RequirementInfo({
           <span className="font-bold">Ngày tiếp nhận:</span> {info.date_receive}
         </p>
         <p>
-          <span className="font-bold">Hạn xử lý:</span> {info.date_end || "-"}
+          <span className="font-bold">Thời gian hoàn thành:</span>{" "}
+          {info.date_end || "-"}
         </p>
         <p>
           <span className="font-bold">Từ khóa:</span>{" "}

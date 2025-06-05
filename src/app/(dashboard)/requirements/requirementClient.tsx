@@ -18,6 +18,8 @@ import OverviewRequirement from "~/components/requirment/overview-required-tab";
 import clsx from "clsx";
 import AddLocationModal from "~/components/requirment/modals/add-location-modal";
 import AddRequirementModal from "~/components/requirment/modals/add-requirement-modal";
+import { toISOString } from "~/utils/fomat-date";
+import { subDays } from "date-fns";
 
 function ContructionTable({ children }: { children: ReactNode }) {
   return (
@@ -47,10 +49,12 @@ function RequirementsClient() {
   const [showAddLocation, setShowAddLocation] = useState(false);
   const [showAddRequirment, setShowAddRequirment] = useState(false);
   const [loading, setloading] = useState(false);
-  const [fromDate, setFromDate] = useState<Date>(
-    new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) //Mặc định 1 tuần trước
+  const [fromDate, setFromDate] = useState<string>(
+    toISOString(subDays(new Date(), 7).toString()) //Mặc định 1 tuần trước
   );
-  const [toDate, settoDate] = useState<Date>(new Date(Date.now()));
+  const [toDate, settoDate] = useState<string>(
+    toISOString(new Date().toString())
+  );
   const { data: requiredList, getData: getRequiredList } =
     useApi<RequirementDto[]>();
   const { data: userList, getData: getUserList } = useApi<UserDto[]>();
@@ -118,8 +122,8 @@ function RequirementsClient() {
   }, [projectSelect]);
   useEffect(() => {
     if (projectSelect !== 0) {
-      const from = fromDate.toISOString().slice(0, 19).replace("T", " ");
-      const to = toDate.toISOString().slice(0, 19).replace("T", " ");
+      const from = fromDate.slice(0, 19).replace("T", " ");
+      const to = toDate.slice(0, 19).replace("T", " ");
       let endpoint =
         "/requirements/" +
         encodeBase64({ type: "project", project_id: projectSelect, from, to });
@@ -141,8 +145,8 @@ function RequirementsClient() {
     }
   }, [projectSelect, productSelect, fromDate, toDate]);
   const onLoadRequire = async () => {
-    const from = fromDate.toISOString().slice(0, 19).replace("T", " ");
-    const to = toDate.toISOString().slice(0, 19).replace("T", " ");
+    const from = fromDate.slice(0, 19).replace("T", " ");
+    const to = toDate.slice(0, 19).replace("T", " ");
     let endpoint =
       "/requirements/" +
       encodeBase64({ type: "project", project_id: projectSelect, from, to });
@@ -210,8 +214,8 @@ function RequirementsClient() {
               <input
                 type="datetime-local"
                 name="from"
-                value={fromDate.toISOString().slice(0, 19)}
-                onChange={(e) => setFromDate(new Date(e.target.value))}
+                value={fromDate}
+                onChange={(e) => setFromDate(e.target.value)}
               />
             </label>
             <label className="input w-fit">
@@ -219,8 +223,8 @@ function RequirementsClient() {
               <input
                 type="datetime-local"
                 name={"to"}
-                value={toDate.toISOString().slice(0, 19)}
-                onChange={(e) => settoDate(new Date(e.target.value))}
+                value={toDate}
+                onChange={(e) => settoDate(e.target.value)}
               />
             </label>
           </div>

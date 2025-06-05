@@ -7,6 +7,7 @@ import {
   ReactNode,
   useEffect,
 } from "react";
+import { logout } from "~/app/(auth)/login/actions/auth";
 import { getSession } from "~/lib/session";
 
 type User = {
@@ -33,6 +34,9 @@ export function UserProvider({ children }: { children: ReactNode }) {
       const session = await getSession();
       if (session) {
         setUser(session);
+      } else {
+        await logout();
+        return;
       }
     };
     checkSession();

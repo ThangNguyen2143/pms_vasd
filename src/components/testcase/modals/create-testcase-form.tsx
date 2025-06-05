@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -29,21 +30,30 @@ function CreateTestcaseForm({
   product_id: string;
   onSuccess: () => void;
 }) {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
     info: {
-      name: "",
-      description: "",
-      environment: "TEST",
-      tags: [] as string[],
-      result_expect: "",
-      task_id: 0,
-    } as {
       name: string;
       description: string;
       environment: string;
       tags: string[];
       result_expect: string;
       task_id?: number;
+      test_data?: string;
+    };
+    steps: {
+      step: number;
+      name: string;
+      description: string;
+      input_data?: string;
+      expected_result: string;
+    }[];
+  }>({
+    info: {
+      name: "",
+      description: "",
+      environment: "TEST",
+      tags: [],
+      result_expect: "",
     },
     steps: [
       {
@@ -76,23 +86,29 @@ function CreateTestcaseForm({
       "/system/config/eyJ0eXBlIjoidGVzdF9lbnZpcm9ubWVudCJ9",
       "force-cache"
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {
     getlistTasks("/tasks/" + encodeBase64({ product_id }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    console.log(encodeBase64({ product_id }));
   }, [product_id]);
   useEffect(() => {
-    if (errorLoadEnv) toast.error(errorLoadEnv.message);
-    if (errorGetTask && errorGetTask.code != 404)
-      toast.error(errorGetTask.message);
-  }, [errorLoadEnv, errorGetTask, errorPost]);
+    if (errorLoadEnv) {
+      toast.error("Môi trường test:" + errorLoadEnv.message);
+    }
+    // if (errorGetTask && errorGetTask.code != 404)
+    //   toast.error("Danh sách task:" + errorGetTask.message);
+    if (errorPost) toast.error(errorPost.message);
+  }, [errorLoadEnv, errorPost]);
   const handleSubmit = async () => {
     const data = {
       product_id,
       ...formData,
     };
     if (data.info.task_id == 0) delete data.info.task_id;
+    if (!data.info.test_data || data.info.test_data.trim().length == 0) {
+      toast.info("Dữ liệu đầu vào sẽ được bỏ qua");
+      delete data.info.test_data;
+    }
     const result = await postData("/testcase", data);
     if (result !== null) {
       toast.success("Tạo testcase thành công");
@@ -109,7 +125,8 @@ function CreateTestcaseForm({
         environment: "TEST",
         tags: [],
         result_expect: "",
-        task_id: 0,
+        task_id: undefined,
+        test_data: undefined,
       },
       steps: [
         {
@@ -234,6 +251,16 @@ function CreateTestcaseForm({
               />
             </div>
             <div>
+              <label className="label">Dữ liệu đầu vào</label>
+              <input
+                type="text"
+                className="input input-bordered w-full"
+                placeholder="Nhập dữ liệu đầu vào"
+                value={formData.info.test_data}
+                onChange={(e) => handleInfoChange("test_data", e.target.value)}
+              />
+            </div>
+            <div>
               <label className="label">Kết quả mong đợi</label>
               <textarea
                 className="textarea textarea-bordered w-full"
@@ -244,46 +271,51 @@ function CreateTestcaseForm({
                 }
               />
             </div>
-            <div>
-              <label className="label">Môi trường</label>
-              <select
-                className="select select-bordered w-full"
-                value={formData.info.environment}
-                onChange={(e) =>
-                  handleInfoChange("environment", e.target.value)
-                }
-              >
-                {environmentTest ? (
-                  environmentTest.map((env) => (
-                    <option value={env.code} key={env.code}>
-                      {env.display}
-                    </option>
-                  ))
-                ) : (
-                  <option>Lỗi tải môi trường</option>
-                )}
-              </select>
+            <div className="flex justify-between">
+              <div>
+                <label className="label">Môi trường</label>
+                <select
+                  className="select select-bordered w-full"
+                  value={formData.info.environment}
+                  onChange={(e) =>
+                    handleInfoChange("environment", e.target.value)
+                  }
+                >
+                  {environmentTest ? (
+                    environmentTest.map((env) => (
+                      <option value={env.code} key={env.code}>
+                        {env.display}
+                      </option>
+                    ))
+                  ) : (
+                    <option>Lỗi tải môi trường</option>
+                  )}
+                </select>
+              </div>
+              <div>
+                <label className="label">Liên kết task</label>
+                <select
+                  className="select select-bordered w-full"
+                  value={formData.info.task_id}
+                  onChange={(e) =>
+                    handleInfoChange("task_id", parseInt(e.target.value))
+                  }
+                >
+                  <option value={0}>Chọn task</option>
+                  {tasks ? (
+                    tasks.map((task) => (
+                      <option key={task.id + "-ref"} value={task.id}>
+                        {task.title}
+                      </option>
+                    ))
+                  ) : errorGetTask ? (
+                    <option value="">{errorGetTask.message}</option>
+                  ) : (
+                    <option>Không có task nào</option>
+                  )}
+                </select>
+              </div>
             </div>
-            <label className="select">
-              <span className="label">Liên kết task</span>
-              <select
-                value={formData.info.task_id}
-                onChange={(e) =>
-                  handleInfoChange("task_id", parseInt(e.target.value))
-                }
-              >
-                <option value={0}>Chọn task</option>
-                {tasks ? (
-                  tasks.map((task) => (
-                    <option key={task.id + "-ref"} value={task.id}>
-                      {task.title}
-                    </option>
-                  ))
-                ) : (
-                  <option>Không có task nào</option>
-                )}
-              </select>
-            </label>
 
             <div>
               <label className="label">Tags</label>
@@ -342,6 +374,18 @@ function CreateTestcaseForm({
                       value={step.description}
                       onChange={(e) =>
                         handleStepChange(index, "description", e.target.value)
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label className="label">Dữ liệu đầu vào</label>
+                    <input
+                      type="text"
+                      className="input input-bordered w-full"
+                      placeholder="Dữ liệu đầu vào (nếu có)"
+                      value={step.input_data || ""}
+                      onChange={(e) =>
+                        handleStepChange(index, "input_data", e.target.value)
                       }
                     />
                   </div>

@@ -46,7 +46,7 @@ function WorkBox({ title, items }: { title: string; items: any[] }) {
     urls = items.map(
       (item) =>
         `/testcase/${encodeBase64({
-          testcase_id: item.tesecase_id,
+          testcase_id: item.testcase_id,
           product_id: item.product_id,
         })}`
     );

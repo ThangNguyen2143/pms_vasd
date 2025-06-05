@@ -49,7 +49,7 @@ export type TestAssign = {
   assigned_by: number;
   assigned_by_name: string;
   status: string;
-  testRunInfo: [];
+  testRunInfo: TestRunInfo[];
 };
 type AssigneeInfo = {
   assign_to: number;
@@ -60,6 +60,21 @@ type AssigneeInfo = {
   dead_line: string;
   is_notify: boolean;
   is_late: boolean;
+  note: string;
+};
+export type TestRunInfo = {
+  code: string;
+  run_at: string;
+  commit_at: string;
+  result: boolean;
+  tester_note: string;
+  step_results: StepResult[];
+};
+type StepResult = {
+  code: string;
+  step_index: number;
+  step_name: string;
+  result: boolean;
   note: string;
 };
 export type TestLog = {

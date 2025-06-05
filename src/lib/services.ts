@@ -23,15 +23,13 @@ export async function getItem<T>({
       token: session.token,
     },
   });
-  let re: DataResponse<T>;
   try {
-    re = (await result.json()) as DataResponse<T>;
-    return re;
+    return (await result.json()) as DataResponse<T>;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
-    console.log(e);
     return {
-      code: 500,
-      message: "Lỗi parse",
+      code: result.status,
+      message: result.statusText,
       hint: "",
       value: "",
       status: "failed",
@@ -54,8 +52,18 @@ export async function postItem({
       cache: "no-store",
       body: data,
     });
-
-    return await result.json();
+    try {
+      return await result.json();
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (e) {
+      return {
+        code: result.status,
+        hint: "",
+        message: result.statusText,
+        status: "failed",
+        value: "",
+      };
+    }
   } catch (error) {
     console.error(error);
     const res: DataResponse<""> = {

@@ -54,7 +54,7 @@ function TaskAssign({
             ) : (
               <p>Người dùng chưa bắt đầu</p>
             )}
-            {assignee.date_end ? <p>Kết thúc: {assignee.date_start}</p> : ""}
+            {assignee.date_end ? <p>Kết thúc: {assignee.date_end}</p> : ""}
             <ul>
               <h4>Liên hệ:</h4>
               {assignee.contact?.map((ct) => {
