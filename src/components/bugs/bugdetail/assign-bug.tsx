@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 import { BugAssign } from "~/lib/types";
+import { format_date } from "~/utils/fomat-date";
 
 type AssignBugProps = {
   bug_id?: number;
@@ -83,14 +84,15 @@ export default function AssignBug({
           </p>
           <p>
             <strong>Bắt đầu lúc:</strong>
-            {assignee.time_start}
+            {assignee.time_start ? format_date(assignee.time_start) : "-"}
           </p>
           <p>
-            <strong>Hạn chót:</strong> {assignee.deadline}
+            <strong>Hạn chót:</strong> {format_date(assignee.deadline)}
           </p>
           {assignee.resolved_at && (
             <p>
-              <strong>Hoàn thành lúc:</strong> {assignee.resolved_at}
+              <strong>Hoàn thành lúc:</strong>{" "}
+              {format_date(assignee.resolved_at)}
             </p>
           )}
           {assignee.resolution_note && (

@@ -12,8 +12,8 @@ import AssignBug from "~/components/bugs/bugdetail/assign-bug";
 import ReTestList from "~/components/bugs/bugdetail/retest-bug";
 import BugLogs from "~/components/bugs/bugdetail/bug-log";
 import AddFileAttachmentModal from "~/components/bugs/modal/add-file-attachment";
-import clsx from "clsx";
-import { status_with_color } from "~/utils/status-with-color";
+// import clsx from "clsx";
+// import { status_with_color } from "~/utils/status-with-color";
 import AssignBugModal from "~/components/bugs/modal/assign-bug-modal";
 import ReTestBugAssignModal from "~/components/bugs/modal/re-test-assign";
 import LinkTaskOrTestToBugModal from "~/components/bugs/modal/ref-update-modal";
@@ -71,7 +71,7 @@ function BugDetailClient({
       <div className="max-w-6xl mx-auto bg-base-100 shadow-lg rounded-xl p-6 grid md:grid-cols-3 gap-6">
         <div className="md:col-span-3 flex justify-between items-center border-b pb-4">
           <h2 className="text-2xl font-bold text-primary">🐞 Chi tiết Bug</h2>
-          <span
+          {/* <span
             className={clsx(
               "badge text-sm px-4 py-2 rounded-full",
               `badge-${status_with_color(bugData.status)}`
@@ -80,7 +80,7 @@ function BugDetailClient({
             {bugStatus
               ? bugStatus.find((st) => st.code == bugData.status)?.description
               : bugData.status}
-          </span>
+          </span> */}
         </div>
         {/* Left side: Bug info + Attachments + Comments */}
         <div className="md:col-span-2 space-y-6">

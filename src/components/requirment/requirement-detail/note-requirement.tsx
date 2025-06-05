@@ -7,6 +7,7 @@ import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { RequirementNote, UserDto } from "~/lib/types";
 import { useUser } from "~/providers/user-context";
+import { formatCommentDate } from "~/utils/format-comment-date";
 
 export default function NoteRequirment({
   requirement_id,
@@ -74,7 +75,9 @@ export default function NoteRequirment({
                   <p className="text-lg mt-0.5 mx-2">{comment.note}</p>
                 </div>
                 <div className="chat-footer">
-                  <time className="text-xs opacity-50">{comment.date}</time>
+                  <time className="text-xs opacity-50">
+                    {formatCommentDate(comment.date)}
+                  </time>
                 </div>
               </div>
             );

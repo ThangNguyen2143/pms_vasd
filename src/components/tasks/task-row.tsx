@@ -3,6 +3,7 @@ import { Pencil } from "lucide-react";
 import Link from "next/link";
 import { encodeBase64 } from "~/lib/services";
 import { TaskDTO, UserDto, WorkStatus } from "~/lib/types";
+import { format_date } from "~/utils/fomat-date";
 
 interface TaskRowProps {
   task: TaskDTO;
@@ -27,9 +28,11 @@ export default function TaskRow({
       <td className="px-4 py-2">
         {creator?.userData.display_name || "Không rõ"}
       </td>
-      <td className="px-4 py-2">{task.create_at}</td>
-      <td className="px-4 py-2">{task.date_start}</td>
-      <td className="px-4 py-2">{task.dead_line}</td>
+      <td className="px-4 py-2">{format_date(task.create_at)}</td>
+      <td className="px-4 py-2">
+        {task.date_start ? format_date(task.date_start) : "-"}
+      </td>
+      <td className="px-4 py-2">{format_date(task.dead_line)}</td>
       <td className="px-4 py-2">
         <span className="badge">{statusDisplay || "Không rõ"}</span>
       </td>

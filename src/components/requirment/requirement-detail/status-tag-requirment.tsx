@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { Star } from "lucide-react";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
+import { format_date } from "~/utils/fomat-date";
 interface DataRating {
   code: string;
   name: string;
@@ -61,7 +62,7 @@ export default function StatusTag({
                   <span>{htr.name}</span>
                   <span>
                     đánh giá lúc <br />
-                    {htr.date}
+                    {format_date(htr.date)}
                   </span>
                 </div>
                 <div className="collapse-content text-sm">

@@ -1,5 +1,6 @@
 import { CircleSmall } from "lucide-react";
 import { ProjectLogDto } from "~/lib/types";
+import { format_date } from "~/utils/fomat-date";
 
 function ProjectLogs({ project_log }: { project_log?: ProjectLogDto[] }) {
   return (
@@ -13,7 +14,7 @@ function ProjectLogs({ project_log }: { project_log?: ProjectLogDto[] }) {
             project_log.map((log) => {
               return (
                 <li key={log.date + "log"}>
-                  <div className="timeline-start">{log.date}</div>
+                  <div className="timeline-start">{format_date(log.date)}</div>
                   <div className="timeline-middle">
                     <CircleSmall />
                   </div>

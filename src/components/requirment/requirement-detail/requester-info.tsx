@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { Pencil } from "lucide-react";
+import { format_date } from "~/utils/fomat-date";
 
 export default function RequesterInfo({
   requester,
@@ -40,7 +41,8 @@ export default function RequesterInfo({
           <span className="font-bold">Vai trò:</span> {requester.role || "-"}
         </p>
         <p>
-          <span className="font-bold">Ngày gửi:</span> {requester.add_in}
+          <span className="font-bold">Ngày gửi:</span>{" "}
+          {format_date(requester.add_in)}
         </p>
       </div>
     </div>

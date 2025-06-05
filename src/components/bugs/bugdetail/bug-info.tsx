@@ -6,6 +6,7 @@ import UpdateSeverityComponent from "../modal/update-severity-btn";
 import { BugSeverity, BugStatus, Priority } from "~/lib/types";
 import { useApi } from "~/hooks/use-api";
 import { toast } from "sonner";
+import { format_date } from "~/utils/fomat-date";
 
 type BugInfoProps = {
   bug: {
@@ -198,7 +199,7 @@ export default function BugInfo({
           <strong>Người báo cáo:</strong> {bug.reporter_name}
         </p>
         <p>
-          <strong>Thời gian:</strong> {bug.reported_at}
+          <strong>Thời gian báo cáo:</strong> {format_date(bug.reported_at)}
         </p>
         <p>
           <strong>Tag:</strong>{" "}

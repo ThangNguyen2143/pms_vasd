@@ -7,6 +7,7 @@ import AddMemberProjectModal from "./modals/add-member-modal";
 import { Pencil, Plus, X } from "lucide-react";
 import UpdateRoleModal from "./modals/update-role-modal";
 import ConfirmDeleteMember from "./modals/confirm-deleted-member";
+import { format_date } from "~/utils/fomat-date";
 export default function ProjectMemberList({
   project_member,
   project_id,
@@ -62,7 +63,7 @@ export default function ProjectMemberList({
               </p>
               <p>
                 <span className="font-semibold">Ngày tham gia:</span>{" "}
-                {member.date_join}
+                {format_date(member.date_join)}
               </p>
               <p>
                 <span className="font-semibold">Người thêm:</span>{" "}

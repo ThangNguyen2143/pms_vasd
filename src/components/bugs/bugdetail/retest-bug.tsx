@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 import { ReTesingInfo } from "~/lib/types";
+import { format_date } from "~/utils/fomat-date";
 
 export default function ReTestList({
   retests,
@@ -65,100 +66,102 @@ export default function ReTestList({
       {retests.length > 0 ? (
         <ul className="list-disc list-inside list">
           {retests.map((r) => (
-            <li key={r.code} className="list-row p-2">
-              <div className="flex flex-col">
-                <div className="text-sm text-gray-600">{r.assignToName}</div>
-                <div>Hạn chót: {r.deadline}</div>
-              </div>
-              {!r.result == null && (
-                <div>
-                  <div
-                    className={clsx(
-                      "badge",
-                      `badge-${r.result ? "success" : "error"}`,
-                      "text-sm"
-                    )}
-                  >
-                    {r.result ? "Đạt" : "Không đạt"}
+            <>
+              <li key={r.code} className="list-row p-2">
+                <div className="flex flex-col">
+                  <div className="text-sm text-gray-600">{r.assignToName}</div>
+                  <div>Hạn chót: {format_date(r.deadline)}</div>
+                </div>
+                {!r.result == null && (
+                  <div>
+                    <div
+                      className={clsx(
+                        "badge",
+                        `badge-${r.result ? "success" : "error"}`,
+                        "text-sm"
+                      )}
+                    >
+                      {r.result ? "Đạt" : "Không đạt"}
+                    </div>
+                    <div className="shadow">{r.note}</div>
                   </div>
-                  <div className="shadow">{r.note}</div>
-                </div>
-              )}
-              {!r.note && r.result == null && (
-                <div
-                  className="tooltip tooltip-left"
-                  data-tip="Hoàn tất re-test"
-                >
-                  <button
-                    className="btn"
-                    onClick={() => setConfirmDone(r.code)}
+                )}
+                {!r.note && r.result == null && (
+                  <div
+                    className="tooltip tooltip-left"
+                    data-tip="Hoàn tất re-test"
                   >
-                    <CheckCircle />
-                  </button>
+                    <button
+                      className="btn"
+                      onClick={() => setConfirmDone(r.code)}
+                    >
+                      <CheckCircle />
+                    </button>
+                  </div>
+                )}
+              </li>
+              {confirmDone != "" && (
+                <div>
+                  {/* Confirm done have 2 field: input to write note and button confirm */}
+                  <div className="mb-2 px-4 flex justify-between">
+                    <div className="flex gap-2">
+                      <input
+                        type="radio"
+                        className="radio"
+                        name="result"
+                        onChange={() => setRetestResult(true)}
+                      />
+                      <label className="label cursor-pointer">
+                        <span className="label-text">Đã fix</span>
+                      </label>
+                    </div>
+                    <div className="flex gap-2">
+                      <input
+                        type="radio"
+                        className="radio"
+                        name="result"
+                        onChange={() => setRetestResult(false)}
+                      />
+                      <label className="label">
+                        <span className="label-text">Chưa fix</span>
+                      </label>
+                    </div>
+                  </div>
+                  <div className="mb-2">
+                    <label className="label">
+                      <span className="label-text">Ghi chú khi kết thúc:</span>
+                    </label>
+                    <textarea
+                      className="textarea textarea-bordered w-full"
+                      placeholder="Nhập ghi chú..."
+                      value={noteCommit}
+                      onChange={(e) => setNoteCommit(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex justify-end">
+                    <button
+                      className="btn btn-primary mr-2"
+                      onClick={() =>
+                        handleConfirmDone(confirmDone, noteCommit, retestResult)
+                      }
+                      disabled={isLoading}
+                    >
+                      {isLoading ? "Đang xử lý..." : "Xác nhận"}
+                    </button>
+                    <button
+                      className="btn btn-secondary"
+                      onClick={() => setConfirmDone("")}
+                    >
+                      Hủy
+                    </button>
+                  </div>
                 </div>
               )}
-            </li>
+            </>
           ))}
         </ul>
       ) : (
         <p className="italic text-gray-500">Chưa có lần re-test nào.</p>
-      )}
-      {confirmDone != "" && (
-        <div>
-          {/* Confirm done have 2 field: input to write note and button confirm */}
-          <div className="mb-2 px-4 flex justify-between">
-            <div className="flex gap-2">
-              <input
-                type="radio"
-                className="radio"
-                name="result"
-                onChange={() => setRetestResult(true)}
-              />
-              <label className="label cursor-pointer">
-                <span className="label-text">Đã fix</span>
-              </label>
-            </div>
-            <div className="flex gap-2">
-              <input
-                type="radio"
-                className="radio"
-                name="result"
-                onChange={() => setRetestResult(false)}
-              />
-              <label className="label">
-                <span className="label-text">Chưa fix</span>
-              </label>
-            </div>
-          </div>
-          <div className="mb-2">
-            <label className="label">
-              <span className="label-text">Ghi chú khi kết thúc:</span>
-            </label>
-            <textarea
-              className="textarea textarea-bordered w-full"
-              placeholder="Nhập ghi chú..."
-              value={noteCommit}
-              onChange={(e) => setNoteCommit(e.target.value)}
-            />
-          </div>
-          <div className="flex justify-end">
-            <button
-              className="btn btn-primary mr-2"
-              onClick={() =>
-                handleConfirmDone(confirmDone, noteCommit, retestResult)
-              }
-              disabled={isLoading}
-            >
-              {isLoading ? "Đang xử lý..." : "Xác nhận"}
-            </button>
-            <button
-              className="btn btn-secondary"
-              onClick={() => setConfirmDone("")}
-            >
-              Hủy
-            </button>
-          </div>
-        </div>
       )}
     </div>
   );

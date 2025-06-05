@@ -6,6 +6,7 @@ import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { Comment, ResopnseInfor, Task } from "~/lib/types";
 import { useUser } from "~/providers/user-context";
+import { formatCommentDate } from "~/utils/format-comment-date";
 import { sendEmail } from "~/utils/send-notify";
 
 function TaskComments({
@@ -77,16 +78,14 @@ function TaskComments({
             comments.map((comment) => {
               return (
                 <div className="chat chat-start" key={comment.id}>
-                  {/* <div className="chat-header">
-                    {comment.name}
-                    <time className="text-xs opacity-50">{comment.date}</time>
-                  </div> */}
                   <div className="chat-bubble wrap-anywhere">
                     <p className="font-bold text-sm">{comment.name}</p>
                     <p className="text-lg mt-0.5 mx-2 ">{comment.content}</p>
                   </div>
                   <div className="chat-footer">
-                    <time className="text-xs opacity-50">{comment.date}</time>
+                    <time className="text-xs opacity-50">
+                      {formatCommentDate(comment.date)}
+                    </time>
                   </div>
                 </div>
               );

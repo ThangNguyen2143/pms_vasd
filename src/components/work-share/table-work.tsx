@@ -6,6 +6,8 @@ import UpdateDeadline from "./update-deadline";
 import clsx from "clsx";
 import { status_with_color } from "~/utils/status-with-color";
 import OverviewWork from "./orverview-work";
+import { format_date } from "~/utils/fomat-date";
+import { format } from "date-fns";
 
 function TableWork({
   workList,
@@ -131,7 +133,11 @@ function TableWork({
                     </td>
                     <td>
                       {isGuess ? (
-                        item.update_at
+                        item.update_at ? (
+                          format_date(item.update_at)
+                        ) : (
+                          "-"
+                        )
                       ) : (
                         <UpdateWork
                           display={item.update_at}
@@ -140,11 +146,17 @@ function TableWork({
                         />
                       )}
                     </td>
-                    <td className="px-6 py-4">{item.create_at}</td>
-                    <td className="px-6 py-4">{item.request_at}</td>
+                    <td className="px-6 py-4">{format_date(item.create_at)}</td>
+                    <td className="px-6 py-4">
+                      {format(item.request_at, "dd/MM/yyyy")}
+                    </td>
                     <td>
                       {isGuess ? (
-                        item.update_at
+                        item.update_at ? (
+                          format_date(item.update_at)
+                        ) : (
+                          "-"
+                        )
                       ) : (
                         <UpdateDeadline
                           display={item.deadline}

@@ -7,6 +7,7 @@ import { status_with_color } from "~/utils/status-with-color";
 import { useApi } from "~/hooks/use-api";
 import { RequirementStatus } from "~/lib/types";
 import { toast } from "sonner";
+import { format_date } from "~/utils/fomat-date";
 
 export default function RequirementInfo({
   info,
@@ -145,14 +146,16 @@ export default function RequirementInfo({
           <span className="font-bold">Loại yêu cầu:</span> {info.type}
         </p>
         <p>
-          <span className="font-bold">Ngày tạo:</span> {info.date_create}
+          <span className="font-bold">Ngày tạo:</span>{" "}
+          {format_date(info.date_create)}
         </p>
         <p>
-          <span className="font-bold">Ngày tiếp nhận:</span> {info.date_receive}
+          <span className="font-bold">Ngày tiếp nhận:</span>{" "}
+          {format_date(info.date_receive)}
         </p>
         <p>
           <span className="font-bold">Thời gian hoàn thành:</span>{" "}
-          {info.date_end || "-"}
+          {info.date_end ? format_date(info.date_end) : "-"}
         </p>
         <p>
           <span className="font-bold">Từ khóa:</span>{" "}

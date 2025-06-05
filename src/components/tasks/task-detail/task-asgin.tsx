@@ -1,6 +1,7 @@
 "use client";
 
 import { UserAssignsTask } from "~/lib/types";
+import { format_date } from "~/utils/fomat-date";
 
 function TaskAssign({
   assignTo,
@@ -23,14 +24,18 @@ function TaskAssign({
             <p>
               <strong>{assignee.name}</strong>
             </p>
-            <p>Ngày giao: {assignee.date_assign}</p>
-            <p>Deadline: {assignee.cur_deadLine}</p>
+            <p>Ngày giao: {format_date(assignee.date_assign)}</p>
+            <p>Deadline: {format_date(assignee.cur_deadLine)}</p>
             {assignee.date_start ? (
-              <p>Bắt đầu: {assignee.date_start}</p>
+              <p>Bắt đầu: {format_date(assignee.date_start)}</p>
             ) : (
               <p>Người dùng chưa bắt đầu</p>
             )}
-            {assignee.date_end ? <p>Kết thúc: {assignee.date_end}</p> : ""}
+            {assignee.date_end ? (
+              <p>Kết thúc: {format_date(assignee.date_end)}</p>
+            ) : (
+              ""
+            )}
           </div>
         ))
       ) : (

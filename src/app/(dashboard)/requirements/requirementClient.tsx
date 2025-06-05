@@ -18,7 +18,7 @@ import OverviewRequirement from "~/components/requirment/overview-required-tab";
 import clsx from "clsx";
 import AddLocationModal from "~/components/requirment/modals/add-location-modal";
 import AddRequirementModal from "~/components/requirment/modals/add-requirement-modal";
-import { toISOString } from "~/utils/fomat-date";
+import { format_date, toISOString } from "~/utils/fomat-date";
 import { startOfDay, subDays } from "date-fns";
 import { toast } from "sonner";
 
@@ -302,7 +302,7 @@ function RequirementsClient() {
                           <td>{required.title}</td>
                           <td>{required.priority}</td>
                           <td>{required.type}</td>
-                          <td>{required.date_create}</td>
+                          <td>{format_date(required.date_create)}</td>
                           <td>
                             {userList
                               ? userList.find(
@@ -310,7 +310,11 @@ function RequirementsClient() {
                                 )?.userData.display_name
                               : required.created_by}
                           </td>
-                          <td>{required.date_end}</td>
+                          <td>
+                            {required.date_end
+                              ? format_date(required.date_end)
+                              : "-"}
+                          </td>
                           <td>
                             <Link
                               href={

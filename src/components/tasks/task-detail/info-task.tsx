@@ -14,6 +14,7 @@ import { Task } from "~/lib/types";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
+import { format_date } from "~/utils/fomat-date";
 export default function TaskInfo({
   task,
   onEdit,
@@ -127,19 +128,19 @@ export default function TaskInfo({
         </p>
         <p>
           <span className="font-bold w-32 inline-block">Ngày tạo:</span>{" "}
-          {task.create_at}
+          {format_date(task.create_at)}
         </p>
         <p>
           <span className="font-bold w-32 inline-block">Bắt đầu:</span>{" "}
-          {task.date_start}
+          {task.date_start ? format_date(task.date_start) : "-"}
         </p>
         <p>
           <span className="font-bold w-32 inline-block">Kết thúc:</span>{" "}
-          {task.date_end}
+          {task.date_end ? format_date(task.date_end) : "-"}
         </p>
         <p>
           <span className="font-bold w-32 inline-block">Deadline:</span>{" "}
-          {task.dead_line}
+          {format_date(task.dead_line)}
         </p>
         <p>
           <span className="font-bold w-32 inline-block">

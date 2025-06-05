@@ -7,6 +7,7 @@ import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { getUser } from "~/lib/dal";
 import { toast } from "sonner";
+import { format_date } from "~/utils/fomat-date";
 
 function StakeholderList({
   project_id,
@@ -55,7 +56,8 @@ function StakeholderList({
                 <span className="font-semibold">Mô tả:</span> {s.description}
               </p>
               <p>
-                <span className="font-semibold">Ngày tạo:</span> {s.created}
+                <span className="font-semibold">Ngày tạo:</span>{" "}
+                {format_date(s.created)}
               </p>
               <p>
                 <span className="font-semibold">Liên hệ:</span>{" "}

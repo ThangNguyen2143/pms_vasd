@@ -4,6 +4,7 @@ import { Pencil } from "lucide-react";
 import Link from "next/link";
 import { encodeBase64 } from "~/lib/services";
 import { BugDto } from "~/lib/types";
+import { format_date } from "~/utils/fomat-date";
 import { status_with_color } from "~/utils/status-with-color";
 
 interface BugRowProps {
@@ -17,8 +18,10 @@ export default function BugRow({ bug, product_id }: BugRowProps) {
       <td className="px-4 py-2">{bug.bug_id}</td>
       <td className="px-4 py-2">{bug.name}</td>
       <td className="px-4 py-2">{bug.create_by || "Không rõ"}</td>
-      <td className="px-4 py-2">{bug.date_create}</td>
-      <td className="px-4 py-2">{bug.dead_line}</td>
+      <td className="px-4 py-2">{format_date(bug.date_create)}</td>
+      <td className="px-4 py-2">
+        {bug.dead_line ? format_date(bug.dead_line) : "-"}
+      </td>
       <td className="px-4 py-2">
         <span
           className={clsx("badge", `badge-${status_with_color(bug.status)}`)}
