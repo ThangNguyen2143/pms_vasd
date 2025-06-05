@@ -3,7 +3,7 @@
 "use client";
 import clsx from "clsx";
 import { notFound } from "next/navigation";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import AddFileAttachmentModal from "~/components/tasks/modals/add-attachment-file-task";
 import AssignUserModal from "~/components/tasks/modals/assign-task-modal";
@@ -16,7 +16,7 @@ import Logs from "~/components/tasks/task-detail/task-log";
 import UpdateInfoTaskModal from "~/components/tasks/modals/update-info-task-btn";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
-import { Comment, Task, UserDto, WorkStatus } from "~/lib/types";
+import { Comment, Task, WorkStatus } from "~/lib/types";
 import { status_with_color } from "~/utils/status-with-color";
 import TaskLinks from "~/components/tasks/task-detail/task-link";
 
@@ -33,11 +33,7 @@ export default function TaskDetailClient({
   const [showAddFileAtachmentModal, setShowAddFileAtachmentModal] =
     useState(false);
   const { data: task, getData: getTask, errorData: errorTask } = useApi<Task>();
-  const {
-    data: users,
-    getData: getUsers,
-    errorData: errorUser,
-  } = useApi<UserDto[]>();
+
   const { data: taskStatus, getData: getTaskStatus } = useApi<WorkStatus[]>();
   const {
     data: comments,
@@ -59,7 +55,6 @@ export default function TaskDetailClient({
       "/tasks/detail/" + encodeBase64({ type: "info", task_id }),
       "default"
     );
-    getUsers("/user/eyJ0eXBlIjoiYWxsIn0=", "default");
     getTaskStatus("/system/config/eyJ0eXBlIjoidGFza19zdGF0dXMifQ==", "default");
     getComments("/tasks/comments/" + encodeBase64({ task_id }), "default");
   }, [task_id]);
@@ -72,13 +67,7 @@ export default function TaskDetailClient({
       }
     }
   }, [errorComment]);
-  const userAssignsWithContact = useMemo(() => {
-    return task?.userAssigns?.map((us) => {
-      const list_contact = users?.find((s) => s.userid == us.user_id)?.userData
-        .contact;
-      return { ...us, contact: list_contact };
-    });
-  }, [task?.userAssigns, users]);
+
   if (!task) {
     if (errorTask?.code == 404) return notFound();
     return (
@@ -86,13 +75,6 @@ export default function TaskDetailClient({
         <span className="loading loading-infinity"></span>
       </div>
     );
-  }
-  if (errorUser) {
-    if (errorUser.code == 404)
-      toast.info("Không tìm thấy dữ liệu danh sách người dùng");
-    else {
-      toast.error(errorUser.message);
-    }
   }
 
   return (
@@ -121,6 +103,7 @@ export default function TaskDetailClient({
             task={task}
             onEdit={() => setShowUpdateModal(true)}
             onLinkRequirement={() => setShowLinkModal(true)}
+            onUpdate={reloadTaskData}
             onAssign={() => setShowAssignModal(true)}
           />
           <Attachments
@@ -138,7 +121,7 @@ export default function TaskDetailClient({
         <div className="space-y-6">
           <TaskLinks task_id={task_id} />
           <TaskAssign
-            assignTo={userAssignsWithContact}
+            assignTo={task.userAssigns}
             task_id={task_id}
             onUpdate={reloadTaskData}
           />
@@ -166,10 +149,10 @@ export default function TaskDetailClient({
       {showAssignModal && (
         <AssignUserModal
           onClose={() => setShowAssignModal(false)}
-          hasAssign={userAssignsWithContact || []}
+          product_id={product_id}
+          hasAssign={task.userAssigns || []}
           onUpdate={reloadTaskData}
           task_id={task_id}
-          users={users || []}
         />
       )}
       {showAddFileAtachmentModal && (

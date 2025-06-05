@@ -14,7 +14,12 @@ export const verifySession = cache(async () => {
     redirect("/login");
   }
 
-  return { isAuth: true, userId: session.userId, token: session.token };
+  return {
+    isAuth: true,
+    userId: session.userId,
+    token: session.token,
+    expires: session.expires,
+  };
 });
 export const getUser = cache(async () => {
   const session = await verifySession();
@@ -30,6 +35,7 @@ export const getUser = cache(async () => {
       username: user.accountData.username,
       code: user.accountData.code,
       role: user.accountData.account_type,
+      expires: session.expires,
     };
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (error) {

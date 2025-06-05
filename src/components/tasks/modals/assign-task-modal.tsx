@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
-import { Contact, UserAssignsTask, UserDto } from "~/lib/types";
+import { Contact, ProjectMember, UserAssignsTask } from "~/lib/types";
 import { sendEmail } from "~/utils/send-notify";
 
 interface ResponseNotify {
@@ -22,25 +22,34 @@ interface DataSend {
 }
 export default function AssignUserModal({
   task_id,
-  users,
+  product_id,
   hasAssign,
   onClose,
   onUpdate,
 }: {
   task_id: number;
+  product_id: string;
   hasAssign: UserAssignsTask[];
-  users: UserDto[];
   onUpdate: () => Promise<void>;
   onClose: () => void;
 }) {
   const [selectUser, setSelectUser] = useState(0);
   const [deadline, setDeadline] = useState("");
   const { putData, isLoading, errorData } = useApi<ResponseNotify, DataSend>();
-  const userWithRole = users?.map((us) => ({
-    user_id: us.userid,
-    display:
-      us.userData.display_name + " (" + us.accountData.account_type + ")",
-  }));
+  const {
+    data: users,
+    getData: getUsers,
+    errorData: errorUser,
+  } = useApi<ProjectMember[]>();
+  useEffect(() => {
+    getUsers(
+      "/system/config/" + encodeBase64({ type: "project_member", product_id })
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product_id]);
+  useEffect(() => {
+    if (errorUser) toast.error(errorUser.message);
+  }, [errorUser]);
   const handleSubmit = async () => {
     const data = {
       task_id,
@@ -95,19 +104,17 @@ export default function AssignUserModal({
             <option value={0} disabled>
               Chọn người thực hiện
             </option>
-            {userWithRole?.map((us) => {
-              const alreadyUser = hasAssign.find(
-                (alr) => alr.user_id == us.user_id
-              );
+            {users?.map((us) => {
+              const alreadyUser = hasAssign.find((alr) => alr.user_id == us.id);
               if (alreadyUser)
                 return (
-                  <option value={us.user_id} key={us.user_id} disabled>
-                    {us.display}
+                  <option value={us.id} key={us.id} disabled>
+                    {us.name}
                   </option>
                 );
               return (
-                <option value={us.user_id} key={us.user_id}>
-                  {us.display}
+                <option value={us.id} key={us.id}>
+                  {us.name}
                 </option>
               );
             })}

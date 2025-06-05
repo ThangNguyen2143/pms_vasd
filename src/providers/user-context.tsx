@@ -8,7 +8,7 @@ import {
   useEffect,
 } from "react";
 import { logout } from "~/app/(auth)/login/actions/auth";
-import { getSession } from "~/lib/session";
+import { getUser } from "~/lib/dal";
 
 type User = {
   userId: number;
@@ -31,9 +31,15 @@ export function UserProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const checkSession = async () => {
       // Gọi API để kiểm tra session
-      const session = await getSession();
-      if (session) {
-        setUser(session);
+      const userAuth = await getUser();
+      if (userAuth) {
+        setUser({
+          userId: userAuth.id,
+          name: userAuth.name,
+          role: userAuth.role,
+          expires: userAuth.expires,
+        });
+        setIsAuthenticated(true);
       } else {
         await logout();
         return;

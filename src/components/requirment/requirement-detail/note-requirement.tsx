@@ -65,7 +65,7 @@ export default function NoteRequirment({
                  {comment.name}
                  <time className="text-xs opacity-50">{comment.date}</time>
                </div> */}
-                <div className="chat-bubble">
+                <div className="chat-bubble wrap-break-word">
                   <p className="font-bold text-sm">
                     {userList
                       ? userList.find((us) => us.id == comment.user_id)?.name

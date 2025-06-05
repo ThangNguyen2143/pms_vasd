@@ -19,7 +19,8 @@ import clsx from "clsx";
 import AddLocationModal from "~/components/requirment/modals/add-location-modal";
 import AddRequirementModal from "~/components/requirment/modals/add-requirement-modal";
 import { toISOString } from "~/utils/fomat-date";
-import { subDays } from "date-fns";
+import { startOfDay, subDays } from "date-fns";
+import { toast } from "sonner";
 
 function ContructionTable({ children }: { children: ReactNode }) {
   return (
@@ -50,13 +51,16 @@ function RequirementsClient() {
   const [showAddRequirment, setShowAddRequirment] = useState(false);
   const [loading, setloading] = useState(false);
   const [fromDate, setFromDate] = useState<string>(
-    toISOString(subDays(new Date(), 7).toString()) //Mặc định 1 tuần trước
+    toISOString(startOfDay(subDays(new Date(), 7))) //Mặc định 1 tuần trước
   );
   const [toDate, settoDate] = useState<string>(
     toISOString(new Date().toString())
   );
-  const { data: requiredList, getData: getRequiredList } =
-    useApi<RequirementDto[]>();
+  const {
+    data: requiredList,
+    getData: getRequiredList,
+    errorData,
+  } = useApi<RequirementDto[]>();
   const { data: userList, getData: getUserList } = useApi<UserDto[]>();
   const {
     data: projectList,
@@ -80,6 +84,12 @@ function RequirementsClient() {
     const saved = sessionStorage.getItem("projectSelected");
     if (saved) setprojectSelect(parseInt(saved));
   }, []);
+  useEffect(() => {
+    if (errorData && errorData.code != 404) {
+      console.log(errorData);
+      toast.error(errorData.message);
+    }
+  }, [errorData]);
   useEffect(() => {
     if (projectSelect != 0) {
       setloading(true);
@@ -122,8 +132,9 @@ function RequirementsClient() {
   }, [projectSelect]);
   useEffect(() => {
     if (projectSelect !== 0) {
-      const from = fromDate.slice(0, 19).replace("T", " ");
-      const to = toDate.slice(0, 19).replace("T", " ");
+      const from = fromDate;
+      const to = toDate;
+      console.log(from, to);
       let endpoint =
         "/requirements/" +
         encodeBase64({ type: "project", project_id: projectSelect, from, to });
@@ -209,22 +220,22 @@ function RequirementsClient() {
                 ))}
               </select>
             )}
-            <label className="input w-fit">
+            <label className="input">
               <span className="label">Từ</span>
               <input
                 type="datetime-local"
                 name="from"
                 value={fromDate}
-                onChange={(e) => setFromDate(e.target.value)}
+                onChange={(e) => setFromDate(toISOString(e.target.value))}
               />
             </label>
-            <label className="input w-fit">
+            <label className="input">
               <span className="label">Đến</span>
               <input
                 type="datetime-local"
                 name={"to"}
                 value={toDate}
-                onChange={(e) => settoDate(e.target.value)}
+                onChange={(e) => settoDate(toISOString(e.target.value))}
               />
             </label>
           </div>

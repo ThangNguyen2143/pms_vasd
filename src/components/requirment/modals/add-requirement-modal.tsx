@@ -189,38 +189,40 @@ export default function AddRequirementModal({
               onChange={(e) => setDateReceive(e.target.value)}
             />
           </label>
-          <div className="join w-full">
-            <input
-              type="text"
-              className="input join-item input-neutral w-full"
-              value={newTag}
-              onChange={(e) => setNewTag(e.target.value)}
-              onKeyUp={(e) => {
-                if (e.key == "Enter") handleAddTag();
-              }}
-              placeholder="Nhập thẻ và nhấn Thêm"
-            />
-            <button
-              type="button"
-              className="btn join-item btn-outline btn-neutral"
-              onClick={handleAddTag}
-            >
-              Thêm
-            </button>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {tags.map((tag, idx) => (
-              <div key={idx} className="badge badge-info gap-2">
-                {tag}
-                <button
-                  type="button"
-                  className="text-xs ml-1"
-                  onClick={() => handleRemoveTag(tag)}
-                >
-                  ✕
-                </button>
-              </div>
-            ))}
+          <div>
+            <div className="join w-full">
+              <input
+                type="text"
+                className="input join-item input-neutral w-full"
+                value={newTag}
+                onChange={(e) => setNewTag(e.target.value)}
+                onKeyUp={(e) => {
+                  if (e.key == "Enter") handleAddTag();
+                }}
+                placeholder="Nhập thẻ và nhấn Thêm"
+              />
+              <button
+                type="button"
+                className="btn join-item btn-outline btn-neutral"
+                onClick={handleAddTag}
+              >
+                Thêm
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {tags.map((tag, idx) => (
+                <div key={idx} className="badge badge-info gap-2">
+                  {tag}
+                  <button
+                    type="button"
+                    className="text-xs ml-1"
+                    onClick={() => handleRemoveTag(tag)}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
 
           <label className="flex flex-col w-full sm:col-span-2">

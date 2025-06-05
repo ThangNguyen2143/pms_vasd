@@ -94,7 +94,7 @@ export default function BugComments({
                  {comment.name}
                  <time className="text-xs opacity-50">{comment.date}</time>
                </div> */}
-                  <div className="chat-bubble">
+                  <div className="chat-bubble wrap-anywhere">
                     <p className="font-bold text-sm">{comment.user_name}</p>
                     <p className="text-lg mt-0.5 mx-2">{comment.comment}</p>
                   </div>

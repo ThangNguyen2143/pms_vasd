@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { ProjectDto, ProjectStatus } from "~/lib/types";
+import { format_date } from "~/utils/fomat-date";
 
 function ProjectTable() {
   const [navigatingId, setNavigatingId] = useState<number | null>(null);
@@ -52,8 +53,8 @@ function ProjectTable() {
                   <th>{index + 1}</th>
                   <td>{item.name}</td>
                   <td>{item.description}</td>
-                  <td>{item.start_date}</td>
-                  <td>{item.end_date}</td>
+                  <td>{format_date(item.start_date)}</td>
+                  <td>{format_date(item.end_date)}</td>
                   <td>
                     {statusList
                       ? statusList.find((st) => st.code == item.status)?.display

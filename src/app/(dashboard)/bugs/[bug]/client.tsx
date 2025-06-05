@@ -146,6 +146,7 @@ function BugDetailClient({
       {retestAssign && (
         <ReTestBugAssignModal
           bug_id={bug_id}
+          product_id={product_id}
           onClose={() => setRetestAssign(false)}
           onUpdate={reloadDataBug}
         />

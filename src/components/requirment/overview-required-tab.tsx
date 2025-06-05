@@ -30,10 +30,6 @@ function OverviewRequirement() {
         <div className="hero-content text-center">
           <div className="max-w-md">
             <h1 className="text-5xl font-bold">Dev code....</h1>
-            <p className="py-6">
-              Chức năng tạm thời đang phát triển. Liên hệ với nhà phát triển để
-              biết thêm chi tiết
-            </p>
           </div>
         </div>
       </div>

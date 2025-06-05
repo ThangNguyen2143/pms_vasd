@@ -1,5 +1,8 @@
 @import "tailwindcss";
 /* @import "./node_modules/pikaday/css/pikaday.css"; */
+@import "react-datetime-picker/dist/DateTimePicker.css";
+@import "react-calendar/dist/Calendar.css";
+@import "react-clock/dist/Clock.css";
 @plugin "daisyui";
 
 @plugin "daisyui/theme" {
@@ -78,7 +81,6 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
-
 body {
   background: var(--background);
   color: var(--foreground);
@@ -89,4 +91,8 @@ body {
 }
 .gantt .bar.gantt-timeline {
   fill: #10b981; /* green */
+}
+/* Loại bỏ border của wrapper */
+.react-datetime-picker__wrapper {
+  border: none !important;
 }

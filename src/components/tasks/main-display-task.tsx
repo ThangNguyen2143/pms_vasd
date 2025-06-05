@@ -45,7 +45,7 @@ function MainDisplayTask() {
           showModal && selectProduct != "" ? "modal-open" : ""
         )}
       >
-        <div className="modal-box w-1/4">
+        <div className="modal-box max-w-5xl w-full">
           <button
             className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
             onClick={() => setShowModal(false)}

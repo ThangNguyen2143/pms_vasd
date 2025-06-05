@@ -9,6 +9,7 @@ import {
   deleteData,
 } from "~/lib/api-client";
 import { DataResponse } from "~/lib/types";
+import { logout } from "~/app/(auth)/login/actions/auth";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function useApi<T, D = any>() {
@@ -27,7 +28,7 @@ export function useApi<T, D = any>() {
     setIsLoading(true);
     try {
       const response = await fetchData<T>({ endpoint, cache });
-
+      if (response.code == 401) await logout();
       // Check if the response contains an error code
       if (response.code != 200) {
         handleApiError({

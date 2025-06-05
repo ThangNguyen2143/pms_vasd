@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
-import { Contact, UserDto } from "~/lib/types";
+import { Contact, ProjectMember } from "~/lib/types";
 import { sendEmail } from "~/utils/send-notify";
 
 interface ResponseNotify {
@@ -38,17 +38,14 @@ export default function AssignBugModal({
     data: users,
     getData: getUsers,
     errorData: errorUser,
-  } = useApi<UserDto[]>();
+  } = useApi<ProjectMember[]>();
   useEffect(() => {
-    getUsers("/user/" + encodeBase64({ type: "all" }));
+    getUsers(
+      "/system/config/" + encodeBase64({ type: "project_member", product_id })
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [product_id]);
 
-  const userWithRole = users?.map((us) => ({
-    user_id: us.userid,
-    display:
-      us.userData.display_name + " (" + us.accountData.account_type + ")",
-  }));
   const handleSubmit = async () => {
     const data = {
       bug_id,
@@ -112,10 +109,10 @@ export default function AssignBugModal({
             <option value={0} disabled>
               Chọn người thực hiện
             </option>
-            {userWithRole?.map((us) => {
+            {users?.map((us) => {
               return (
-                <option value={us.user_id} key={us.user_id}>
-                  {us.display}
+                <option value={us.id} key={us.id}>
+                  {us.name}
                 </option>
               );
             })}

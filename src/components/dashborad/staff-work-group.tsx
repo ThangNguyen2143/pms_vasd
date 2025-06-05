@@ -3,6 +3,7 @@ import Link from "next/link";
 import React from "react";
 import { encodeBase64 } from "~/lib/services";
 import { WorkOverviewDTO } from "~/lib/types";
+import { format_date } from "~/utils/fomat-date";
 
 export default function StaffWorkGroup({ user }: { user: WorkOverviewDTO }) {
   return (
@@ -50,6 +51,7 @@ function WorkBox({ title, items }: { title: string; items: any[] }) {
           product_id: item.product_id,
         })}`
     );
+
   return (
     <div className="bg-base-100 p-3 rounded shadow border">
       <h4 className="font-semibold text-primary mb-2">{title}</h4>
@@ -61,7 +63,7 @@ function WorkBox({ title, items }: { title: string; items: any[] }) {
                 <p className="font-medium">{item.title || item.name}</p>
               </Link>
               <p className="text-xs text-gray-500">
-                {item.deadline ? `⏳ ${item.deadline}` : ""}{" "}
+                {item.deadline ? `⏳ ${format_date(item.deadline)}` : ""}{" "}
                 {item.status ? `| 📌 ${item.status}` : ""}
               </p>
             </li>

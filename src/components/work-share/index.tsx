@@ -7,8 +7,11 @@ import AddWorkBtn from "./add-work-btn";
 import { encodeBase64 } from "~/lib/services";
 import { useApi } from "~/hooks/use-api";
 import { Priority, WorkShareDto, WorkStatus, WorkType } from "~/lib/types";
+import { useUser } from "~/providers/user-context";
 
-function MainWork({ role }: { role?: string }) {
+function MainWork() {
+  const { user } = useUser();
+  const role = user?.role;
   const [projectSelected, setProjectSelect] = useState<number>(0);
   const { data: statusList, getData: getStatusList } = useApi<WorkStatus[]>();
   const { data: priorityList, getData: getPriority } = useApi<Priority[]>();

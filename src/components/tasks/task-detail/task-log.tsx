@@ -10,7 +10,7 @@ export default function Logs({ logs }: { logs: TaskLog[] }) {
       <h3 className="text-lg font-semibold text-primary mb-2">
         📜 Nhật ký nhiệm vụ
       </h3>
-      <div className="space-y-2 max-h-96 overflow-auto">
+      <div className="space-y-2 max-h-96 overflow-auto flex flex-col-reverse">
         {logs.map((log, idx) => (
           <div
             key={idx}

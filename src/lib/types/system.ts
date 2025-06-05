@@ -40,3 +40,7 @@ export type ResopnseInfor = {
     telegram: string[];
   };
 };
+export type ProjectMember = {
+  id: number;
+  name: string;
+};
