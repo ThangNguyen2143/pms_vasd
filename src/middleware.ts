@@ -9,17 +9,24 @@ export default async function middleware(req: NextRequest) {
   // 2. Check if the current route is public
   const path = req.nextUrl.pathname;
   const isPublicRoute = publicRoutes.includes(path);
-  // 3. Decrypt the session from the cookie
-  // const session = await getSession();
   const session = req.cookies.get("session")?.value;
-  let userId: number | null = null;
   let role: string | null = null;
   const guessRoutesCookie = req.cookies.get("menuRoutes")?.value;
   let guessRoutes: string[] = [];
 
+  if (!session && !isPublicRoute) {
+    if (path.startsWith("/.well-known") || path.startsWith("/_next")) {
+      return NextResponse.next();
+    }
+    const callbackUrl = req.nextUrl.pathname + req.nextUrl.search;
+    const loginUrl = new URL("/login", req.url);
+    loginUrl.searchParams.set("callbackUrl", callbackUrl);
+    const response = NextResponse.redirect(loginUrl);
+    return response;
+  }
   try {
     const sessionData = JSON.parse(session || "{}");
-    userId = sessionData.userId;
+    // userId = sessionData.userId;
     role = sessionData?.role;
   } catch (err) {
     console.error("Invalid session cookie:", err);
@@ -30,22 +37,23 @@ export default async function middleware(req: NextRequest) {
     console.error("Failed to parse guessRoutes cookie", e);
   }
   // 4. Redirect to /login if the user is not authenticated
-  if (!session && !isPublicRoute) {
-    const url = req.nextUrl.clone();
-    url.pathname = "/login";
-    url.searchParams.set("callbackUrl", req.nextUrl.pathname);
-    return NextResponse.redirect(url);
-  }
+  // if (!session && !isPublicRoute) {
+  //   const callbackUrl = req.nextUrl.pathname + req.nextUrl.search;
+  //   const loginUrl = new URL("/login", req.nextUrl);
+  //   loginUrl.searchParams.set("callbackUrl", callbackUrl);
+
+  //   return NextResponse.redirect(loginUrl);
+  // }
   if (role === "Guess" && !guessRoutes.includes(path)) {
     return NextResponse.redirect(new URL(defaultGuessRoute, req.nextUrl));
   }
   // 5. Redirect to /dashboard if the user is authenticated
-  if (isPublicRoute && userId) {
-    // if (session?.role == "Guess") {
-    //   return NextResponse.redirect(new URL("/work_share", req.nextUrl));
-    // }
-    return NextResponse.redirect(new URL("/", req.nextUrl));
-  }
+  // if (isPublicRoute && userId) {
+  //   // if (session?.role == "Guess") {
+  //   //   return NextResponse.redirect(new URL("/work_share", req.nextUrl));
+  //   // }
+  //   return NextResponse.redirect(new URL("/", req.nextUrl));
+  // }
 
   // 6. Allow the request to continue if the user is authenticated
   return NextResponse.next();
@@ -53,5 +61,7 @@ export default async function middleware(req: NextRequest) {
 
 // Routes Middleware should not run on
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|.*\\.png$).*)"],
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico|icon.png|scripts/|images/|.*\\.(?:svg|css|js|woff2?|ttf)$).*)",
+  ],
 };

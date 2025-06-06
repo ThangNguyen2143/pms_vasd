@@ -6,9 +6,10 @@ import {
   useState,
   ReactNode,
   useEffect,
+  useMemo,
 } from "react";
-import { logout } from "~/app/(auth)/login/actions/auth";
 import { getUser } from "~/lib/dal";
+import { deleteSession } from "~/lib/session";
 
 type User = {
   userId: number;
@@ -21,48 +22,62 @@ type UserContextType = {
   user: User | null;
   setUser: (user: User | null) => void;
   isAuthenticated: boolean;
+  isLoading: boolean;
+  logout: () => Promise<void>;
 };
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const logout = async () => {
+    try {
+      // await logout(); // Gọi API logout nếu cần
+      await deleteSession();
+      setUser(null);
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
   useEffect(() => {
     const checkSession = async () => {
-      // Gọi API để kiểm tra session
-      const userAuth = await getUser();
-      if (userAuth) {
-        setUser({
-          userId: userAuth.id,
-          name: userAuth.name,
-          role: userAuth.role,
-          expires: userAuth.expires,
-        });
-        setIsAuthenticated(true);
-      } else {
-        await logout();
-        return;
+      setIsLoading(true);
+      try {
+        const userAuth = await getUser();
+        if (userAuth) {
+          setUser({
+            userId: userAuth.id,
+            name: userAuth.name,
+            role: userAuth.role,
+            expires: userAuth.expires,
+          });
+        }
+      } catch (error) {
+        console.error("Session check failed:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
     checkSession();
   }, []);
-  // Kiểm tra token hết hạn
-  useEffect(() => {
-    if (user && new Date(user.expires) < new Date()) {
-      setUser(null);
-      setIsAuthenticated(false);
-    } else if (user) {
-      setIsAuthenticated(true);
-    } else {
-      setIsAuthenticated(false);
-    }
-  }, [user]);
-  const value = {
-    user,
-    setUser,
-    isAuthenticated,
-  };
+
+  const isAuthenticated = !!user && new Date(user.expires) > new Date();
+
+  const value = useMemo(
+    () => ({
+      user,
+      setUser,
+      isAuthenticated,
+      isLoading,
+      logout,
+    }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [user, isLoading]
+  );
+
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }
 

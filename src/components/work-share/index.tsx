@@ -54,9 +54,11 @@ function MainWork() {
   }, [projectSelected]);
 
   useEffect(() => {
-    const endpointWork =
-      "/work/" + encodeBase64({ project_id: projectSelected });
-    getWorkList(endpointWork, "reload");
+    if (projectSelected != 0) {
+      const endpointWork =
+        "/work/" + encodeBase64({ project_id: projectSelected });
+      getWorkList(endpointWork, "reload");
+    }
   }, [projectSelected]);
   if (!statusList || !priorityList || !typeWorkList) {
     return (

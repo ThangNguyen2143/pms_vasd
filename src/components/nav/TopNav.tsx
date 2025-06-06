@@ -5,10 +5,9 @@ import Image from "next/image";
 import Navigation from "./sidenav/component/navigation";
 // import { useEffect } from "react";
 // import { getUser } from "~/lib/dal";
-import { logout } from "~/app/(auth)/login/actions/auth";
 import ThemeToggle from "./theme-toggle";
 import { useUser } from "~/providers/user-context";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 // type userSecurity = {
 //   id: number | undefined;
 //   name: string;
@@ -16,8 +15,8 @@ import { useRouter } from "next/navigation";
 //   role: string;
 // };
 export default function TopNav() {
-  const router = useRouter();
-  const { user, isAuthenticated, setUser } = useUser(); // Sử dụng hook useUser
+  // const router = useRouter();
+  const { user, isAuthenticated, isLoading, logout } = useUser(); // Sử dụng hook useUser
 
   // Kiểm tra đăng nhập và chuyển hướng nếu cần
   // useEffect(() => {
@@ -33,11 +32,10 @@ export default function TopNav() {
   // }, [isAuthenticated, router]);
   const handleLogout = async () => {
     await logout();
-    setUser(null); // Xóa thông tin user khỏi context
-    router.push("/login"); // Chuyển hướng đến trang đăng nhập
+    // router.push("/login"); // Chuyển hướng đến trang đăng nhập
   };
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated && !isLoading) {
     return <div>Đang chuyển hướng...</div>; // Hoặc hiển thị loading
   }
   if (!user) return <div>Đang tải</div>;

@@ -2,7 +2,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getMenu } from "~/lib/dal";
-import { SignInFormSchema, FormState } from "~/lib/definitions";
+// import { SignInFormSchema, FormState } from "~/lib/definitions";
 import { postItem } from "~/lib/services";
 import { createSession, deleteSession } from "~/lib/session";
 import { DataResponse } from "~/lib/types";
@@ -15,42 +15,37 @@ type SignInRespone = {
   expired: string;
   account_type: string;
 };
-export async function signIn(state: FormState, formData: FormData) {
+
+export async function signIn(
+  state: { status: string; error?: { message: string } },
+  formData: FormData
+) {
   // Validate form fields
-  const validatedFields = SignInFormSchema.safeParse({
-    username: formData.get("username"),
-    password: formData.get("password"),
-  });
 
   // If any form fields are invalid, return early
-  if (!validatedFields.success) {
-    return {
-      errors: {
-        ...validatedFields.error.flatten().fieldErrors,
-        server: undefined,
-      },
-    };
-  }
-  const dataSend = JSON.stringify({ data: validatedFields.data });
+  // if (!validatedFields.success) {
+  //   return {
+  //     errors: {
+  //       ...validatedFields.error.flatten().fieldErrors,
+  //       server: undefined,
+  //     },
+  //   };
+  // }
+  const dataSend = JSON.stringify({ data: formData });
   // 3. Insert the user call an Auth Library's API
   const postResponse: DataResponse<SignInRespone> = await postItem({
     endpoint: "/user/login",
     data: dataSend,
   });
-  if (postResponse.code !== 200) {
+  if (!postResponse || postResponse.code !== 200) {
     return {
+      status: "Failed",
       errors: {
-        username: undefined,
-        password: undefined,
-        server: {
-          message: postResponse.message,
-          hint: postResponse.hint || "",
-          code: postResponse.code,
-        },
+        message: postResponse.message,
       },
-    };
+    } as typeof state;
   }
-  const data = postResponse?.value;
+  const data = postResponse.value;
   // 4. Handle the response from the API
   await createSession({
     userId: data.userid,
@@ -59,16 +54,9 @@ export async function signIn(state: FormState, formData: FormData) {
     token: data.token,
     role: data.account_type,
   });
-  const nav = await getMenu();
-  const menuRoutes = nav?.map((item) => `/${item.code}`);
-  const cookie = await cookies();
-  cookie.set("menuRoutes", JSON.stringify(menuRoutes), {
-    path: "/",
-    httpOnly: false,
-  });
-
+  await setMenuRoute();
   // 5. Redirect user
-  redirect("/");
+  return { status: "Success" } as typeof state;
 }
 export async function setMenuRoute() {
   const nav = await getMenu();
@@ -79,7 +67,7 @@ export async function setMenuRoute() {
     httpOnly: false,
   });
 }
-export async function logout() {
+export async function logout(path?: string) {
   deleteSession();
-  redirect("/login");
+  redirect(`/login?callbackUrl=${path}`);
 }

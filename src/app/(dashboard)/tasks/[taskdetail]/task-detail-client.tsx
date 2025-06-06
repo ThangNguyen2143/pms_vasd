@@ -16,9 +16,11 @@ import Logs from "~/components/tasks/task-detail/task-log";
 import UpdateInfoTaskModal from "~/components/tasks/modals/update-info-task-btn";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
-import { Comment, Task, WorkStatus } from "~/lib/types";
+import { Comment, DataRating, Task, WorkStatus } from "~/lib/types";
 import { status_with_color } from "~/utils/status-with-color";
 import TaskLinks from "~/components/tasks/task-detail/task-link";
+import CriteriaTask from "~/components/tasks/task-detail/criterial-task";
+import AddCriterialModal from "~/components/tasks/modals/add-criterial-modal";
 
 export default function TaskDetailClient({
   task_id,
@@ -30,6 +32,7 @@ export default function TaskDetailClient({
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showLinkModal, setShowLinkModal] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState(false);
+  const [showEvaluate, setShowEvaluate] = useState(false);
   const [showAddFileAtachmentModal, setShowAddFileAtachmentModal] =
     useState(false);
   const { data: task, getData: getTask, errorData: errorTask } = useApi<Task>();
@@ -41,6 +44,8 @@ export default function TaskDetailClient({
     errorData: errorComment,
     setData: setComments,
   } = useApi<Comment[]>();
+
+  const { data: criterList, getData: getCrit } = useApi<DataRating[]>();
   const reloadTaskData = async () => {
     await getTask(
       "/tasks/detail/" + encodeBase64({ type: "info", task_id }),
@@ -50,6 +55,12 @@ export default function TaskDetailClient({
   const reloadComment = async () => {
     await getComments("/tasks/comments/" + encodeBase64({ task_id }), "reload");
   };
+  const reloadCrit = async () => {
+    await getCrit(
+      "/tasks/detail/" + encodeBase64({ type: "acceptance", task_id }),
+      "reload"
+    );
+  };
   useEffect(() => {
     getTask(
       "/tasks/detail/" + encodeBase64({ type: "info", task_id }),
@@ -57,6 +68,10 @@ export default function TaskDetailClient({
     );
     getTaskStatus("/system/config/eyJ0eXBlIjoidGFza19zdGF0dXMifQ==", "default");
     getComments("/tasks/comments/" + encodeBase64({ task_id }), "default");
+    getCrit(
+      "/tasks/detail/" + encodeBase64({ type: "acceptance", task_id }),
+      "reload"
+    );
   }, [task_id]);
   useEffect(() => {
     if (errorComment) {
@@ -105,6 +120,12 @@ export default function TaskDetailClient({
             onLinkRequirement={() => setShowLinkModal(true)}
             onUpdate={reloadTaskData}
             onAssign={() => setShowAssignModal(true)}
+          />
+          <CriteriaTask
+            onEvaluate={() => setShowEvaluate(true)}
+            task_id={task_id}
+            onUpdate={reloadCrit}
+            data={criterList || []}
           />
           <Attachments
             attachments={task.taskFiles || []}
@@ -160,6 +181,13 @@ export default function TaskDetailClient({
           onClose={() => setShowAddFileAtachmentModal(false)}
           onUpdate={reloadTaskData}
           task_id={task_id}
+        />
+      )}
+      {showEvaluate && (
+        <AddCriterialModal
+          task_id={task.task_id}
+          onClose={() => setShowEvaluate(false)}
+          onUpdate={reloadCrit}
         />
       )}
     </div>

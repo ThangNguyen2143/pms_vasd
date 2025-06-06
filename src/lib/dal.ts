@@ -2,7 +2,7 @@
 import "server-only";
 import { getSession } from "~/lib/session";
 import { cache } from "react";
-import { redirect } from "next/navigation";
+// import { redirect } from "next/navigation";
 import { encodeBase64 } from "./services";
 import { MenuNav, UserDto } from "./types";
 import { fetchData } from "./api-client";
@@ -11,7 +11,7 @@ export const verifySession = cache(async () => {
   const session = await getSession();
 
   if (!session?.userId) {
-    redirect("/login");
+    return;
   }
 
   return {
@@ -24,9 +24,10 @@ export const verifySession = cache(async () => {
 export const getUser = cache(async () => {
   const session = await verifySession();
   // Get user ID from session and fetch data
+  if (!session) return;
   try {
     const endpoint =
-      "/user/" + encodeBase64({ type: "info", id: session?.userId });
+      "/user/" + encodeBase64({ type: "info", id: session.userId });
     const data = await fetchData<UserDto>({ endpoint, cache: "default" });
     const user: UserDto = data?.value;
     return {

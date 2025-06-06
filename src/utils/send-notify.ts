@@ -7,6 +7,7 @@ type Content = {
 };
 const bodyEmailHtml = (
   type: string,
+  action: string,
   id: number,
   name: string,
   content: string,
@@ -21,11 +22,11 @@ const bodyEmailHtml = (
   <body>
     <div style='text-align:center;'>
       <img src='https://pms-ui-vasd.vercel.app/icon.png?a939bbf917091023' alt='VASD' style='max-width:100%;height:auto;'>
-      <h2>${type}</h2>
+      <h2>${action}</h2>
     </div>
     <p>Có cập nhật mới:</p>
-    <h1 style='letter-spacing: 5px; font-size: 24px;'>${id}: ${name}</h1>
-    <p>  Với nội dung:${content}</p>
+    <h1 style='letter-spacing: 5px; font-size: 24px;'>${type} id [${id}]: ${name}</h1>
+    <p>${content}</p>
     <div style='text-align: center; margin: 20px 0;'>
       <a href='${link}'style='display: inline-block; padding: 10px 20px; background-color: #1eeafd; color: #ffeeee; text-decoration: none; border-radius: 6px; font-weight: bold; font-family: sans-serif;'>
         Truy cập
@@ -75,6 +76,7 @@ async function sendEmail(
     receiver_email: email,
     subject: action + ": " + type,
     body: bodyEmailHtml(
+      type,
       action,
       content.id,
       content.name,

@@ -50,3 +50,12 @@ export type RequirementTask = {
   requirement_id: number;
   requirement_title: string;
 };
+export interface DataRating {
+  code: string;
+  title: string;
+  created_by: number;
+  type: string;
+  createdBy_name: string;
+  is_accepted: boolean;
+  created_at: string;
+}

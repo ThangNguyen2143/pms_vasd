@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 // import { useEffect } from "react";
 // import { useApi } from "~/hooks/use-api";
 // import { encodeBase64 } from "~/lib/services";
@@ -14,39 +15,13 @@ function ListProject({
 }) {
   const projectContext = useProject();
   const projectList = projectContext?.projects;
-  // const { data: projectList, getData, errorData } = useApi<ProjectDto[]>();
-  // const endpointProject = "/system/config/" + encodeBase64({ type: "project" });
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     await getData(endpointProject, "no-cache");
-  //   };
-  //   fetchData();
-  // }, []);
+  useEffect(() => {
+    if (projectList) setProjectSelect(projectList[0].id);
+  }, [projectList, setProjectSelect]);
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = e.target.value;
     setProjectSelect(Number.parseInt(selectedValue));
   };
-  // if (errorData) {
-  //   if (errorData.code == 404)
-  //     return (
-  //       <div>
-  //         <span className="alert alert-info">
-  //           Bạn chưa được phân vào bất kì dự án nào
-  //         </span>
-  //       </div>
-  //     );
-  //   if (errorData.code == 500)
-  //     return (
-  //       <div>
-  //         <span className="alert alert-error">Lỗi server</span>
-  //       </div>
-  //     );
-  //   return (
-  //     <div>
-  //       <span className="alert alert-error">{errorData.message}</span>
-  //     </div>
-  //   );
-  // }
   return (
     <select
       className="select select-ghost"
@@ -58,7 +33,7 @@ function ListProject({
       </option>
       {projectList ? (
         projectList.map((item, index) => {
-          if (projectList.length == 1)
+          if (projectList.length === 1)
             return (
               <option key={index} value={item.id} defaultChecked>
                 {item.name}

@@ -1,9 +1,14 @@
-import SignInForm from "./signin-form";
+import { cookies } from "next/headers";
+import LoginForm from "./form-signIn";
+import { redirect } from "next/navigation";
 type SearchParams = Promise<{ [key: string]: string | undefined }>;
 async function LoginPage(props: { searchParams: SearchParams }) {
   const searchParams = await props.searchParams;
   const callbackurl = searchParams.callbackUrl;
-
+  const session = await cookies();
+  if (session.get("session")) {
+    redirect(callbackurl ? callbackurl : "/");
+  }
   return (
     <main className="flex flex-col items-center justify-center min-h-screen p-4 bg-base-100">
       <div
@@ -15,7 +20,7 @@ async function LoginPage(props: { searchParams: SearchParams }) {
       >
         <div className="hero-overlay"></div>
         <div className="hero-content text-neutral-content text-center">
-          <SignInForm callbackUrl={callbackurl} />
+          <LoginForm />
         </div>
       </div>
     </main>

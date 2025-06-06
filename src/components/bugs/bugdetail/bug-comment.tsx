@@ -6,6 +6,7 @@ import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { BugComment, Contact } from "~/lib/types";
 import { useUser } from "~/providers/user-context";
+import { formatCommentDate } from "~/utils/format-comment-date";
 import { sendEmail } from "~/utils/send-notify";
 
 interface ResponseNotify {
@@ -99,7 +100,9 @@ export default function BugComments({
                     <p className="text-lg mt-0.5 mx-2">{comment.comment}</p>
                   </div>
                   <div className="chat-footer">
-                    <time className="text-xs opacity-50">{comment.date}</time>
+                    <time className="text-xs opacity-50">
+                      {formatCommentDate(comment.date)}
+                    </time>
                   </div>
                 </div>
               );

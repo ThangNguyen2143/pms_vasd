@@ -100,7 +100,7 @@ export default function ReTestList({
                   </div>
                 )}
               </li>
-              {confirmDone != "" && (
+              {confirmDone == r.code && (
                 <div>
                   {/* Confirm done have 2 field: input to write note and button confirm */}
                   <div className="mb-2 px-4 flex justify-between">

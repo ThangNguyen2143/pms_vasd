@@ -54,6 +54,7 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
       endpoint: "/system/config/" + encodeBase64({ type: "project" }),
       cache: "default",
     });
+    if (!response.value) return;
     setProject(response.value);
     response.value.map((project) => {
       fetchSoftware(project.id);
