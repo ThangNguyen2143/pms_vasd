@@ -1,6 +1,7 @@
 import { decode, encode } from "base-64";
 import { verifySession } from "./dal";
 import { DataResponse } from "./types";
+import { getSession } from "./session";
 
 const DOMAIN = process.env.DOMAIN || "https://pmapi.vasd.vn/api";
 export function encodeBase64(obj: object): string {
@@ -16,7 +17,15 @@ export async function getItem<T>({
   endpoint: string;
   cache?: RequestCache;
 }) {
-  const session = await verifySession();
+  const session = await getSession();
+  if (!session)
+    return {
+      code: 401,
+      hint: "Not session",
+      message: "Session hết hạn",
+      value: "",
+      status: "failed",
+    } as DataResponse<T>;
   const result = await fetch(DOMAIN + endpoint, {
     cache,
     headers: {
