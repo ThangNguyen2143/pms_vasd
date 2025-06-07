@@ -1,68 +1,73 @@
 "use client";
 import { Send } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
-import { Comment, ResopnseInfor, Task } from "~/lib/types";
+import { Contact, TestComment } from "~/lib/types";
 import { useUser } from "~/providers/user-context";
 import { formatCommentDate } from "~/utils/format-comment-date";
 import { sendEmail } from "~/utils/send-notify";
+interface ResponseNotify {
+  action: string;
+  content: {
+    testcase_id: number;
+    testcase_name: string;
+    message: string;
+  };
 
-function TaskComments({
+  contact: Contact[][];
+}
+function CommentTestcase({
+  testcase_id,
+  product_id,
   comments,
-  task,
-  onUpdate,
+  updateComment,
 }: {
-  comments?: Comment[];
-  task: Task;
-  onUpdate: () => Promise<void>;
+  testcase_id: number;
+  product_id: string;
+  comments: TestComment[];
+  updateComment: () => Promise<void>;
 }) {
   const { user } = useUser();
   const [newComment, setNewComment] = useState("");
-  const { postData, isLoading, errorData } = useApi<
-    ResopnseInfor,
-    { task_id: number; content: string }
+  const { postData, errorData } = useApi<
+    ResponseNotify,
+    { testcase_id: number; comment: string }
   >();
-
   useEffect(() => {
     if (errorData) toast.error(errorData.message);
   }, [errorData]);
   const handleAddComment = async () => {
-    const content = newComment.trim();
-    if (!content || content.length == 0) {
-      toast.info("Chưa nhập kí tự nào");
-      return;
-    }
     // API post comment here
     const data = {
-      task_id: task.task_id,
-      content: newComment.trim(),
+      testcase_id,
+      comment: newComment,
     };
-    const re = await postData("/tasks/comments", data);
+    const re = await postData("/testcase/comments", data);
     if (!re) return;
     else {
-      const email = re.list_contacts.email;
+      const email = re.contact
+        ?.flat()
+        .filter((ct) => ct.code === "email")
+        .map((ct) => ct.value);
       // const tele = re.contact.find((ct) => ct.code == "telegram")?.value;
       const content = {
-        id: task.task_id,
-        name: task.title,
-        massage: "Có bình luận mới",
+        id: re.content.testcase_id,
+        name: re.content.testcase_name,
+        massage: re.content.message,
       };
       const link =
         window.location.origin +
-          "/tasks/" +
-          encodeBase64({
-            task_id: task.task_id,
-            product_id: task.product_id,
-          }) || "https://pm.vasd.vn/";
+          "/bugs/" +
+          encodeBase64({ testcase_id, product_id }) || "https://pm.vasd.vn/";
       if (email.length > 0)
         email.forEach((e) =>
-          sendEmail(content, e, "Thông báo comment mới", link, "task")
+          sendEmail(content, e, "Thông báo comment", link, "Testcase")
             .then((mes) => toast(mes.message))
             .catch((e) => toast.error(e))
         );
-      await onUpdate();
+      await updateComment();
       setNewComment("");
     }
   };
@@ -80,14 +85,18 @@ function TaskComments({
         <h4 className="text-lg font-semibold text-primary mb-2">
           💬 Bình luận
         </h4>
-        <div className="border border-amber-100 shadow">
+        <div className="border border-amber-100 shadow max-h-96 overflow-y-auto">
           {comments ? (
             comments.map((comment) => {
               return (
                 <div className="chat chat-start" key={comment.id}>
+                  {/* <div className="chat-header">
+                 {comment.name}
+                 <time className="text-xs opacity-50">{comment.date}</time>
+               </div> */}
                   <div className="chat-bubble wrap-anywhere">
                     <p className="font-bold text-sm">{comment.name}</p>
-                    <p className="text-lg mt-0.5 mx-2 ">{comment.content}</p>
+                    <p className="text-lg mt-0.5 mx-2">{comment.comment}</p>
                   </div>
                   <div className="chat-footer">
                     <time className="text-xs opacity-50">
@@ -128,14 +137,10 @@ function TaskComments({
               <button
                 className="btn btn-ghost btn-sm rounded-full"
                 onClick={handleAddComment}
+                disabled={newComment.trim().length == 0}
                 aria-label="Gửi"
-                disabled={isLoading || newComment.trim().length == 0}
               >
-                {isLoading ? (
-                  <span className="loading loading-spinner loading-sm"></span>
-                ) : (
-                  <Send />
-                )}
+                <Send />
               </button>
             </div>
           </div>
@@ -145,4 +150,4 @@ function TaskComments({
   );
 }
 
-export default TaskComments;
+export default CommentTestcase;

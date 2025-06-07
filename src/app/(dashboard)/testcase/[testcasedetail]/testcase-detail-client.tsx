@@ -7,6 +7,7 @@ import {
   TestAssign,
   EnviromentTest,
   TestRunInfo,
+  TestComment,
 } from "~/lib/types";
 import { toast } from "sonner";
 import AssignTestcaseModal from "~/components/testcase/modals/assign-testcase-modal";
@@ -19,6 +20,7 @@ import TestcaseLog from "~/components/testcase/testcase-detail/testcase-log";
 import AssignedUser from "~/components/testcase/testcase-detail/assign-user";
 import AddTestRunModal from "~/components/testcase/modals/open-add-test-modal";
 import StepTable from "~/components/testcase/testcase-detail/step-of-test";
+import CommentTestcase from "~/components/testcase/testcase-detail/comment-testcase";
 
 export default function TestcaseDetailClient({
   testcase_id,
@@ -32,6 +34,7 @@ export default function TestcaseDetailClient({
     data: testcase,
     isLoading: loading,
   } = useApi<TestcaseDetail>();
+  const { getData: getComments, data: commentsList } = useApi<TestComment[]>();
   const {
     getData: getEnv,
     data: environmentTest,
@@ -52,6 +55,7 @@ export default function TestcaseDetailClient({
   }, [errorLoadEnv]);
   useEffect(() => {
     fetchTestcase();
+    fetchComment();
   }, [testcase_id]);
 
   const fetchTestcase = async () => {
@@ -65,7 +69,17 @@ export default function TestcaseDetailClient({
       toast.error("Failed to fetch testcase details");
     }
   };
-
+  const fetchComment = async () => {
+    try {
+      await getComments(
+        `/testcase/comments/${encodeBase64({ testcase_id })}`,
+        "reload"
+      );
+    } catch (e) {
+      console.log(e);
+      toast.error("Failed to fetch comment testcases");
+    }
+  };
   const handleEditSubmit = async () => {
     //  try {
     //    await postData(
@@ -90,23 +104,16 @@ export default function TestcaseDetailClient({
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div className="flex flex-col">
-          <TestcaseInfo
-            testcase={testcase}
-            openUpdate={() => setShowEditModal(true)}
-          />
-          <AttachmentTestcaseFile
-            files={testcase.testFiles}
-            testcase_id={testcase_id}
-            uploadFile={() => setShowUploadModal(true)}
-          />
-        </div>
-        <AssignedUser
-          assignTo={testcase.testCaseAssigns}
-          onUpdate={() => fetchTestcase()}
+        {/* Testcase Info  Section */}
+        <TestcaseInfo
+          testcase={testcase}
+          openUpdate={() => setShowEditModal(true)}
+        />
+        {/* Attachment Section*/}
+        <AttachmentTestcaseFile
+          files={testcase.testFiles}
           testcase_id={testcase_id}
-          openAddTest={(code) => setOpenAddTest(code)}
-          openAssign={() => setShowAssignModal(true)}
+          uploadFile={() => setShowUploadModal(true)}
         />
       </div>
 
@@ -119,6 +126,21 @@ export default function TestcaseDetailClient({
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Comment testcase */}
+        <CommentTestcase
+          testcase_id={testcase_id}
+          comments={commentsList || []}
+          product_id={product_id}
+          updateComment={fetchComment}
+        />
+        {/* Assign User Section */}
+        <AssignedUser
+          assignTo={testcase.testCaseAssigns}
+          onUpdate={() => fetchTestcase()}
+          testcase_id={testcase_id}
+          openAddTest={(code) => setOpenAddTest(code)}
+          openAssign={() => setShowAssignModal(true)}
+        />
         {/* Test History Section */}
         <div className="bg-base-200 shadow p-4 rounded-lg">
           <h2 className="text-xl font-semibold mb-4 border-l-4 border-green-500 pl-3">

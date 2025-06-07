@@ -88,3 +88,10 @@ export type EnviromentTest = {
   display: string;
   description: string;
 };
+export type TestComment = {
+  id: number;
+  create_by: number;
+  comment: string;
+  name: string;
+  date: string;
+};

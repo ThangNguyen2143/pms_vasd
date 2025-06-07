@@ -1,6 +1,6 @@
 "use client";
 import { Send } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
@@ -80,6 +80,14 @@ export default function BugComments({
       setNewComment("");
     }
   };
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto"; // Reset height
+      textareaRef.current.style.height =
+        textareaRef.current.scrollHeight + "px";
+    }
+  }, [newComment]);
   return (
     <div className="bg-base-200 rounded-lg p-4">
       <div className="mt-4">
@@ -126,8 +134,10 @@ export default function BugComments({
             </div>
           </div>
           <div className="join-vertical mt-4 w-full border-dashed border rounded-2xl p-3">
-            <input
-              className="join-item w-full focus-visible:outline-none focus-visible:border-none focus-visible:ring-0"
+            <textarea
+              ref={textareaRef}
+              rows={1}
+              className="join-item resize-none break-words overflow-hidden w-full focus-visible:outline-none focus-visible:border-none focus-visible:ring-0"
               placeholder="Viết bình luận..."
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
