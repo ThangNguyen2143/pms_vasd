@@ -7,9 +7,9 @@ function TestcaseLog({ testLogs }: { testLogs: TestLog[] }) {
       <h2 className="text-xl font-semibold mb-4 border-l-4 border-green-500 pl-3">
         Nhật ký hoạt động
       </h2>
-      <div className="flex flex-col-reverse overflow-y-auto max-h-96">
+      <div className="overflow-y-auto max-h-96">
         {testLogs.length > 0 ? (
-          <ul className="space-y-3">
+          <ul className="space-y-3 flex flex-col-reverse gap-2">
             {testLogs.map((log: TestLog) => (
               <li key={log.id + " " + log.date} className="flex items-start">
                 <span className="mr-2">🕓</span>

@@ -1,35 +1,53 @@
 "use client";
-import { useState } from "react";
-import { EnviromentTest, TestcaseDetail } from "~/lib/types";
-
+import { useEffect, useState } from "react";
+import { useApi } from "~/hooks/use-api";
+import { encodeBase64 } from "~/lib/services";
+import { EnviromentTest, TaskDTO, TestcaseDetail } from "~/lib/types";
+type InfoTestcaseDetail = {
+  name: string;
+  description: string;
+  task_id?: number;
+  tags: string[];
+  test_data: string;
+  environment: string;
+  result_expect: string;
+};
 export default function EditTestcaseModal({
   isOpen,
+  product_id,
   onClose,
   testcase,
   environmentTests,
   onSubmit,
 }: {
   isOpen: boolean;
+  product_id: string;
   onClose: () => void;
   testcase: TestcaseDetail;
   environmentTests: EnviromentTest[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onSubmit: (data: any) => void;
+  onSubmit: ({ info }: { info: InfoTestcaseDetail }) => void;
 }) {
   const [formData, setFormData] = useState({
     name: testcase.name,
     description: testcase.description,
     environment: testcase.environment,
     tags: testcase.tags.join(", "),
+    task_id: testcase.task?.id || 0,
     test_data: testcase.test_data || "",
     result_expect: testcase.result_expect,
   });
-
+  const { getData: getlistTasks, data: tasks } = useApi<TaskDTO[]>();
+  useEffect(() => {
+    getlistTasks("/tasks/" + encodeBase64({ product_id }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product_id]);
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({
-      ...formData,
-      tags: formData.tags.split(",").map((tag) => tag.trim()),
+      info: {
+        ...formData,
+        tags: formData.tags.split(",").map((tag) => tag.trim()),
+      },
     });
   };
 
@@ -78,6 +96,27 @@ export default function EditTestcaseModal({
                     {envT.display}
                   </option>
                 ))}
+              </select>
+            </div>
+            <div>
+              <label className="label">Liên kết task</label>
+              <select
+                className="select select-bordered w-full"
+                value={formData.task_id}
+                onChange={(e) =>
+                  setFormData({ ...formData, task_id: Number(e.target.value) })
+                }
+              >
+                <option value={0}>Chọn task</option>
+                {tasks ? (
+                  tasks.map((task) => (
+                    <option key={task.id + "-ref"} value={task.id}>
+                      {task.title}
+                    </option>
+                  ))
+                ) : (
+                  <option>Không có task nào</option>
+                )}
               </select>
             </div>
             <div>

@@ -29,7 +29,7 @@ function AssignedUser({
       assign_code,
       status,
     });
-    if (re) {
+    if (re == "") {
       await onUpdate();
       toast.success("Xử lý thành công");
     }
@@ -77,7 +77,7 @@ function AssignedUser({
             {assignInfo.end_at ? <p>Kết thúc: {assignInfo.end_at}</p> : ""}
             <div className="flex justify-end gap-2">
               <div className="join">
-                {status != "INPROGRESS" && (
+                {status == "ASSIGNED" && (
                   <button
                     className="btn btn-primary btn-outline join-item tooltip"
                     onClick={() => handleSubmit(code, "START")}
@@ -86,7 +86,7 @@ function AssignedUser({
                     <CirclePlay />
                   </button>
                 )}
-                {status != "ASSIGNED" && (
+                {status == "INPROGRESS" && (
                   <button
                     className="join-item btn btn-outline btn-info tooltip"
                     data-tip="Ghi nhận test"
@@ -95,13 +95,15 @@ function AssignedUser({
                     <Plus></Plus>
                   </button>
                 )}
-                <button
-                  className="btn btn-outline join-item btn-success tooltip"
-                  onClick={() => handleSubmit(code, "END")}
-                  data-tip={"Hoàn thành"}
-                >
-                  <SquareCheckBig />
-                </button>
+                {status == "INPROGRESS" && (
+                  <button
+                    className="btn btn-outline join-item btn-success tooltip"
+                    onClick={() => handleSubmit(code, "END")}
+                    data-tip={"Hoàn thành"}
+                  >
+                    <SquareCheckBig />
+                  </button>
+                )}
               </div>
             </div>
           </div>

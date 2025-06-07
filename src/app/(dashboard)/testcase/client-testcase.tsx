@@ -52,7 +52,7 @@ function ClientTestCasesPage() {
           >
             ✕
           </button>
-          <h3 className="text-lg">Thêm task</h3>
+          <h3 className="text-lg">Tạo testcase</h3>
           <CreateTestcaseForm
             product_id={selectProduct}
             onSuccess={() => {

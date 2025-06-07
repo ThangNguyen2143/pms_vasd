@@ -4,11 +4,15 @@ import { TestStep } from "~/lib/types";
 function StepTest({
   steps,
   result_expect,
+  openUpdateStep,
 }: {
   steps: TestStep[];
   result_expect: string;
-  onUpdate: () => void;
+  openUpdateStep: () => void;
 }) {
+  // const handleUpdate = (stepTest) => {
+  //   onUpdate({ stepTest });
+  // }
   return (
     <div className="bg-base-200 shadow p-4 rounded-lg mb-6">
       <div className="flex justify-between items-center mb-4">
@@ -18,7 +22,7 @@ function StepTest({
         <button
           className="btn btn-primary btn-outline btn-sm tooltip"
           data-tip="Sửa bước"
-          //  onClick={() => (true)}
+          onClick={openUpdateStep}
         >
           <Wrench />
         </button>

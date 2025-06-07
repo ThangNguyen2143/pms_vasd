@@ -21,7 +21,26 @@ import AssignedUser from "~/components/testcase/testcase-detail/assign-user";
 import AddTestRunModal from "~/components/testcase/modals/open-add-test-modal";
 import StepTable from "~/components/testcase/testcase-detail/step-of-test";
 import CommentTestcase from "~/components/testcase/testcase-detail/comment-testcase";
-
+import UpdateStepTestModal from "~/components/testcase/modals/update-step-test";
+import TestDependComp from "~/components/testcase/testcase-detail/test-depend";
+type InfoTestcaseDetail = {
+  name: string;
+  description: string;
+  task_id?: number;
+  tags: string[];
+  test_data: string;
+  environment: string;
+  result_expect: string;
+};
+type StepTest = {
+  step: number;
+  name: string;
+  description: string;
+  expected_result: string;
+  input_data?: string;
+  output_data?: string;
+  note?: string;
+};
 export default function TestcaseDetailClient({
   testcase_id,
   product_id,
@@ -40,9 +59,11 @@ export default function TestcaseDetailClient({
     data: environmentTest,
     errorData: errorLoadEnv,
   } = useApi<EnviromentTest[]>();
+  const { putData, errorData: errorPost } = useApi();
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showUpdateStep, setShowUpdateStep] = useState(false);
   const [openAddTest, setOpenAddTest] = useState<string>();
   useEffect(() => {
     getEnv(
@@ -52,7 +73,9 @@ export default function TestcaseDetailClient({
   }, []);
   useEffect(() => {
     if (errorLoadEnv) toast.error(errorLoadEnv.message);
-  }, [errorLoadEnv]);
+    if (errorPost) toast.error(errorPost.message);
+    console.log(errorLoadEnv, errorPost);
+  }, [errorLoadEnv, errorPost]);
   useEffect(() => {
     fetchTestcase();
     fetchComment();
@@ -80,18 +103,64 @@ export default function TestcaseDetailClient({
       toast.error("Failed to fetch comment testcases");
     }
   };
-  const handleEditSubmit = async () => {
-    //  try {
-    //    await postData(
-    //      `/products/${product_id}/testcases/${testcase_id}`,
-    //      updatedData
-    //    );
-    //    toast.success("Testcase updated successfully");
-    //    setShowEditModal(false);
-    //    fetchTestcase();
-    //  } catch (error) {
-    //    toast.error("Failed to update testcase");
-    //  }
+  const handleEditSubmit = async ({
+    info,
+    stepTest,
+  }: {
+    info?: InfoTestcaseDetail;
+    stepTest?: StepTest[];
+  }) => {
+    try {
+      const body: {
+        steps: StepTest[];
+        testcase_id: number;
+        name: string;
+        description: string;
+        task_id?: number;
+        tags: string[];
+        test_data?: string;
+        result_expect: string;
+        environment: string;
+      } = {
+        testcase_id,
+        name: info?.name || testcase?.name || "",
+        description: info?.description || testcase?.description || "",
+        task_id: info?.task_id || testcase?.task?.id,
+        tags: info?.tags || testcase?.tags || [],
+        test_data: info?.test_data || testcase?.test_data,
+        result_expect: info?.result_expect || testcase?.result_expect || "",
+        environment: info?.environment || testcase?.environment || "",
+        steps: stepTest
+          ? stepTest.map((step, index) => ({
+              ...step,
+              step: index + 1,
+            }))
+          : testcase
+          ? testcase?.testSteps.map((step, index) => ({
+              ...step,
+              step: index + 1,
+            }))
+          : [],
+      };
+      if (!body.task_id) delete body.task_id; // Remove task_id if not provided
+      if (!body.test_data) delete body.test_data; // Remove test_data if not provided
+      const re = await putData(`/testcase`, body);
+      if (re != "") {
+        toast.error("Cập nhật thất bại");
+        return;
+      }
+      await fetchTestcase(); // Refetch to get updated data
+      toast.success("Cập nhật thành công");
+      if (info) {
+        setShowEditModal(false);
+      }
+      if (stepTest) {
+        setShowUpdateStep(false);
+      }
+    } catch (e) {
+      console.error(e);
+      toast.error("Cập nhật thất bại");
+    }
   };
 
   if (loading) return <div>Loading...</div>;
@@ -108,13 +177,22 @@ export default function TestcaseDetailClient({
         <TestcaseInfo
           testcase={testcase}
           openUpdate={() => setShowEditModal(true)}
+          onUpdate={fetchTestcase}
         />
+        <div>
+          <TestDependComp
+            product_id={product_id}
+            testcase_id={testcase_id}
+            onUpdate={fetchTestcase}
+            testDepend={testcase.test_depend}
+          />
+          <AttachmentTestcaseFile
+            files={testcase.testFiles}
+            testcase_id={testcase_id}
+            uploadFile={() => setShowUploadModal(true)}
+          />
+        </div>
         {/* Attachment Section*/}
-        <AttachmentTestcaseFile
-          files={testcase.testFiles}
-          testcase_id={testcase_id}
-          uploadFile={() => setShowUploadModal(true)}
-        />
       </div>
 
       {/* Test Steps Section */}
@@ -122,7 +200,7 @@ export default function TestcaseDetailClient({
         steps={testcase.testSteps}
         result_expect={testcase.result_expect}
         // testcase_id={testcase.id}
-        onUpdate={handleEditSubmit} // hàm để refetch dữ liệu
+        openUpdateStep={() => setShowUpdateStep(true)} // hàm để refetch dữ liệu
       />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -206,9 +284,16 @@ export default function TestcaseDetailClient({
           testcase_id={testcase_id}
         />
       )}
+      <UpdateStepTestModal
+        isOpen={showUpdateStep}
+        onClose={() => setShowUpdateStep(false)}
+        onUpdate={({ stepTest }) => handleEditSubmit({ stepTest })}
+        stepTest={testcase.testSteps}
+      />
       <EditTestcaseModal
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
+        product_id={product_id}
         testcase={testcase}
         environmentTests={environmentTest || []}
         onSubmit={handleEditSubmit}

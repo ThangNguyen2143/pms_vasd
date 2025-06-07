@@ -20,6 +20,9 @@ type CreateTestcaseData = {
     step: number;
     name: string;
     description: string;
+    input_data?: string;
+    output_data?: string;
+    note?: string;
     expected_result: string;
   }[];
 };
@@ -45,6 +48,8 @@ function CreateTestcaseForm({
       name: string;
       description: string;
       input_data?: string;
+      output_data?: string;
+      note?: string;
       expected_result: string;
     }[];
   }>({
@@ -89,7 +94,6 @@ function CreateTestcaseForm({
   }, []);
   useEffect(() => {
     getlistTasks("/tasks/" + encodeBase64({ product_id }));
-    console.log(encodeBase64({ product_id }));
   }, [product_id]);
   useEffect(() => {
     if (errorLoadEnv) {
@@ -106,9 +110,18 @@ function CreateTestcaseForm({
     };
     if (data.info.task_id == 0) delete data.info.task_id;
     if (!data.info.test_data || data.info.test_data.trim().length == 0) {
-      toast.info("Dữ liệu đầu vào sẽ được bỏ qua");
+      // toast.info("Dữ liệu đầu vào sẽ được bỏ qua");
       delete data.info.test_data;
     }
+    data.steps = data.steps.map((step) => {
+      const { input_data, output_data, note, ...rest } = step;
+      return {
+        ...rest,
+        input_data: input_data?.trim() || undefined,
+        output_data: output_data?.trim() || undefined,
+        note: note?.trim() || undefined,
+      };
+    });
     const result = await postData("/testcase", data);
     if (result !== null) {
       toast.success("Tạo testcase thành công");
@@ -390,6 +403,18 @@ function CreateTestcaseForm({
                     />
                   </div>
                   <div>
+                    <label className="label">Dữ liệu đầu ra</label>
+                    <input
+                      type="text"
+                      className="input input-bordered w-full"
+                      placeholder="Dữ liệu đầu ra (nếu có)"
+                      value={step.output_data || ""}
+                      onChange={(e) =>
+                        handleStepChange(index, "output_data", e.target.value)
+                      }
+                    />
+                  </div>
+                  <div>
                     <label className="label">Kết quả mong đợi</label>
                     <input
                       type="text"
@@ -402,6 +427,18 @@ function CreateTestcaseForm({
                           "expected_result",
                           e.target.value
                         )
+                      }
+                    />
+                  </div>
+                  <div>
+                    <label className="label">Ghi chú</label>
+                    <input
+                      type="text"
+                      className="input input-bordered w-full"
+                      placeholder="Nhập Ghi chú"
+                      value={step.note}
+                      onChange={(e) =>
+                        handleStepChange(index, "note", e.target.value)
                       }
                     />
                   </div>
@@ -423,10 +460,6 @@ function CreateTestcaseForm({
           </div>
         </fieldset>
       </div>
-      {/* Phần thông tin chung */}
-
-      {/* Phần các bước thực hiện */}
-
       <div className="flex justify-between">
         <button
           className="btn btn-primary"

@@ -99,7 +99,27 @@ export async function putItem({
     },
     body: data,
   });
-  return await result.json();
+  try {
+    if (!result.ok) {
+      return {
+        code: result.status,
+        hint: "",
+        message: result.statusText,
+        status: "failed",
+        value: "",
+      };
+    }
+    return await result.json();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (e) {
+    return {
+      code: result.status,
+      hint: "",
+      message: result.statusText,
+      status: "failed",
+      value: "",
+    };
+  }
 }
 export async function deleteItem({ endpoint }: { endpoint: string }) {
   const session = await verifySession();

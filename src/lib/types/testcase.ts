@@ -22,7 +22,11 @@ export type TestcaseDetail = {
   environment: string;
   test_data: string;
   result_expect: string;
-  test_depend: []; //Khum biết nốt
+  test_depend: {
+    id: number;
+    name: string;
+    relation_type: string;
+  }[]; //Khum biết nốt
   create_date: string;
   created_by: number;
   time_start?: string;
@@ -94,4 +98,9 @@ export type TestComment = {
   comment: string;
   name: string;
   date: string;
+};
+export type TestcaseDependType = {
+  code: string;
+  display: string;
+  description: string;
 };
