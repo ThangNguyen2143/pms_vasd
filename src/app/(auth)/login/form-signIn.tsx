@@ -4,9 +4,19 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { SignInFormSchema } from "~/lib/definitions";
 import { z } from "zod";
-
+import { useUser } from "~/providers/user-context";
+type SignInRespone = {
+  token: string;
+  username: string;
+  userid: number;
+  code: string;
+  display: string;
+  expired: string;
+  account_type: string;
+};
 export default function LoginForm() {
   const router = useRouter();
+  const { setUser } = useUser();
   const searchParams = useSearchParams();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -52,6 +62,14 @@ export default function LoginForm() {
         const errorData = await response.json();
         throw new Error(errorData.message || "Đăng nhập thất bại");
       }
+      // Set user for context
+      const user: SignInRespone = await response.json();
+      setUser({
+        userId: user.userid,
+        name: user.display,
+        role: user.account_type,
+        expires: user.expired,
+      });
       const isValidUrl = (url: string) => {
         try {
           new URL(url, window.location.origin);

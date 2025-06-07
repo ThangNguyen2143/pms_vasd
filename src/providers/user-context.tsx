@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import {
   createContext,
   useContext,
@@ -31,12 +32,13 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
+  const router = useRouter();
   const logout = async () => {
     try {
       // await logout(); // Gọi API logout nếu cần
       await deleteSession();
       setUser(null);
+      router.refresh();
     } catch (error) {
       console.error("Logout failed:", error);
     }
