@@ -187,6 +187,7 @@ export default function TestcaseDetailClient({
             testDepend={testcase.test_depend}
           />
           <AttachmentTestcaseFile
+            onUpdate={fetchTestcase}
             files={testcase.testFiles}
             testcase_id={testcase_id}
             uploadFile={() => setShowUploadModal(true)}

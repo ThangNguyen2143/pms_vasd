@@ -122,6 +122,7 @@ export default function RequirementDetailClient({
             onEdit={() => setShowEditRequesterModal(true)}
           />
           <Attachments
+            onUpdate={async () => await updateRequirement()}
             files={requirement.requirementFiles || []}
             onAdd={() => setShowAddAttachmentModal(true)}
           />

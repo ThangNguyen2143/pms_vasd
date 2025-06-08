@@ -1,5 +1,5 @@
 "use client";
-import { Download, ExternalLink, Paperclip } from "lucide-react";
+import { Download, Paperclip, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
@@ -13,15 +13,29 @@ import {
 function AttachmentTestcaseFile({
   files,
   testcase_id,
+  onUpdate, // hàm để reload lại danh sách file sau khi thêm/xóa
   uploadFile,
 }: {
   testcase_id: number;
   files: RequirementFile[];
+  onUpdate: () => Promise<void>; // hàm để reload lại danh sách file sau khi thêm/xóa
   uploadFile: () => void;
 }) {
   const { getData, errorData } = useApi<FileDto>(); // ⚠️ chỉ dùng getData, không dùng state dùng chung
   const [loadingMap, setLoadingMap] = useState<Record<number, boolean>>({}); // trạng thái tải theo file_id
-
+  const { removeData: removeFile, errorData: errorRemoveFile } = useApi();
+  const handleRemoveFile = async (file_id: number) => {
+    if (confirm("Bạn có chắc chắn muốn xóa tệp này?")) {
+      const res = await removeFile(
+        "/testcase/file/" + encodeBase64({ testcase_id, file_id })
+      );
+      if (res == "") {
+        toast.success("Đã xóa tệp thành công.");
+        // reload files after removing
+        await onUpdate();
+      }
+    }
+  };
   const handleDownfile = async (file_id: number, type: string) => {
     setLoadingMap((prev) => ({ ...prev, [file_id]: true }));
 
@@ -34,6 +48,9 @@ function AttachmentTestcaseFile({
 
     setLoadingMap((prev) => ({ ...prev, [file_id]: false }));
   };
+  useEffect(() => {
+    if (errorRemoveFile) toast.error(errorRemoveFile.message);
+  }, [errorRemoveFile]);
   useEffect(() => {
     if (errorData) toast.error(errorData.message);
   }, [errorData]);
@@ -69,12 +86,19 @@ function AttachmentTestcaseFile({
                   >
                     <Download></Download>
                   </span>
-                  <span
+                  {/* <span
                     className="link text-blue-500 btn btn-ghost tooltip"
                     data-tip={"Mở file"}
                     onClick={() => handleDownfile(f.file_id, "open")}
                   >
                     <ExternalLink />
+                  </span> */}
+                  <span
+                    className="btn btn-ghost text-error tooltip"
+                    data-tip="Xóa tệp"
+                    onClick={() => handleRemoveFile(f.file_id)}
+                  >
+                    <X />
                   </span>
                 </>
               )}

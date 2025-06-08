@@ -33,12 +33,16 @@ function DetailPhase({
     getData,
   } = useApi<ProjectPhaseDetail>();
   const { removeData: deletePhase } = useApi<string>();
+  const { removeData: removeFilePhase, errorData: errorRemoveFile } = useApi();
   useEffect(() => {
     if (phase_id) {
       getData(`/project/phase/detail/${encodeBase64({ phase_id })}`, "default");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase_id]);
+  useEffect(() => {
+    if (errorRemoveFile) toast.error(errorRemoveFile.message);
+  }, [errorRemoveFile]);
   const reloadData = async () => {
     onUpdate();
     if (phase_id) {
@@ -63,8 +67,17 @@ function DetailPhase({
     setLoadingMap((prev) => ({ ...prev, [file_id]: false }));
   };
   const handleDeteleFile = async (file_id: number) => {
-    console.log(file_id);
-    toast.info("Tính năng đang phát triển...");
+    setLoadingMap((prev) => ({ ...prev, [file_id]: true }));
+    const re = await removeFilePhase(
+      "/project/phase/file/" + encodeBase64({ file_id, phase_id })
+    );
+    if (re != "") {
+      setLoadingMap((prev) => ({ ...prev, [file_id]: false }));
+      return;
+    }
+    toast.success("Xóa file thành công");
+    setLoadingMap((prev) => ({ ...prev, [file_id]: false }));
+    await reloadData();
   };
   const handleDeletePhase = async () => {
     const re = await deletePhase(
@@ -81,7 +94,7 @@ function DetailPhase({
       <div className="p-5">
         {isLoading && (
           <div className="flex items-center gap-2">
-            <span>Loading phase details</span>
+            <span>Đang tải chi tiết giai đoạn</span>
             <span className="loading loading-dots loading-sm"></span>
           </div>
         )}

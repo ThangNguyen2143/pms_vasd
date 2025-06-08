@@ -1,5 +1,5 @@
 "use client";
-import { Download, ExternalLink, Paperclip } from "lucide-react";
+import { Download, Paperclip, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
@@ -13,14 +13,32 @@ import {
 export default function BugAttachments({
   files,
   bug_id,
+  onUpdate, // hàm để reload lại danh sách file sau khi thêm/xóa
   uploadFile,
 }: {
   bug_id: number;
   files: RequirementFile[];
+  onUpdate: () => Promise<void>; // hàm để reload lại danh sách file sau khi thêm/xóa
   uploadFile: () => void;
 }) {
   const { getData, errorData } = useApi<FileDto>(); // ⚠️ chỉ dùng getData, không dùng state dùng chung
   const [loadingMap, setLoadingMap] = useState<Record<number, boolean>>({}); // trạng thái tải theo file_id
+  const { removeData: removeFile, errorData: errorRemoveFile } = useApi();
+  const handleRemoveFile = async (file_id: number) => {
+    if (confirm("Bạn có chắc chắn muốn xóa tệp này?")) {
+      const res = await removeFile(
+        "/bugs/file/" + encodeBase64({ bug_id, file_id })
+      );
+      if (res == "") {
+        toast.success("Đã xóa tệp thành công.");
+        // reload files after removing
+        await onUpdate();
+      }
+    }
+  };
+  useEffect(() => {
+    if (errorRemoveFile) toast.error(errorRemoveFile.message);
+  }, [errorRemoveFile]);
   useEffect(() => {
     if (errorData) toast.error(errorData.message);
   }, [errorData]);
@@ -67,17 +85,24 @@ export default function BugAttachments({
                 <span className="loading loading-ball"></span>
               ) : (
                 <>
-                  <span
+                  {/* <span
                     className="link text-blue-500 hover:underline cursor-pointer btn btn-circle"
                     onClick={() => handleDownfile(f.file_id, "open")}
                   >
                     <ExternalLink />
-                  </span>
+                  </span> */}
                   <span
                     className="link text-blue-500 hover:underline cursor-pointer btn btn-circle "
                     onClick={() => handleDownfile(f.file_id, "down")}
                   >
                     <Download />
+                  </span>
+                  <span
+                    className="btn btn-circle text-red-500 hover:text-red-700 ml-2 tooltip"
+                    data-tip="Xóa tệp"
+                    onClick={() => handleRemoveFile(f.file_id)}
+                  >
+                    <X />
                   </span>
                 </>
               )}

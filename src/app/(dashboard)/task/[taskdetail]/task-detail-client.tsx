@@ -137,6 +137,7 @@ export default function TaskDetailClient({
           />
           <Attachments
             attachments={task.taskFiles || []}
+            onUpdate={reloadTaskData}
             uploadFile={() => setShowAddFileAtachmentModal(true)}
           />
           <TaskComments

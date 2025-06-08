@@ -54,12 +54,12 @@ function UpdateInfoProductModal({
     try {
       const re = await removeData(deleteEndpoint);
       if (re != "") return;
-      toast.success("Xóa sản phẩm thành công");
+      toast.success("Xóa phần mềm thành công");
       onUpdate();
       onClose();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
-      toast.error("Xóa sản phẩm thất bại: " + error.message);
+      toast.error("Xóa phần mềm thất bại: " + error.message);
     }
   };
   return (

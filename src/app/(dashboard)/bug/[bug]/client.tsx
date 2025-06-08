@@ -93,6 +93,7 @@ function BugDetailClient({
             onUpdate={reloadDataBug}
           />
           <BugAttachments
+            onUpdate={async () => await reloadDataBug()}
             files={bugData.bugFiles || []}
             bug_id={bug_id}
             uploadFile={() => setShowAddFile(true)}
