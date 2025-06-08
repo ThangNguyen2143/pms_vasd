@@ -139,7 +139,7 @@ function AddCriterialModal({
             onClick={handlePost}
             disabled={isLoading}
           >
-            {isLoading ? "Đang tạo..." : "Tạo công việc"}
+            {isLoading ? "Đang tạo..." : "Thêm tiêu chí"}
           </button>
           <button
             className="btn btn-outline btn-accent"

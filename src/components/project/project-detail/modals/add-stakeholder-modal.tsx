@@ -11,8 +11,10 @@ interface AddStakeholderData {
 }
 function AddStakeholderModal({
   project_id,
+  onUpdate,
   onClose,
 }: {
+  onUpdate: () => Promise<void>;
   project_id: number;
   onClose: () => void;
 }) {
@@ -63,6 +65,7 @@ function AddStakeholderModal({
     //  const res = "";
     if (res == "") {
       toast.success("Xử lý thành công");
+      await onUpdate();
       onClose();
     } else {
       toast.error(errorData?.message);

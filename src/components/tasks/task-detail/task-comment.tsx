@@ -80,7 +80,7 @@ function TaskComments({
         <h4 className="text-lg font-semibold text-primary mb-2">
           💬 Bình luận
         </h4>
-        <div className="border border-amber-100 shadow">
+        <div className="border border-amber-100 shadow max-h-[400px] overflow-y-auto p-2 rounded-lg">
           {comments ? (
             comments.map((comment) => {
               return (

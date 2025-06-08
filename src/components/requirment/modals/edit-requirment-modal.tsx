@@ -121,7 +121,7 @@ export default function EditRequirementModal({
           </label>
           <label className="join w-full">
             <span className="join-item border w-1/5 text-center items-center">
-              Tags
+              Thẻ
             </span>
             <input
               type="text"

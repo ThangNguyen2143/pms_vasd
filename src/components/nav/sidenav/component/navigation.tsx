@@ -2,19 +2,36 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { navigations } from "~/config/site";
+import { navigations, setNavigation } from "~/config/site";
 import { clsx } from "clsx";
+import { getMenu } from "~/lib/dal";
+import { useEffect, useState } from "react";
 
-export default function Navigation({ role }: { role?: string }) {
+export default function Navigation() {
   const pathname = usePathname();
+  const [nav, setNav] = useState(navigations);
+  useEffect(() => {
+    // Hàm này có thể được sử dụng để lấy menu từ API nếu cần thiết
+    const fetchMenu = async () => {
+      try {
+        const menu = await getMenu();
+        if (menu) {
+          // Cập nhật state với menu mới nếu cần
+          setNav(setNavigation(menu));
+        }
+        // Xử lý menu nếu cần
+      } catch (error) {
+        console.error("Lỗi khi lấy menu:", error);
+      }
+    };
+    fetchMenu();
+  }, []); // Gọi hàm để lấy menu từ API, có thể cần thiết nếu menu được cập nhật động
   // Thêm loại tài khoản hiển thị trong menu điều hướng
-  if (role == "Guess") {
-    return <li></li>;
-  }
-  return navigations.map((navigation) => {
+
+  return nav.map((navigation) => {
     const Icon = navigation.icon;
     return (
-      <li key={navigation.name}>
+      <li key={navigation.href}>
         <Link
           href={navigation.href}
           className={clsx(

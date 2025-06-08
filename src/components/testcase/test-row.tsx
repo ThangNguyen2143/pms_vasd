@@ -36,7 +36,7 @@ function TestRow({ testcase, users, statusList, product_id }: TestRowProps) {
         {/* Có thể thêm nút sửa/xoá ở đây */}
         <Link
           href={
-            "/testcase/" +
+            "/test_case/" +
             encodeBase64({ testcase_id: testcase.id, product_id })
           }
           className="btn btn-sm btn-secondary"

@@ -38,9 +38,9 @@ function CreateTaskForm({
   const [selectedRequirement, setSelectedRequirement] = useState<number>(0);
   const { data: requireds, getData: getRequiredList } =
     useApi<{ id: number; title: string }[]>();
+  const { postData, isLoading, errorData: postError } = useApi<"">();
   const { data: criteriaType, getData: getCriterial } =
     useApi<{ code: string; display: string }[]>();
-  const { postData, isLoading, errorData: postError } = useApi<"">();
   useEffect(() => {
     getCriterial(
       "/system/config/eyJ0eXBlIjoiY3JpdGVyaWFfdHlwZSJ9",
@@ -51,9 +51,6 @@ function CreateTaskForm({
     getRequiredList("/requirements/list/" + encodeBase64({ product_id }));
   }, [product_id]);
   useEffect(() => {
-    // if (requirError && requirError.code != 404)
-    //   toast.error("Lỗi danh sách:" + requirError.message);
-    // if (errorData) toast.error("Lỗi tiêu chí:" + errorData.message);
     if (postError) toast.error(postError.message);
   }, [postError]);
   const handleSubmit = async () => {
@@ -165,7 +162,9 @@ function CreateTaskForm({
                   updateCriteria(criteria.id, "type", e.target.value)
                 }
               >
-                <option value="">Chọn loại tiêu chí</option>
+                <option value="" disabled>
+                  Chọn loại tiêu chí
+                </option>
                 {criteriaType &&
                   criteriaType.map((crit) => (
                     <option

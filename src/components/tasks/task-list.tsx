@@ -1,32 +1,19 @@
-import { encodeBase64 } from "~/lib/services";
 import { TaskDTO, UserDto, WorkStatus } from "~/lib/types";
-import { useApi } from "~/hooks/use-api";
-import { useEffect } from "react";
 import TaskRow from "./task-row";
 interface TaskListProps {
   product_id: string;
+  taskList?: TaskDTO[];
+  userList?: UserDto[];
+  statusList: WorkStatus[];
   externalTaskCreated?: TaskDTO;
 }
-function TaskList({ product_id, externalTaskCreated }: TaskListProps) {
-  const endpoint = "/tasks/" + encodeBase64({ product_id });
-  const endpointUser = "/user/" + encodeBase64({ type: "all" });
-  const endpointStatus = "/system/config/eyJ0eXBlIjoidGFza19zdGF0dXMifQ==";
-
-  const {
-    data: taskList,
-    getData: getTaskList,
-    errorData,
-  } = useApi<TaskDTO[]>();
-  const { data: userList, getData: getUser } = useApi<UserDto[]>();
-  const { data: statusList, getData: getStatus } = useApi<WorkStatus[]>();
-
-  useEffect(() => {
-    if (product_id != "") getTaskList(endpoint, "reload");
-    getUser(endpointUser);
-    getStatus(endpointStatus);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [product_id]);
-
+function TaskList({
+  product_id,
+  taskList,
+  userList,
+  statusList,
+  externalTaskCreated,
+}: TaskListProps) {
   const fullTaskList = taskList ? [...taskList] : [];
   if (
     externalTaskCreated &&
@@ -71,13 +58,9 @@ function TaskList({ product_id, externalTaskCreated }: TaskListProps) {
           ) : (
             <tr>
               <td colSpan={6} className="text-center py-4">
-                {errorData
-                  ? errorData.code === 500
-                    ? "Lỗi máy chủ, vui lòng thử lại sau"
-                    : errorData.message
-                  : product_id == ""
+                {product_id == ""
                   ? "Chưa chọn phần mềm nào"
-                  : "Đang tải..."}
+                  : "Chưa có công việc nào được tạo"}
               </td>
             </tr>
           )}

@@ -25,7 +25,7 @@ export default function TaskLinks({ task_id }: { task_id: number }) {
       <h3 className="text-lg font-semibold text-primary mb-2">
         🔗 Bug of Task
       </h3>
-      <div className="space-y-1">
+      <div className="space-y-1 max-h-60 overflow-y-auto">
         {bugList ? (
           bugList.map((bug) => (
             <div key={bug.id}>

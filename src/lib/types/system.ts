@@ -24,7 +24,7 @@ export type Priority = {
 };
 export type MenuNav = {
   code: string;
-  value: string;
+  display: string;
 };
 export type FileDto = {
   fileName: string;

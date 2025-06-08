@@ -70,7 +70,7 @@ export type ReTesingInfo = {
   assignByName: string;
   create_at: string;
   deadline: string;
-  time_end: string;
-  result: string;
-  note: string;
+  time_end?: string;
+  result?: boolean;
+  note?: string;
 };

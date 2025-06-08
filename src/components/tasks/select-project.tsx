@@ -29,44 +29,6 @@ function SelectProject({
       setProductSelect(storedId);
     }
   }, []);
-
-  // Lấy dữ liệu project
-  // useEffect(() => {
-  //   if (!dataProject && !errorData) getData(endpointProject, "reload");
-  // }, []);
-
-  // Lấy danh sách sản phẩm theo từng project
-  // useEffect(() => {
-  //   const fetchAllProducts = async () => {
-  //     if (dataProject) {
-  //       const promises = dataProject.map(async (project) => {
-  //         const endpointProduct =
-  //           "/product/" + encodeBase64({ type: "all", project_id: project.id });
-  //         try {
-  //           const products = await getProductList(endpointProduct, "reload");
-  //           const activeProducts = products?.filter(
-  //             (p) => p.status === "active"
-  //           );
-  //           return {
-  //             ...project,
-  //             product: activeProducts?.length ? activeProducts : undefined,
-  //           };
-  //         } catch {
-  //           return {
-  //             ...project,
-  //             product: undefined,
-  //           };
-  //         }
-  //       });
-
-  //       const results = await Promise.all(promises);
-  //       setListSelect(results);
-  //     }
-  //   };
-
-  //   fetchAllProducts();
-  // }, [dataProject]);
-
   // Lưu vào localStorage khi người dùng chọn sản phẩm
   const handleClickProduct = (product_id: string) => {
     setProductSelect(product_id);

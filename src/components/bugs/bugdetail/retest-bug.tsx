@@ -67,25 +67,31 @@ export default function ReTestList({
         <ul className="list-disc list-inside list">
           {retests.map((r) => (
             <>
-              <li key={r.code} className="list-row p-2">
+              <li
+                key={r.code + "Retest" + r.create_at}
+                className="list-row p-2"
+              >
                 <div className="flex flex-col">
                   <div className="text-sm text-gray-600">{r.assignToName}</div>
                   <div>Hạn chót: {format_date(r.deadline)}</div>
-                </div>
-                {!r.result == null && (
-                  <div>
-                    <div
-                      className={clsx(
-                        "badge",
-                        `badge-${r.result ? "success" : "error"}`,
-                        "text-sm"
-                      )}
-                    >
-                      {r.result ? "Đạt" : "Không đạt"}
+                  {r.result != null && (
+                    <div>
+                      {" "}
+                      Kết quả:
+                      <div
+                        className={clsx(
+                          "badge",
+                          `badge-${r.result ? "success" : "error"}`,
+                          "text-sm"
+                        )}
+                      >
+                        {r.result ? "Đạt" : "Không đạt"}
+                      </div>
+                      <div className="shadow">{r.note}</div>
                     </div>
-                    <div className="shadow">{r.note}</div>
-                  </div>
-                )}
+                  )}
+                </div>
+
                 {!r.note && r.result == null && (
                   <div
                     className="tooltip tooltip-left"

@@ -3,36 +3,14 @@ import Link from "next/link";
 import UserIcon from "./user";
 import Image from "next/image";
 import Navigation from "./sidenav/component/navigation";
-// import { useEffect } from "react";
-// import { getUser } from "~/lib/dal";
 import ThemeToggle from "./theme-toggle";
 import { useUser } from "~/providers/user-context";
-// import { useRouter } from "next/navigation";
-// type userSecurity = {
-//   id: number | undefined;
-//   name: string;
-//   username: string;
-//   role: string;
-// };
+
 export default function TopNav() {
-  // const router = useRouter();
   const { user, isAuthenticated, isLoading, logout } = useUser(); // Sử dụng hook useUser
 
-  // Kiểm tra đăng nhập và chuyển hướng nếu cần
-  // useEffect(() => {
-  //   const checkAuth = async () => {
-  //     console.log("Kiểm tra xác thực:", isAuthenticated);
-  //     if (!isAuthenticated) {
-  //       // Nếu không đăng nhập, chuyển hướng đến trang login
-  //       router.push("/login");
-  //     }
-  //   };
-
-  //   checkAuth();
-  // }, [isAuthenticated, router]);
   const handleLogout = async () => {
     await logout();
-    // router.push("/login"); // Chuyển hướng đến trang đăng nhập
   };
 
   if (!isAuthenticated && !isLoading) {
@@ -64,7 +42,7 @@ export default function TopNav() {
             tabIndex={0}
             className="menu menu-sm dropdown-content bg-base-100 rounded-box z-52 mt-3 w-52 p-2 shadow"
           >
-            <Navigation role={user.role} />
+            <Navigation />
           </ul>
         </div>
         <Link className="btn btn-ghost text-xl" href="/">
@@ -81,7 +59,7 @@ export default function TopNav() {
 
       <div className="navbar-center hidden xl:flex">
         <ul className="menu menu-horizontal px-1">
-          <Navigation role={user.role} />
+          <Navigation />
         </ul>
       </div>
       <div className="navbar-end">

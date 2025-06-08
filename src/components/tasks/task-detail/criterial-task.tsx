@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
 import { Pencil, Star, X, XCircle } from "lucide-react";
@@ -18,11 +17,13 @@ interface GroupedRating {
 export default function CriteriaTask({
   task_id,
   data,
+  critTypes,
   onUpdate,
   onEvaluate,
 }: {
   task_id: number;
   data: DataRating[];
+  critTypes?: { code: string; display: string }[];
   onUpdate: () => Promise<void>;
   onEvaluate: () => void;
 }) {
@@ -32,13 +33,8 @@ export default function CriteriaTask({
   const [showUpdateStatus, setshowUpdateStatus] = useState<
     Record<string, boolean>
   >({});
-  const { data: critTypes, getData: getType } =
-    useApi<{ code: string; display: string }[]>();
   const { removeData, errorData: errorDelete } = useApi();
   const { putData, errorData: errorUpdate } = useApi();
-  useEffect(() => {
-    getType("/system/config/eyJ0eXBlIjoiY3JpdGVyaWFfdHlwZSJ9");
-  }, []);
 
   useEffect(() => {
     if (errorUpdate) toast.error(errorUpdate.message);

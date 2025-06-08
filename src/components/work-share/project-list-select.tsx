@@ -16,8 +16,9 @@ function ListProject({
   const projectContext = useProject();
   const projectList = projectContext?.projects;
   useEffect(() => {
-    if (projectList) setProjectSelect(projectList[0].id);
-  }, [projectList, setProjectSelect]);
+    if (projectList && projectSelected == 0)
+      setProjectSelect(projectList[0].id);
+  }, [projectList, setProjectSelect, projectSelected]);
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedValue = e.target.value;
     setProjectSelect(Number.parseInt(selectedValue));

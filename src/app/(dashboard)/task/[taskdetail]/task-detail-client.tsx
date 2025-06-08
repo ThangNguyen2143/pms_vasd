@@ -44,7 +44,8 @@ export default function TaskDetailClient({
     errorData: errorComment,
     setData: setComments,
   } = useApi<Comment[]>();
-
+  const { data: criteriaType, getData: getCriterial } =
+    useApi<{ code: string; display: string }[]>();
   const { data: criterList, getData: getCrit } = useApi<DataRating[]>();
   const reloadTaskData = async () => {
     await getTask(
@@ -62,11 +63,17 @@ export default function TaskDetailClient({
     );
   };
   useEffect(() => {
+    getCriterial(
+      "/system/config/eyJ0eXBlIjoiY3JpdGVyaWFfdHlwZSJ9",
+      "force-cache"
+    );
+    getTaskStatus("/system/config/eyJ0eXBlIjoidGFza19zdGF0dXMifQ==", "default");
+  }, []);
+  useEffect(() => {
     getTask(
       "/tasks/detail/" + encodeBase64({ type: "info", task_id }),
       "default"
     );
-    getTaskStatus("/system/config/eyJ0eXBlIjoidGFza19zdGF0dXMifQ==", "default");
     getComments("/tasks/comments/" + encodeBase64({ task_id }), "default");
     getCrit(
       "/tasks/detail/" + encodeBase64({ type: "acceptance", task_id }),
@@ -126,6 +133,7 @@ export default function TaskDetailClient({
             task_id={task_id}
             onUpdate={reloadCrit}
             data={criterList || []}
+            critTypes={criteriaType || undefined}
           />
           <Attachments
             attachments={task.taskFiles || []}
@@ -153,9 +161,14 @@ export default function TaskDetailClient({
       {/* Modals */}
       {showUpdateModal && (
         <UpdateInfoTaskModal
+          critList={criterList || []}
+          criteriaType={criteriaType || []}
           onClose={() => setShowUpdateModal(false)}
           task_info={task}
-          onUpdate={reloadTaskData}
+          onUpdate={async () => {
+            reloadTaskData();
+            reloadCrit();
+          }}
         />
       )}
       {showLinkModal && (

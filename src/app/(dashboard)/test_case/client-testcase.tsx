@@ -1,51 +1,57 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-import { useEffect, useState } from "react";
-import SelectProject from "./select-project";
-import TaskList from "./task-list";
-import CreateTaskForm from "./create-task-form";
+
 import clsx from "clsx";
-import { TaskDTO, UserDto, WorkStatus } from "~/lib/types";
+import { useEffect, useState } from "react";
+import SelectProject from "~/components/tasks/select-project";
+import CreateTestcaseForm from "~/components/testcase/modals/create-testcase-form";
+import TestList from "~/components/testcase/test-list";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
+import { TestcaseDto, UserDto, WorkStatus } from "~/lib/types";
 
-function MainDisplayTask() {
+function ClientTestCasesPage() {
   const [selectProduct, setSelectProduct] = useState<string>("");
   const [showModal, setShowModal] = useState(false);
-  const [findTask, setFindTask] = useState("");
-  const [filterStatus, setFilterStatus] = useState("");
+  const [testList, setTestList] = useState<TestcaseDto[]>([]);
+  const [filterStatus, setFilterStatus] = useState<string>("");
+  const [findTest, setFindTest] = useState("");
+  // API endpoints
   const endpoint = (product_id: string) =>
-    "/tasks/" + encodeBase64({ product_id });
+    "/testcase/" + encodeBase64({ product_id });
   const endpointUser = "/user/" + encodeBase64({ type: "all" });
-  const endpointStatus = "/system/config/eyJ0eXBlIjoidGFza19zdGF0dXMifQ==";
-  const [taskList, setTaskList] = useState([] as TaskDTO[]);
-  const { data: tasks, getData: getTaskList } = useApi<TaskDTO[]>();
+  const endpointStatus = "/system/config/eyJ0eXBlIjoidGVzdF9zdGF0dXMifQ==";
+  const { data: tests, getData: getTestList } = useApi<TestcaseDto[]>();
   const { data: userList, getData: getUser } = useApi<UserDto[]>();
   const { data: statusList, getData: getStatus } = useApi<WorkStatus[]>();
   useEffect(() => {
     getStatus(endpointStatus);
     getUser(endpointUser);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {
-    if (selectProduct != "") getTaskList(endpoint(selectProduct), "reload");
+    if (selectProduct != "") getTestList(endpoint(selectProduct), "reload");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectProduct]);
+
   useEffect(() => {
-    if (tasks) {
-      setTaskList(tasks);
-    } else setTaskList([]);
-  }, [tasks]);
+    if (tests) {
+      setTestList(tests);
+    } else {
+      setTestList([]);
+    }
+  }, [tests]);
   useEffect(() => {
-    if (tasks) {
-      const filteredTasks = tasks
-        .filter((task) => (filterStatus ? task.status === filterStatus : true))
-        .filter((task) =>
-          findTask
-            ? task.title.toLowerCase().includes(findTask.toLowerCase())
+    if (tests) {
+      const filteredTests = tests
+        .filter((test) => (filterStatus ? test.status === filterStatus : true))
+        .filter((test) =>
+          findTest
+            ? test.name.toLowerCase().includes(findTest.toLowerCase())
             : true
         );
-      setTaskList(filteredTasks);
+      setTestList(filteredTests);
     }
-  }, [filterStatus, findTask]);
+  }, [filterStatus, findTest, tests]);
   return (
     <div className="flex flex-col w-full h-full align-middle gap-4">
       <div className="flex flex-row justify-between items-center">
@@ -54,7 +60,7 @@ function MainDisplayTask() {
           productSelected={selectProduct}
         />
         <button className="btn btn-info" onClick={() => setShowModal(true)}>
-          Thêm task
+          Thêm testcase
         </button>
       </div>
       <div className="flex flex-row justify-between items-center gap-4">
@@ -63,9 +69,9 @@ function MainDisplayTask() {
             <span className="label">Tìm kiếm</span>
             <input
               type="text"
-              placeholder="Nhập tên việc"
-              value={findTask}
-              onChange={(e) => setFindTask(e.target.value)}
+              placeholder="Nhập tiêu đề test"
+              value={findTest}
+              onChange={(e) => setFindTest(e.target.value)}
             />
           </label>
         </div>
@@ -74,9 +80,7 @@ function MainDisplayTask() {
             <span className="label">Trạng thái</span>
             <select
               value={filterStatus}
-              onChange={(e) => {
-                setFilterStatus(e.target.value);
-              }}
+              onChange={(e) => setFilterStatus(e.target.value)}
             >
               <option value="">Tất cả</option>
               {statusList?.map((status) => (
@@ -88,11 +92,11 @@ function MainDisplayTask() {
           </label>
         </div>
       </div>
-      <TaskList
+      <TestList
         product_id={selectProduct}
         statusList={statusList || []}
-        taskList={taskList || undefined}
-        userList={userList || undefined}
+        testList={testList}
+        userList={userList || []}
       />
 
       <dialog
@@ -101,18 +105,18 @@ function MainDisplayTask() {
           showModal && selectProduct != "" ? "modal-open" : ""
         )}
       >
-        <div className="modal-box max-w-5xl w-full">
+        <div className="modal-box w-11/12 max-w-7xl max-h-11/12 h-full">
           <button
             className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
             onClick={() => setShowModal(false)}
           >
             ✕
           </button>
-          <h3 className="text-lg">Thêm task</h3>
-          <CreateTaskForm
+          <h3 className="text-lg">Tạo testcase</h3>
+          <CreateTestcaseForm
             product_id={selectProduct}
             onSuccess={() => {
-              getTaskList(endpoint(selectProduct), "reload");
+              getTestList(endpoint(selectProduct), "reload");
               setShowModal(false);
             }} // trigger reload
           />
@@ -122,4 +126,4 @@ function MainDisplayTask() {
   );
 }
 
-export default MainDisplayTask;
+export default ClientTestCasesPage;

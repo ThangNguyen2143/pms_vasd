@@ -10,8 +10,10 @@ interface AddGroupData {
 }
 function AddGroupContactModal({
   project_id,
+  onUpdate,
   onClose,
 }: {
+  onUpdate: () => Promise<void>;
   project_id: number;
   onClose: () => void;
 }) {
@@ -32,6 +34,7 @@ function AddGroupContactModal({
     const res = await putData("/project/contacts", dataSend);
     if (res == "") {
       toast.success("Cập nhật thông tin thành công");
+      await onUpdate();
       onClose();
     } else {
       return;

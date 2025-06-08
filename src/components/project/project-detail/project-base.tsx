@@ -75,6 +75,7 @@ function ProjectBase({ project_id }: { project_id: number }) {
         />
         <ProjectLogs project_log={data.project_log} />
         <ProjectGroupList
+          onUpdate={async () => await fetchDataProject()}
           project_id={data.id}
           project_group={data.project_group_contacts}
         />

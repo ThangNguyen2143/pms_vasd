@@ -32,7 +32,7 @@ export default function BugRow({ bug, product_id }: BugRowProps) {
       <td className="px-4 py-2">
         {/* Có thể thêm nút sửa/xoá ở đây */}
         <Link
-          href={"/bugs/" + encodeBase64({ bug_id: bug.bug_id, product_id })}
+          href={"/bug/" + encodeBase64({ bug_id: bug.bug_id, product_id })}
           className="btn btn-sm btn-secondary"
         >
           <Pencil />

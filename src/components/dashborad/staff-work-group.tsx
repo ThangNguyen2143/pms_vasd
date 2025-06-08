@@ -22,7 +22,7 @@ function WorkBox({ title, items }: { title: string; items: any[] }) {
   if (title.includes("Task"))
     urls = items.map(
       (item) =>
-        `/tasks/${encodeBase64({
+        `/task/${encodeBase64({
           task_id: item.id,
           product_id: item.product_id,
         })}`
@@ -30,7 +30,7 @@ function WorkBox({ title, items }: { title: string; items: any[] }) {
   else if (title.includes("Bug"))
     urls = items.map(
       (item) =>
-        `/bugs/${encodeBase64({
+        `/bug/${encodeBase64({
           bug_id: item.id,
           product_id: item.product_id,
         })}`
@@ -38,7 +38,7 @@ function WorkBox({ title, items }: { title: string; items: any[] }) {
   else if (title.includes("Re-test"))
     urls = items.map(
       (item) =>
-        `/bugs/${encodeBase64({
+        `/bug/${encodeBase64({
           bug_id: item.bug_id,
           product_id: item.product_id,
         })}`
@@ -46,7 +46,7 @@ function WorkBox({ title, items }: { title: string; items: any[] }) {
   else if (title.includes("Testcase"))
     urls = items.map(
       (item) =>
-        `/testcase/${encodeBase64({
+        `/test_case/${encodeBase64({
           testcase_id: item.testcase_id,
           product_id: item.product_id,
         })}`

@@ -109,6 +109,7 @@ function StakeholderList({
       )}
       {showAddStakeholderModal && (
         <AddStakeholderModal
+          onUpdate={onUpdate}
           project_id={project_id}
           onClose={() => setShowModal(false)}
         />

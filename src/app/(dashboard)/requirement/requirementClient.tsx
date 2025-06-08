@@ -318,7 +318,7 @@ function RequirementsClient() {
                           <td>
                             <Link
                               href={
-                                `/requirements/` +
+                                `/requirement/` +
                                 encodeBase64({
                                   requirement_id: required.id,
                                   project_id: projectSelect,

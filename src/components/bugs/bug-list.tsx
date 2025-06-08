@@ -1,22 +1,11 @@
-import { encodeBase64 } from "~/lib/services";
 import { BugDto } from "~/lib/types";
-import { useApi } from "~/hooks/use-api";
-import { useEffect } from "react";
 import BugRow from "./bug-row";
 interface BugListProps {
   product_id: string;
+  bugList?: BugDto[];
   externalBugCreated?: BugDto;
 }
-function BugList({ product_id, externalBugCreated }: BugListProps) {
-  const endpoint = "/bugs/" + encodeBase64({ product_id });
-
-  const { data: bugList, getData: getBugList, errorData } = useApi<BugDto[]>();
-
-  useEffect(() => {
-    if (product_id != "") getBugList(endpoint, "reload");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [product_id]);
-
+function BugList({ product_id, bugList, externalBugCreated }: BugListProps) {
   const fullBugList = bugList ? [...bugList] : [];
   if (
     externalBugCreated &&
@@ -58,13 +47,9 @@ function BugList({ product_id, externalBugCreated }: BugListProps) {
           ) : (
             <tr>
               <td colSpan={6} className="text-center py-4">
-                {errorData
-                  ? errorData.code == 500
-                    ? "Lỗi máy chủ"
-                    : errorData.message
-                  : product_id == ""
+                {product_id == ""
                   ? "Chưa chọn phần mềm nào"
-                  : "Đang tải..."}
+                  : "Chưa có bug nào được báo cáo"}
               </td>
             </tr>
           )}

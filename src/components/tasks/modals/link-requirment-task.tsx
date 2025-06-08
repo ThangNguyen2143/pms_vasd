@@ -35,15 +35,28 @@ export default function LinkRequirementModal({
 
   const [selectedRequirementId, setSelectedRequirementId] = useState<number>(0);
   const [linkedRequirements, setLinkedRequirements] = useState<
-    LinkRequirement[]
+    LinkRequirement[] | undefined
   >(
     linked?.map((linkRe) => ({
       id: linkRe.requirement_id,
       title: linkRe.requirement_title,
-    })) || []
+    }))
   );
+  // Nếu có yêu cầu liên kết từ props, sử dụng nó
+  const [selectedRequirement, setSelectedRequirement] = useState<
+    LinkRequirement[]
+  >([]);
   // const [loading, setLoading] = useState(false);
-  const { putData, isLoading, errorData } = useApi<string, DataPut>();
+  const {
+    putData: updateLinkRemove,
+    isLoading,
+    errorData: errorRemove,
+  } = useApi<string, DataPut>();
+
+  const { putData: updateLinkAdd, errorData: errorAdd } = useApi<
+    string,
+    DataPut
+  >();
   // Gọi API sau 1500ms kể từ khi người dùng thay đổi ngày
   useEffect(() => {
     getData(
@@ -63,40 +76,89 @@ export default function LinkRequirementModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {
-    if (errorData) toast.error(errorData.message);
-  }, [errorData]);
+    if (errorAdd) toast.error(errorAdd.message);
+    if (errorRemove) toast.error(errorRemove.message);
+  }, [errorAdd, errorRemove]);
   const handleAdd = () => {
     const selected = requirementList.find(
       (r) => r.id === selectedRequirementId
     );
-    if (selected && !linkedRequirements.some((r) => r.id === selected.id)) {
-      setLinkedRequirements((prev) => [...prev, selected]);
+    if (
+      selected &&
+      !selectedRequirement.some((r) => r.id === selected.id) &&
+      !linkedRequirements?.some((r) => r.id === selected.id)
+    ) {
+      setSelectedRequirement((prev) => [...prev, selected]);
     }
   };
 
   const handleRemove = (id: number) => {
-    setLinkedRequirements((prev) => prev.filter((r) => r.id !== id));
+    setSelectedRequirement((prev) => prev.filter((r) => r.id !== id));
+  };
+  const handleRemoveLinked = (id: number) => {
+    setLinkedRequirements((prev) =>
+      prev ? prev.filter((r) => r.id !== id) : []
+    );
   };
   const handleUpdate = async () => {
-    let requirement_id: number[] = [];
-    if (linkedRequirements.length == 0 && selectedRequirementId != 0) {
-      requirement_id.push(selectedRequirementId);
+    let requirement_id: { requirement: number; type: string }[] = [];
+    // if (selectedRequirement.length == 0 && selectedRequirementId != 0) {
+    //   requirement_id.push({ requirement: selectedRequirementId, type: "add" });
+    // }
+    if (selectedRequirement.length > 0) {
+      requirement_id = [
+        ...selectedRequirement.map((req) => {
+          return { requirement: req.id, type: "add" };
+        }),
+      ];
     }
-    if (linkedRequirements.length > 0) {
-      requirement_id = [...linkedRequirements.map((req) => req.id)];
+    if (
+      linkedRequirements &&
+      linked &&
+      linkedRequirements.length < linked.length
+    ) {
+      requirement_id = [
+        ...requirement_id,
+        ...linked.map((req) => {
+          if (linkedRequirements.some((r) => r.id === req.requirement_id)) {
+            return { requirement: req.requirement_id, type: "keep" };
+          }
+          return { requirement: req.requirement_id, type: "remove" };
+        }),
+      ];
     }
     if (requirement_id.length == 0) {
-      toast.warning("chưa chọn yêu cầu liên kết");
+      toast.warning("chưa có thay đổi nào");
       return;
     }
-    const data = {
+    const dataAdd = {
       type: "add", //add, remove
       task_id,
-      requirement_id,
+      requirement_id: requirement_id
+        .filter((req) => req.type === "add")
+        .map((req) => req.requirement),
     };
-    const re = await putData("/tasks/requirement", data);
-    if (!re) return;
-    toast.success(re);
+    const dataRemove = {
+      type: "remove", //add, remove
+      task_id,
+      requirement_id: requirement_id
+        .filter((req) => req.type === "remove")
+        .map((req) => {
+          return req.requirement;
+        }),
+    };
+    if (dataRemove.requirement_id.length > 0) {
+      console.log("re:", dataRemove);
+      const re = await updateLinkRemove("/tasks/requirement", dataRemove);
+      if (!re) return;
+      toast.success(re);
+    }
+
+    if (dataAdd.requirement_id.length > 0) {
+      const re = await updateLinkAdd("/tasks/requirement", dataAdd);
+      if (re != "") return;
+      toast.success("Thêm yêu cầu thành công");
+    }
     await onUpdate();
     onClose();
   };
@@ -105,35 +167,6 @@ export default function LinkRequirementModal({
     <div className="modal modal-open">
       <div className="modal-box">
         <h3 className="font-bold text-lg">Liên kết yêu cầu</h3>
-        {/*   
-        <fieldset className="fieldset">
-          <legend className="fieldset-legend">Khoảng thời gian</legend>
-          <button popoverTarget="rdp-popover" className="input input-border">
-            {date
-              ? date.from?.toDateString() + " - " + date.to?.toDateString()
-              : "Chọn ngày"}
-          </button>
-          <div popover="auto" id="rdp-popover" className="dropdown">
-            <DayPicker
-              className="react-day-picker"
-              mode="range"
-              selected={date}
-              onSelect={setDate}
-            />
-          </div>
-        </fieldset>
-        
-        {loading ? (
-          <span className="loading loading-ball"></span>
-        ) : (
-          requirementList.length === 0 &&
-          date?.from &&
-          date?.to && (
-            <p className="text-sm text-red-500 mt-2">
-              Không có yêu cầu nào trong khoảng thời gian đã chọn.
-            </p>
-          )
-        )} */}
         {loadData && (
           <span className="loading loading-infinity loading-xl"></span>
         )}
@@ -161,26 +194,49 @@ export default function LinkRequirementModal({
             </div>
           </fieldset>
         )}
-
-        {/* Danh sách các yêu cầu đã chọn */}
-        {linkedRequirements.length > 0 && (
+        {/* Danh sách các yêu cầu đã có sẵn */}
+        {linkedRequirements && linkedRequirements.length > 0 && (
           <fieldset className="fieldset">
-            <legend className="fieldset-legend">Đã chọn</legend>
+            <legend className="fieldset-legend">Đã liên kết</legend>
             <ul className="space-y-1">
-              {linkedRequirements.map((req, index) => (
+              {linkedRequirements.map((req) => (
                 <li
                   key={req.id}
                   className="flex justify-between items-center bg-base-100 p-2 rounded"
                 >
                   <span>{req.title}</span>
-                  {index > 0 && (
+                  {
+                    <button
+                      className="btn btn-xs btn-error"
+                      onClick={() => handleRemoveLinked(req.id)}
+                    >
+                      Hủy
+                    </button>
+                  }
+                </li>
+              ))}
+            </ul>
+          </fieldset>
+        )}
+        {/* Danh sách các yêu cầu đã chọn */}
+        {selectedRequirement.length > 0 && (
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">Đã chọn</legend>
+            <ul className="space-y-1">
+              {selectedRequirement.map((req) => (
+                <li
+                  key={req.id}
+                  className="flex justify-between items-center bg-base-100 p-2 rounded"
+                >
+                  <span>{req.title}</span>
+                  {
                     <button
                       className="btn btn-xs btn-error"
                       onClick={() => handleRemove(req.id)}
                     >
                       Hủy
                     </button>
-                  )}
+                  }
                 </li>
               ))}
             </ul>

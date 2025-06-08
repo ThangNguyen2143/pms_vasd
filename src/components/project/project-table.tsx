@@ -66,7 +66,7 @@ function ProjectTable() {
                       onClick={() => {
                         setNavigatingId(item.id);
                         router.push(
-                          "/projects/" + encodeBase64({ project_id: item.id })
+                          "/project/" + encodeBase64({ project_id: item.id })
                         );
                       }}
                       disabled={navigatingId !== null}

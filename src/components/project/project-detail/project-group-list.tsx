@@ -6,7 +6,9 @@ import AddGroupContactModal from "./modals/add-group-modal";
 function ProjectGroupList({
   project_id,
   project_group,
+  onUpdate,
 }: {
+  onUpdate: () => Promise<void>;
   project_id: number;
   project_group?: ProjectGroupContactDto[];
 }) {
@@ -46,6 +48,7 @@ function ProjectGroupList({
       )}
       {showAddGroupContactModal && (
         <AddGroupContactModal
+          onUpdate={onUpdate}
           project_id={project_id}
           onClose={() => setShowModal(false)}
         />

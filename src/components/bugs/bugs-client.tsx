@@ -1,13 +1,43 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import SelectProject from "../tasks/select-project";
 import AddBugModal from "./modal/add-bug-modal";
 import BugList from "./bug-list";
+import { encodeBase64 } from "~/lib/services";
+import { useApi } from "~/hooks/use-api";
+import { BugDto } from "~/lib/types";
 
 function BugsClient() {
   const [selectProduct, setSelectProduct] = useState<string>("");
   const [showModal, setShowModal] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
+  const [findBug, setFindBug] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const endpoint = (product_id: string) =>
+    "/bugs/" + encodeBase64({ product_id });
+  const [bugList, setBugList] = useState([] as BugDto[]);
+  const { data: bugs, getData: getBugList } = useApi<BugDto[]>();
+  useEffect(() => {
+    if (selectProduct != "") getBugList(endpoint(selectProduct), "reload");
+  }, [selectProduct]);
+  useEffect(() => {
+    if (bugs) {
+      setBugList(bugs);
+    } else setBugList([]);
+  }, [bugs]);
+  useEffect(() => {
+    if (bugs) {
+      const filteredBugs = bugs
+        .filter((bug) => (filterStatus ? bug.status === filterStatus : true))
+        .filter((bug) => {
+          return findBug
+            ? bug.bug_id === parseInt(findBug) ||
+                bug.name.toLowerCase().includes(findBug.toLowerCase())
+            : true;
+        });
+      setBugList(filteredBugs);
+    }
+  }, [filterStatus, findBug, bugs]);
   return (
     <div className="flex flex-col w-full h-full align-middle gap-4">
       <div className="flex flex-row justify-between items-center">
@@ -23,44 +53,77 @@ function BugsClient() {
         <div>
           <label className="input">
             <span className="label">Tìm kiếm</span>
-            <input type="text" placeholder="Nhập ID, tiêu đề tìm kiếm" />
+            <input
+              type="text"
+              placeholder="Nhập ID, tiêu đề tìm kiếm"
+              value={findBug}
+              onChange={(e) => setFindBug(e.target.value)}
+            />
           </label>
         </div>
         <form className="filter">
-          <input className="btn btn-square" type="reset" value="×" />
           <input
-            className="btn"
-            type="radio"
-            name="frameworks"
-            aria-label="New"
+            className="btn btn-square"
+            type="reset"
+            value="×"
+            onClick={() => setFilterStatus("")}
           />
           <input
             className="btn"
             type="radio"
             name="frameworks"
-            aria-label="Open"
+            aria-label="New"
+            value={"NEW"}
+            checked={filterStatus === "NEW"}
+            onChange={() => setFilterStatus("NEW")}
+          />
+          <input
+            className="btn"
+            type="radio"
+            name="frameworks"
+            aria-label="Confirmed"
+            value={"CONFIRMED"}
+            checked={filterStatus === "CONFIRMED"}
+            onChange={() => setFilterStatus("CONFIRMED")}
           />
           <input
             className="btn"
             type="radio"
             name="frameworks"
             aria-label="Resolved"
+            value={"RESOLVED"}
+            checked={filterStatus === "RESOLVED"}
+            onChange={() => setFilterStatus("RESOLVED")}
           />
           <input
             className="btn"
             type="radio"
             name="frameworks"
             aria-label="Rejected"
+            value={"REJECTED"}
+            checked={filterStatus === "REJECTED"}
+            onChange={() => setFilterStatus("REJECTED")}
+          />
+          <input
+            className="btn"
+            type="radio"
+            name="frameworks"
+            aria-label="Closed"
+            value={"CLOSED"}
+            checked={filterStatus === "CLOSED"}
+            onChange={() => setFilterStatus("CLOSED")}
           />
         </form>
       </div>
-      <BugList product_id={selectProduct} key={refreshKey} />
+      <BugList product_id={selectProduct} bugList={bugList} />
 
       {showModal && (
         <AddBugModal
           product_id={selectProduct}
           onClose={() => setShowModal(false)}
-          onCreated={() => setRefreshKey((prev) => prev + 1)}
+          onCreated={() => {
+            getBugList(endpoint(selectProduct), "reload");
+          }}
         />
       )}
     </div>

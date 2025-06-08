@@ -8,18 +8,18 @@ function NavLink() {
   return (
     <div role="tablist" className="tabs tabs-lift">
       <Link
-        href={"/employees"}
+        href={"/user_manage"}
         role="tab"
-        className={clsx("tab", pathname === "/employees" && "tab-active")}
+        className={clsx("tab", pathname === "/user_manage" && "tab-active")}
       >
         Nhân viên
       </Link>
       <Link
-        href={"/employees/groups"}
+        href={"/user_manage/groups"}
         role="tab"
         className={clsx(
           "tab",
-          pathname === "/employees/groups" && "tab-active"
+          pathname === "/user_manage/groups" && "tab-active"
         )}
       >
         Nhóm người dùng

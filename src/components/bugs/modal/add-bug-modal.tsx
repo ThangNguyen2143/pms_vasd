@@ -4,7 +4,8 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
-import { BugSeverity, Priority } from "~/lib/types";
+import { encodeBase64 } from "~/lib/services";
+import { BugSeverity, Priority, TestcaseDto } from "~/lib/types";
 
 interface AddBugProps {
   product_id: string;
@@ -19,6 +20,7 @@ interface DataCreate {
   description: string;
   priority: string;
   severity: string;
+  test_case_ref_id?: number;
   tags: string[];
 }
 
@@ -33,7 +35,7 @@ export default function AddBugModal({
   const [prioritySelected, setPrioritySelected] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState("");
-
+  const [testcaseSelected, setTestcaseSelected] = useState("");
   const { postData, isLoading, errorData } = useApi<"", DataCreate>();
   const {
     data: severityList,
@@ -45,6 +47,7 @@ export default function AddBugModal({
     getData: getPriority,
     errorData: errorType,
   } = useApi<Priority[]>();
+  const { data: testcaseList, getData: getTestCase } = useApi<TestcaseDto[]>();
   useEffect(() => {
     getPriority("/system/config/eyJ0eXBlIjoicHJpb3JpdHkifQ==", "force-cache");
     getSeverity(
@@ -52,6 +55,9 @@ export default function AddBugModal({
       "force-cache"
     );
   }, []);
+  useEffect(() => {
+    getTestCase("/testcase/" + encodeBase64({ product_id }), "reload");
+  }, [product_id]);
   useEffect(() => {
     if (errorData) toast.error(errorData.message);
   }, [errorData]);
@@ -82,7 +88,6 @@ export default function AddBugModal({
       toast.warning("Vui lòng điền đầy đủ thông tin.");
       return;
     }
-
     const data: DataCreate = {
       product_id,
       title,
@@ -90,7 +95,11 @@ export default function AddBugModal({
       priority: prioritySelected,
       tags,
       severity: severitySelect,
+      // Nếu không có testcaseSelected thì sẽ là chuỗi rỗng
+      // Nếu có thì sẽ là id của testcase
+      test_case_ref_id: Number(testcaseSelected),
     };
+    if (!data.test_case_ref_id) delete data.test_case_ref_id;
     const re = await postData("/bugs", data);
 
     if (re != "") return;
@@ -193,15 +202,19 @@ export default function AddBugModal({
               </div>
             ))}
           </div>
-
-          <fieldset className="fieldset">
-            <legend className="fieldset-legend">Tệp đính kèm</legend>
-            <input type="file" className="file-input" />
-          </fieldset>
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Test case liên quan</legend>
-            <select disabled>
+            <select
+              className="select select-neutral"
+              value={testcaseSelected}
+              onChange={(e) => setTestcaseSelected(e.target.value)}
+            >
               <option value="">Chọn test case liên kết</option>
+              {testcaseList?.map((testcase) => (
+                <option key={testcase.id} value={testcase.id}>
+                  {testcase.name}
+                </option>
+              ))}
             </select>
           </fieldset>
         </div>

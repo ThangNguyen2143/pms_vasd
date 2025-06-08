@@ -2,12 +2,14 @@ import {
   Bug,
   ChartLine,
   FolderSearch,
+  Globe,
   ListCheck,
   type LucideIcon,
   NotebookPen,
   Projector,
   Users,
 } from "lucide-react";
+import { MenuNav } from "~/lib/types";
 
 export type SiteConfig = typeof siteConfig;
 export type Navigation = {
@@ -18,9 +20,48 @@ export type Navigation = {
 
 export const siteConfig = {
   title: "PMS VASD",
-  description: "website quản lý tiến độ dự án",
+  description: "website quản lý dự án thuộc công ty VASD",
 };
-
+export const setNavigation = (menu: MenuNav[]) => {
+  return menu
+    .map((item) => {
+      let icon: LucideIcon;
+      switch (item.code) {
+        case "project":
+          icon = Projector;
+          break;
+        case "task":
+          icon = ListCheck;
+          break;
+        case "work_share":
+          icon = ChartLine;
+          break;
+        case "requirement":
+          icon = NotebookPen;
+          break;
+        case "test_case":
+          icon = FolderSearch;
+          break;
+        case "bug":
+          icon = Bug;
+          break;
+        case "user_manage":
+          icon = Users;
+          break;
+        default:
+          icon = Globe; // Default icon if no match
+      }
+      if (item.code === "home" || item.code === "profile") {
+        return undefined; // Skip home and profile items
+      }
+      return {
+        icon,
+        name: item.display,
+        href: "/" + item.code,
+      };
+    })
+    .filter((nav): nav is Navigation => nav !== undefined);
+};
 export const navigations: Navigation[] = [
   {
     icon: Projector,
@@ -29,7 +70,7 @@ export const navigations: Navigation[] = [
   },
   {
     icon: ListCheck,
-    name: "Công việc",
+    name: "Nhiệm vụ",
     href: "/tasks",
   },
   {

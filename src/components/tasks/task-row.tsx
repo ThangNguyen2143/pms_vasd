@@ -39,7 +39,7 @@ export default function TaskRow({
       <td className="px-4 py-2">
         {/* Có thể thêm nút sửa/xoá ở đây */}
         <Link
-          href={"/tasks/" + encodeBase64({ task_id: task.id, product_id })}
+          href={"/task/" + encodeBase64({ task_id: task.id, product_id })}
           className="btn btn-sm btn-secondary"
         >
           <Pencil />
