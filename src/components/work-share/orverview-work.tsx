@@ -60,16 +60,30 @@ export default function OverviewWork({
   );
 
   // Biểu đồ radar: mỗi priority là 1 line, theo các status
-  const radarDatasets = priorityList.map((prio) => {
+  const radarDatasets = priorityList.map((prio, idx) => {
     const counts = statusList.map(
       (st) =>
         dataRaw.filter((w) => w.priority === prio.code && w.status === st.code)
           .length
     );
+    const colors = [
+      "rgba(255, 99, 132, 0.6)",
+      "rgba(54, 162, 235, 0.6)",
+      "rgba(255, 206, 86, 0.6)",
+      "rgba(75, 192, 192, 0.6)",
+      "rgba(153, 102, 255, 0.6)",
+      "rgba(255, 159, 64, 0.6)",
+    ];
+    const borderColors = colors.map((c) => c.replace("0.6", "1"));
     return {
       label: prio.display,
       data: counts,
+      backgroundColor: colors[idx % colors.length],
+      borderColor: borderColors[idx % borderColors.length],
+      pointBorderColor: borderColors[idx % borderColors.length],
+      pointBackgroundColor: "#fff",
       fill: true,
+      tension: 0.3,
     };
   });
 
@@ -174,7 +188,7 @@ export default function OverviewWork({
           }}
         />
       </div>
-      <div className="md:col-span-2 h-[400px] w-full flex justify-center items-center">
+      <div className="md:col-span-2 h-[500px] w-full flex justify-center items-center">
         <Radar
           data={radarData}
           options={{
@@ -184,6 +198,7 @@ export default function OverviewWork({
                 display: true,
                 text: "Tương quan trạng thái & ưu tiên",
               },
+              legend: { position: "right" },
             },
           }}
         />
