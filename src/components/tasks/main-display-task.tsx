@@ -5,7 +5,7 @@ import SelectProject from "./select-project";
 import TaskList from "./task-list";
 import CreateTaskForm from "./create-task-form";
 import clsx from "clsx";
-import { TaskDTO, UserDto, WorkStatus } from "~/lib/types";
+import { TaskDTO, WorkStatus } from "~/lib/types";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 
@@ -16,15 +16,12 @@ function MainDisplayTask() {
   const [filterStatus, setFilterStatus] = useState("");
   const endpoint = (product_id: string) =>
     "/tasks/" + encodeBase64({ product_id });
-  const endpointUser = "/user/" + encodeBase64({ type: "all" });
   const endpointStatus = "/system/config/eyJ0eXBlIjoidGFza19zdGF0dXMifQ==";
   const [taskList, setTaskList] = useState([] as TaskDTO[]);
   const { data: tasks, getData: getTaskList } = useApi<TaskDTO[]>();
-  const { data: userList, getData: getUser } = useApi<UserDto[]>();
   const { data: statusList, getData: getStatus } = useApi<WorkStatus[]>();
   useEffect(() => {
     getStatus(endpointStatus);
-    getUser(endpointUser);
   }, []);
   useEffect(() => {
     if (selectProduct != "") getTaskList(endpoint(selectProduct), "reload");
@@ -92,7 +89,6 @@ function MainDisplayTask() {
         product_id={selectProduct}
         statusList={statusList || []}
         taskList={taskList || undefined}
-        userList={userList || undefined}
       />
 
       <dialog
