@@ -39,7 +39,7 @@ function PhaseTab({ project_id }: { project_id: number }) {
     if (!errorData)
       return (
         <div className="p-6">
-          Loading phases
+          Đang tải dữ liệu giai đoạn dự án
           <span className="loading loading-dots loading-sm"></span>
         </div>
       );

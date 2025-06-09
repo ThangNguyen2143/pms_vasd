@@ -1,16 +1,14 @@
-import { TaskDTO, UserDto, WorkStatus } from "~/lib/types";
+import { TaskDTO, WorkStatus } from "~/lib/types";
 import TaskRow from "./task-row";
 interface TaskListProps {
   product_id: string;
   taskList?: TaskDTO[];
-  userList?: UserDto[];
   statusList: WorkStatus[];
   externalTaskCreated?: TaskDTO;
 }
 function TaskList({
   product_id,
   taskList,
-  userList,
   statusList,
   externalTaskCreated,
 }: TaskListProps) {
@@ -24,7 +22,7 @@ function TaskList({
   const fieldTable = [
     { code: "id", display: "ID" },
     { code: "title", display: "Công việc" },
-    { code: "create_by", display: "Người tạo" },
+    { code: "update", display: "Tình trạng" },
     { code: "create_at", display: "Ngày tạo" },
     { code: "date_start", display: "Ngày bắt đầu" },
     { code: "dead_line", display: "Deadline" },
@@ -49,7 +47,6 @@ function TaskList({
             fullTaskList.map((task) => (
               <TaskRow
                 task={task}
-                users={userList || []}
                 statusList={statusList || []}
                 key={task.id}
                 product_id={product_id}

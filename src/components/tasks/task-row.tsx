@@ -1,22 +1,19 @@
 import Link from "next/link";
 import { encodeBase64 } from "~/lib/services";
-import { TaskDTO, UserDto, WorkStatus } from "~/lib/types";
+import { TaskDTO, WorkStatus } from "~/lib/types";
 import { format_date } from "~/utils/fomat-date";
 
 interface TaskRowProps {
   task: TaskDTO;
-  users: UserDto[];
   statusList: WorkStatus[];
   product_id: string;
 }
 
 export default function TaskRow({
   task,
-  users,
   statusList,
   product_id,
 }: TaskRowProps) {
-  const creator = users.find((u) => u.userid === task.create_by);
   const statusDisplay = statusList.find((s) => s.code === task.status)?.display;
 
   return (
@@ -24,7 +21,7 @@ export default function TaskRow({
       <td className="px-4 py-2">{task.id}</td>
       <td className="px-4 py-2">{task.title}</td>
       <td className="px-4 py-2">
-        {creator?.userData.display_name || "Không rõ"}
+        {task.is_update ? "Đã cập nhật" : "Chưa cập nhật"}
       </td>
       <td className="px-4 py-2">{format_date(task.create_at)}</td>
       <td className="px-4 py-2">

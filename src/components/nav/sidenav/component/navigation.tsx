@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { navigations, setNavigation } from "~/config/site";
+import { Navigation as NavMenu, setNavigation } from "~/config/site";
 import { clsx } from "clsx";
 import { getMenu } from "~/lib/dal";
 import { useEffect, useState } from "react";
 
 export default function Navigation() {
   const pathname = usePathname();
-  const [nav, setNav] = useState(navigations);
+  const [nav, setNav] = useState<NavMenu[]>([]);
   useEffect(() => {
     // Hàm này có thể được sử dụng để lấy menu từ API nếu cần thiết
     const fetchMenu = async () => {

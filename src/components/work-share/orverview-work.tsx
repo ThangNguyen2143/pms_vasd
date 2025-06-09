@@ -200,6 +200,21 @@ export default function OverviewWork({
               },
               legend: { position: "right" },
             },
+            scales: {
+              r: {
+                beginAtZero: true,
+                ticks: {
+                  display: false, // ⬅ Ẩn hoàn toàn số liệu trên vòng tròn
+                  stepSize: 1,
+                  precision: 0, // ⬅ nếu bạn vẫn muốn hiện số, dùng cái này để tránh số thập phân
+                },
+                pointLabels: {
+                  font: {
+                    size: 12,
+                  },
+                },
+              },
+            },
           }}
         />
       </div>

@@ -14,7 +14,7 @@ export default function StaffTreeView({ data }: { data: WorkOverviewDTO[] }) {
 
       {/* Tree view container */}
       <div className="overflow-x-auto">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 min-w-max">
+        <div className="grid grid-cols-1 min-w-max">
           {data.map((user) => (
             <StaffColumn key={user.user_id} user={user} />
           ))}
@@ -26,12 +26,13 @@ export default function StaffTreeView({ data }: { data: WorkOverviewDTO[] }) {
 
 function StaffColumn({ user }: { user: WorkOverviewDTO }) {
   return (
-    <div className="bg-base-100 p-3 rounded shadow border">
-      <h4 className="font-bold text-lg border-b pb-2 mb-2">
+    <div tabIndex={0} className="collapse bg-base-100 border-base-300 border">
+      <input type="checkbox" id={user.user_id + "collapse"} defaultChecked />
+      <h4 className="collapse-title font-bold text-lg border-b pb-2 mb-2">
         {user.user_name || `Nhân sự ${user.user_id}`}
       </h4>
 
-      <div className="space-y-3">
+      <div className="collapse-content space-y-3">
         <WorkBox title="📋 Task" items={user.tasks} />
         <WorkBox title="🐛 Bug" items={user.bugs} />
         <WorkBox title="🧪 Testcase" items={user.testcases} />
@@ -77,10 +78,11 @@ function WorkBox({ title, items }: { title: string; items: any[] }) {
         })}`
     );
   return (
-    <div className="bg-base-200 p-2 rounded">
-      <h5 className="font-semibold text-sm mb-1">{title}</h5>
+    <div className="bg-base-200 p-2 rounded collapse">
+      <input type="checkbox" id={title + "col"} defaultChecked />
+      <h5 className="collapse-title font-semibold text-sm mb-1">{title}</h5>
       {items?.length > 0 ? (
-        <ul className="space-y-1 text-xs">
+        <ul className="collapse-content space-y-1 text-xs">
           {items.map((item, idx) => (
             <li key={idx} className="pl-2 border-l-2 border-primary">
               <Link href={urls[idx] || "/"}>
@@ -94,7 +96,9 @@ function WorkBox({ title, items }: { title: string; items: any[] }) {
           ))}
         </ul>
       ) : (
-        <p className="italic text-gray-500 text-xs">Không có công việc</p>
+        <p className="collapse-content italic text-gray-500 text-xs">
+          Không có công việc
+        </p>
       )}
     </div>
   );
