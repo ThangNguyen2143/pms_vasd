@@ -2,13 +2,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useApi } from "~/hooks/use-api";
-import {
-  TestcaseDetail,
-  TestAssign,
-  EnviromentTest,
-  TestRunInfo,
-  TestComment,
-} from "~/lib/types";
+import { TestcaseDetail, EnviromentTest, TestComment } from "~/lib/types";
 import { toast } from "sonner";
 import AssignTestcaseModal from "~/components/testcase/modals/assign-testcase-modal";
 import UploadFileModal from "~/components/testcase/modals/upload-file-modal";
@@ -23,6 +17,7 @@ import StepTable from "~/components/testcase/testcase-detail/step-of-test";
 import CommentTestcase from "~/components/testcase/testcase-detail/comment-testcase";
 import UpdateStepTestModal from "~/components/testcase/modals/update-step-test";
 import TestDependComp from "~/components/testcase/testcase-detail/test-depend";
+import TestHistory from "~/components/testcase/testcase-detail/test-history";
 type InfoTestcaseDetail = {
   name: string;
   description: string;
@@ -203,7 +198,7 @@ export default function TestcaseDetailClient({
         // testcase_id={testcase.id}
         openUpdateStep={() => setShowUpdateStep(true)} // hàm để refetch dữ liệu
       />
-
+      <TestHistory testcase={testcase}></TestHistory>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Comment testcase */}
         <CommentTestcase
@@ -221,48 +216,6 @@ export default function TestcaseDetailClient({
           openAssign={() => setShowAssignModal(true)}
         />
         {/* Test History Section */}
-        <div className="bg-base-200 shadow p-4 rounded-lg">
-          <h2 className="text-xl font-semibold mb-4 border-l-4 border-green-500 pl-3">
-            Lịch sử kiểm thử
-          </h2>
-          {testcase.testCaseAssigns.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="table w-full">
-                <thead>
-                  <tr>
-                    <th>Người thực hiện</th>
-                    <th>Thời gian</th>
-                    <th>Kết quả</th>
-                    <th>Ghi chú</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {testcase.testCaseAssigns.map((assign: TestAssign) =>
-                    assign.testRunInfo.map((run: TestRunInfo) => (
-                      <tr key={run.code}>
-                        <td>{assign.assignInfo.assign_name}</td>
-                        <td>{new Date(run.run_at).toLocaleString()}</td>
-                        <td>{run.result ? "✅ Pass" : "❌ Fail"}</td>
-                        <td>
-                          {run.tester_note || "-"}
-                          <div className="text-sm mt-1">
-                            {run.step_results?.map((step) => (
-                              <div key={step.step_index}>
-                                🔹 {step.step_name}: {step.result ? "✅" : "❌"}
-                              </div>
-                            ))}
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className="text-gray-500">Chưa có lịch sử kiểm thử</p>
-          )}
-        </div>
 
         {/* Activity Log Section */}
         <TestcaseLog testLogs={testcase.testLogs} />

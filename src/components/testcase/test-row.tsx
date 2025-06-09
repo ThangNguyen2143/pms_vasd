@@ -1,6 +1,4 @@
 "use client";
-
-import { Pencil } from "lucide-react";
 import Link from "next/link";
 import { encodeBase64 } from "~/lib/services";
 import { UserDto, WorkStatus } from "~/lib/types";
@@ -41,7 +39,7 @@ function TestRow({ testcase, users, statusList, product_id }: TestRowProps) {
           }
           className="btn btn-sm btn-secondary"
         >
-          <Pencil />
+          Chi tiết
         </Link>
       </td>
     </tr>

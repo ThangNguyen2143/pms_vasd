@@ -1,6 +1,5 @@
 // components/task/task-row.tsx
 import clsx from "clsx";
-import { Pencil } from "lucide-react";
 import Link from "next/link";
 import { encodeBase64 } from "~/lib/services";
 import { BugDto } from "~/lib/types";
@@ -35,7 +34,7 @@ export default function BugRow({ bug, product_id }: BugRowProps) {
           href={"/bug/" + encodeBase64({ bug_id: bug.bug_id, product_id })}
           className="btn btn-sm btn-secondary"
         >
-          <Pencil />
+          Chi tiết
         </Link>
       </td>
     </tr>

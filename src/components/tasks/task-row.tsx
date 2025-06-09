@@ -1,5 +1,3 @@
-// components/task/task-row.tsx
-import { Pencil } from "lucide-react";
 import Link from "next/link";
 import { encodeBase64 } from "~/lib/services";
 import { TaskDTO, UserDto, WorkStatus } from "~/lib/types";
@@ -42,7 +40,7 @@ export default function TaskRow({
           href={"/task/" + encodeBase64({ task_id: task.id, product_id })}
           className="btn btn-sm btn-secondary"
         >
-          <Pencil />
+          Chi tiết
         </Link>
       </td>
     </tr>
