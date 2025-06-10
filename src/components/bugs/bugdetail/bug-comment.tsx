@@ -60,12 +60,14 @@ export default function BugComments({
       };
       const link =
         window.location.origin +
-          "/bugs/" +
+          "/bug/" +
           encodeBase64({ bug_id, product_id }) || "https://pm.vasd.vn/";
       if (email.length > 0)
         email.forEach((e) =>
           sendEmail(content, e, "Thông báo comment", link, "bug")
-            .then((mes) => toast(mes.message))
+            .then((mes) => {
+              if (mes.message != "OK") toast(mes.message);
+            })
             .catch((e) => toast.error(e))
         );
 

@@ -111,10 +111,11 @@ export default function TimelineDetailModal({
           encodeBase64({ project_id: timeline.project_id }) ||
         "https://pm.vasd.vn/";
       if (email)
-        toast(
-          (await sendEmail(content, email, "Thông báo", link, "timeline"))
-            .message
-        );
+        sendEmail(content, email, "Thông báo timeline", link, "Timeline")
+          .then((mes) => {
+            if (mes.message != "OK") toast(mes.message);
+          })
+          .catch((e) => toast.error(e));
       // if (tele)
       //   sendTelegram(content, tele, "Thông báo", link, "task")
       //     .then((re) => {

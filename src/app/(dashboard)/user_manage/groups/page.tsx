@@ -6,7 +6,8 @@ export const metadata: Metadata = {
   title: "Quản lý nhóm",
   description: "Trang quản lý nhóm trong công ty",
 };
-function GroupPage() {
+
+async function GroupPage() {
   return (
     <div className="tabs tabs-box">
       <div className="border-base-300 bg-base-100 p-10 w-full">

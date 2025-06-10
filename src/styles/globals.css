@@ -97,3 +97,16 @@ body {
 .react-datetime-picker__wrapper {
   border: none !important;
 }
+
+.rich-text-editor .ql-toolbar {
+  @apply bg-base-200 border-b border-base-300 p-2 rounded-t-box;
+}
+
+.rich-text-editor .ql-container {
+  @apply min-h-[8rem] bg-white p-2 rounded-b-box;
+  font-family: inherit;
+}
+
+.rich-text-editor .ql-editor {
+  @apply text-base min-h-[6rem];
+}

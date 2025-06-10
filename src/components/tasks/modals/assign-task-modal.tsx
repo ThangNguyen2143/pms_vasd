@@ -68,12 +68,14 @@ export default function AssignUserModal({
         massage: re.content.message,
       };
       const link =
-        window.location.origin + "/tasks/" + encodeBase64({ task_id }) ||
+        window.location.origin + "/task/" + encodeBase64({ task_id }) ||
         "https://pm.vasd.vn/";
       if (email)
-        toast(
-          (await sendEmail(content, email, "Thông báo", link, "task")).message
-        );
+        sendEmail(content, email, "Thông báo task", link, "Task")
+          .then((mes) => {
+            if (mes.message != "OK") toast(mes.message);
+          })
+          .catch((e) => toast.error(e));
       // if (tele)
       //   sendTelegram(content, tele, "Thông báo", link, "task")
       //     .then((re) => {

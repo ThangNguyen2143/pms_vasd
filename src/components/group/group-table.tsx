@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { AccountType, FieldDto, GroupDto } from "~/lib/types";
+import { AccountType, FieldDto, GroupDto, RoleType } from "~/lib/types";
 import clsx from "clsx";
 import RemoveGroupBtn from "./remove-group";
 import GroupDetail from "./group-detail";
@@ -7,10 +7,12 @@ import GroupDetail from "./group-detail";
 function TableItem({
   emp,
   feildTable,
+  roles,
 }: {
   emp: GroupDto;
   feildTable: FieldDto[];
   accountType?: any[];
+  roles: RoleType[];
 }) {
   return (
     <tr>
@@ -38,7 +40,7 @@ function TableItem({
                     aria-label="close sidebar"
                     className="drawer-overlay"
                   ></label>
-                  <GroupDetail group={emp} />
+                  <GroupDetail group={emp} roles={roles} />
                 </div>
               </div>
             </td>
@@ -79,10 +81,12 @@ function Group_Table({
   groupData,
   feildTable,
   typeAccount,
+  roles,
 }: {
   groupData: GroupDto[];
   feildTable: FieldDto[];
   typeAccount?: AccountType[];
+  roles: RoleType[];
 }) {
   if (!groupData) {
     return <div className="alert alert-error">Không có dữ liệu</div>;
@@ -106,6 +110,7 @@ function Group_Table({
                 key={index}
                 feildTable={feildTable}
                 accountType={typeAccount}
+                roles={roles}
               />
             );
           })}

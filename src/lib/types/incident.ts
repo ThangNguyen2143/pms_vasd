@@ -6,6 +6,7 @@ export type Incident = {
   receiver: number;
   receiver_name: string;
   date_create: string;
+  status: string;
 };
 export type IncidentDetail = {
   id: number;

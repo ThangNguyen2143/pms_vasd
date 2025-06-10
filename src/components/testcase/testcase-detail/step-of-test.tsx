@@ -1,4 +1,5 @@
 import { Wrench } from "lucide-react";
+import SafeHtmlViewer from "~/components/ui/safeHTMLviewer";
 import { TestStep } from "~/lib/types";
 
 function StepTest({
@@ -49,7 +50,9 @@ function StepTest({
                 <td>{step.input_data || "-"}</td>
                 <td>{step.output_data || "-"}</td>
                 <td>{step.expected_result}</td>
-                <td>{step.note || "-"}</td>
+                <td>
+                  <SafeHtmlViewer html={step.note || "-"} />
+                </td>
               </tr>
             ))}
           </tbody>

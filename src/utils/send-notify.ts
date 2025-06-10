@@ -88,7 +88,7 @@ async function sendEmail(
     endpoint: "/notification/email",
     data: JSON.stringify(data),
   });
-  if (res.code == 200) return { message: "Đã gửi thông báo email" };
+  if (res.code == 200) return { message: "OK" };
   else return { message: "Lỗi gửi thông báo email" };
 }
 export { sendEmail, sendTelegram };

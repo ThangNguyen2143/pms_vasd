@@ -19,7 +19,6 @@ export async function HandlerAddUser(
     username: formData.get("username"),
     account_type: formData.get("account_type"),
     email: formData.get("email"),
-    telegram: formData.get("telegram"),
   });
   // If any form fields are invalid, return early
   if (!validatedFields.success) {
@@ -67,7 +66,7 @@ export async function HandlerAddUser(
       },
     };
   }
-  redirect("/employees", "push" as RedirectType);
+  redirect("/user_manage", "push" as RedirectType);
 }
 export async function HandleAddGroup(
   state: CreateGroupState,
@@ -103,5 +102,5 @@ export async function HandleAddGroup(
       },
     };
   }
-  redirect("/employees/groups");
+  redirect("/user_manage/groups");
 }

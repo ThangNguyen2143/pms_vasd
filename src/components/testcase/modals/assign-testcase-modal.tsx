@@ -68,12 +68,14 @@ export default function AssignTestcaseModal({
       };
       const link =
         window.location.origin +
-          "/bugs/" +
+          "/bug/" +
           encodeBase64({ testcase_id: test_id, product_id }) ||
         "https://pm.vasd.vn/";
       if (email)
         sendEmail(content, email, "Thông báo", link, "testcase")
-          .then((mes) => toast(mes.message))
+          .then((mes) => {
+            if (mes.message != "OK") toast(mes.message);
+          })
           .catch((e) => toast.error(e));
 
       // if (tele)

@@ -11,7 +11,9 @@ function roleCheck(item: Contact, roleOwn: Contact[]) {
 function ListofRole({
   user_code,
   group_id,
+  roles,
 }: {
+  roles: RoleType[];
   user_code?: string;
   group_id?: string;
 }) {
@@ -33,15 +35,7 @@ function ListofRole({
     setData: setRole,
     getData: getRole,
   } = useApi<RoleType[]>();
-  const {
-    data: roleList,
-    getData: getUserRole,
 
-    errorData: errorRole,
-  } = useApi<RoleType[]>();
-  useEffect(() => {
-    getUserRole("/system/config/eyJ0eXBlIjoicm9sZSJ9", "force-cache");
-  }, []);
   useEffect(() => {
     let enpoint: string | undefined = undefined;
     if (group_id)
@@ -62,12 +56,11 @@ function ListofRole({
   }, [user_code, group_id]);
   useEffect(() => {
     if (errorData) toast.error(errorData.message);
-    if (errorRole) toast.error(errorRole.message);
     if (errorGetRole) {
       if (errorGetRole.code == 404) setRole([]);
       else toast.error(errorGetRole.message);
     }
-  }, [errorData, errorRole, errorGetRole]);
+  }, [errorData, errorGetRole]);
 
   const handlerClick = async (role_code: string, isCheck: boolean) => {
     let re;
@@ -104,8 +97,8 @@ function ListofRole({
   return (
     <div>
       <ul className="list bg-base-100 rounded-box shadow-md">
-        {roleList &&
-          roleList.map((item, i) => (
+        {roles &&
+          roles.map((item, i) => (
             <li className="list-row" key={"9i" + i}>
               <div>{item.value}</div>
               <div className="divider divider-horizontal"></div>

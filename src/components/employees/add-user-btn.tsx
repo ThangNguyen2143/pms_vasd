@@ -1,184 +1,193 @@
 "use client";
-import { useActionState, useEffect, useState } from "react";
-import { HandlerAddUser } from "./actions";
-import { AccountType } from "~/lib/types";
-import ErrorMessage from "../ui/error-message";
-import { useApi } from "~/hooks/use-api";
-import { encodeBase64 } from "~/lib/services";
+import { useEffect, useState } from "react";
 
-function AddUserBtn() {
-  const [state, action, pending] = useActionState(HandlerAddUser, undefined);
-  const [isOpenErrorDialog, setIsOpenErrorDialog] = useState(false);
-  const [isChangeValue, setChangeValue] = useState(false);
-  const {
-    data: account_type,
-    isLoading,
-    getData,
-    errorData,
-    isErrorDialogOpen,
-    setIsErrorDialogOpen,
-  } = useApi<AccountType[]>();
-  const loadTypeAccount = () => {
-    getData("/system/config/" + encodeBase64({ type: "account_type" })); // Load account type from API
+import { AccountType, Contact, CreateUserDto } from "~/lib/types";
+import { useApi } from "~/hooks/use-api";
+import clsx from "clsx";
+import { toast } from "sonner";
+
+function AddUserBtn({
+  onUpdate,
+  account_type,
+}: {
+  onUpdate: () => Promise<void>;
+  account_type: AccountType[];
+}) {
+  // const [state, action, pending] = useActionState(HandlerAddUser, undefined);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
+  const [accountSelect, setAccountSelect] = useState("");
+  const [listContacts, setlistContacts] = useState<Contact[]>([
+    { code: "email", value: "" },
+  ]);
+  const { postData, isLoading, errorData } = useApi<"", CreateUserDto>();
+  const handleAddContact = () => {
+    setlistContacts([...listContacts, { code: "email", value: "" }]);
+  };
+  const handleRemoveContact = (index: number) => {
+    setlistContacts(listContacts.filter((_, i) => i !== index));
+  };
+  const handleContactChange = (
+    index: number,
+    field: keyof Contact,
+    value: string
+  ) => {
+    const newContacts = [...listContacts];
+    newContacts[index][field] = value;
+    setlistContacts(newContacts);
+  };
+  const handleSubmit = async () => {
+    const dataSend: CreateUserDto = {
+      userData: {
+        display_name: name,
+        birthday: "2000-01-01",
+        gender: "male",
+        contact: listContacts,
+      },
+      accountData: {
+        username,
+        account_type: accountSelect,
+      },
+    };
+    const re = await postData("/user/create", dataSend);
+    if (re == "") {
+      toast.success("Thêm tài khoản thành công");
+      setShowAddModal(false);
+      await onUpdate();
+    }
   };
   useEffect(() => {
-    setChangeValue(false);
-  }, [state]);
-  useEffect(() => {
-    if (state?.message) {
-      setIsOpenErrorDialog(true); // Show error dialog if there is a message
-    }
-    loadTypeAccount(); // Load account type when component mounts
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state?.message]); // Only run when state.message changes
+    if (errorData) toast.error(errorData.message);
+  }, [errorData]);
   return (
     <>
       <label
         htmlFor="AddUserDialog"
         className="btn btn-info"
-        onClick={loadTypeAccount}
+        onClick={() => setShowAddModal(true)}
       >
         Thêm tài khoản
       </label>
-      <input type="checkbox" id="AddUserDialog" className="modal-toggle" />
-      <div className="modal" role="dialog">
-        <div className="modal-box justify-items-center">
+      <div
+        className={clsx("modal", showAddModal ? "modal-open" : "")}
+        role="dialog"
+      >
+        <div className="modal-box">
           <h3 className="text-xl font-bold p-4">Thêm tài khoản mới</h3>
-          <form action={action}>
+          <div>
             <div className="flex flex-col gap-4 justify-center">
-              <label className="input">
-                <span className="label">Họ và tên</span>
+              <label className="input w-full">
+                <span className="label">Họ tên</span>
                 <input
                   type="text"
-                  placeholder="Nhập họ và tên"
+                  value={name}
+                  placeholder="Nhập họ tên"
                   name="display_name"
-                  className="validator"
-                  pattern="^[\p{L} ]+$"
-                  title="Họ và tên không được chứa ký tự đặc biệt"
-                  onKeyDown={() => setChangeValue(true)}
+                  onChange={(e) => setName(e.target.value)}
                 />
               </label>
-              {state?.errors?.display_name && (
-                <div
-                  className="validator-hint text-error"
-                  hidden={isChangeValue}
-                >
-                  {state.errors.display_name}
-                </div>
-              )}
-              <label className="input">
-                <span className="label">Tên tài khoản</span>
+              <label className="input w-full">
+                <span className="label">Tài khoản</span>
                 <input
                   type="text"
                   placeholder="Nhập tên tài khoản"
+                  value={username}
                   name="username"
-                  className="validator"
-                  minLength={4}
-                  maxLength={20}
-                  onKeyDown={() => setChangeValue(true)}
+                  onChange={(e) => setUsername(e.target.value)}
                 />
               </label>
-              {state?.errors?.username && (
-                <div
-                  className="validator-hint text-error"
-                  hidden={isChangeValue}
-                >
-                  {state.errors.username}
-                </div>
-              )}
-              <label className="select">
+              <label className="select w-full">
                 <span className="label">Vai trò</span>
                 <select
-                  className="select select-ghost w-full max-w-xs"
-                  name="account_type"
-                  disabled={isLoading}
+                  value={accountSelect}
+                  onChange={(e) => setAccountSelect(e.target.value)}
                 >
-                  {account_type?.map((item) => (
-                    <option key={item.code} value={item.code}>
-                      {item.display}
-                    </option>
-                  ))}
+                  <option value="" disabled>
+                    Chọn loại
+                  </option>
+                  {account_type?.map((type) => {
+                    return (
+                      <option value={type.code} key={type.code}>
+                        {type.display}
+                      </option>
+                    );
+                  })}
                 </select>
               </label>
-              <label className="input">
-                <span className="label">Email</span>
-                <input
-                  type="email"
-                  placeholder="Nhập email"
-                  name="email"
-                  className="validator"
-                  title="Email không hợp lệ"
-                  onKeyDown={() => setChangeValue(true)}
-                />
-              </label>
-              {state?.errors?.email && (
-                <div
-                  className="validator-hint text-error"
-                  hidden={isChangeValue}
+              <fieldset className="fieldset">
+                <legend className="fieldset-legend">Liên hệ</legend>
+                {listContacts.map((contact, index) => (
+                  <label key={index} className="input w-full">
+                    <select
+                      value={contact.code}
+                      onChange={(e) =>
+                        handleContactChange(index, "code", e.target.value)
+                      }
+                    >
+                      <option value="email">Email</option>
+                      <option value="phone">Số điện thoại</option>
+                      <option value="zalo">Zalo</option>
+                      <option value="telegram">Telegram</option>
+                      <option value="other">Khác</option>
+                    </select>
+                    <input
+                      type="text"
+                      placeholder="Nhập liên hệ"
+                      value={contact.value}
+                      onChange={(e) =>
+                        handleContactChange(index, "value", e.target.value)
+                      }
+                    />
+                    {listContacts.length > 1 && (
+                      <button
+                        type="button"
+                        className="bg-error border rounded-full px-2"
+                        onClick={() => handleRemoveContact(index)}
+                      >
+                        Xoá
+                      </button>
+                    )}
+                  </label>
+                ))}
+                <button
+                  type="button"
+                  className="btn btn-sm btn-outline"
+                  onClick={handleAddContact}
                 >
-                  {state.errors.email}
-                </div>
-              )}
-              <label className="input">
-                <span className="label">Telegram</span>
-                <input
-                  type="text"
-                  placeholder="Nhập Id Telegram"
-                  name="telegram"
-                  className="validator"
-                  pattern="^([0-9]{10})$"
-                  minLength={10}
-                  maxLength={10}
-                  title="Id Telegram phải là 10 chữ số"
-                  onKeyDown={() => setChangeValue(true)}
-                />
-              </label>
-              {state?.errors?.telegram && (
-                <div
-                  className="validator-hint text-error"
-                  hidden={isChangeValue}
-                >
-                  {state.errors.telegram}
-                </div>
-              )}
+                  + Thêm liên hệ
+                </button>
+              </fieldset>
               <div className="flex justify-between items-center gap-4">
                 <button
                   type="submit"
                   className="btn btn-info"
-                  disabled={pending}
+                  onClick={handleSubmit}
+                  disabled={isLoading}
                 >
-                  {pending ? "Đang xử lý..." : "Thêm"}
+                  {isLoading ? (
+                    <span className="loading loading-spinner"></span>
+                  ) : (
+                    "Thêm"
+                  )}
                 </button>
-                <label htmlFor="AddUserDialog" className="btn btn-error ml-4">
+                <label
+                  className="btn btn-error ml-4"
+                  onClick={() => setShowAddModal(false)}
+                >
                   Hủy
                 </label>
               </div>
             </div>
-          </form>
-
-          <label className="modal-backdrop" htmlFor="AddUserDialog">
-            Close
-          </label>
+          </div>
         </div>
+        <label
+          className="modal-backdrop"
+          onClick={() => setShowAddModal(false)}
+        >
+          Close
+        </label>
       </div>
-      <ErrorMessage
-        isOpen={isErrorDialogOpen}
-        onOpenChange={setIsErrorDialogOpen}
-        errorData={errorData}
-      />
-      {state?.message && (
-        <ErrorMessage
-          isOpen={isOpenErrorDialog}
-          onOpenChange={setIsOpenErrorDialog}
-          errorData={{
-            message: state.message.message,
-            code: state.message.code,
-            hint: state.message.hint,
-            status: "error",
-            value: "",
-          }}
-        />
-      )}
     </>
   );
 }

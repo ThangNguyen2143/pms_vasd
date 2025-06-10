@@ -1,6 +1,7 @@
 "use client";
 
 import clsx from "clsx";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import SelectProject from "~/components/tasks/select-project";
 import CreateTestcaseForm from "~/components/testcase/modals/create-testcase-form";
@@ -10,6 +11,8 @@ import { encodeBase64 } from "~/lib/services";
 import { TestcaseDto, UserDto, WorkStatus } from "~/lib/types";
 
 function ClientTestCasesPage() {
+  const route = useRouter();
+  const [navigatingId, setNavigatingId] = useState<boolean>(false);
   const [selectProduct, setSelectProduct] = useState<string>("");
   const [showModal, setShowModal] = useState(false);
   const [testList, setTestList] = useState<TestcaseDto[]>([]);
@@ -64,8 +67,19 @@ function ClientTestCasesPage() {
           setProductSelect={setSelectProduct}
           productSelected={selectProduct}
         />
-        <button className="btn btn-info" onClick={() => setShowModal(true)}>
-          Thêm testcase
+        <button
+          className="btn btn-info"
+          onClick={() => {
+            setNavigatingId(true);
+            route.push("/test_case/create");
+          }}
+          disabled={navigatingId}
+        >
+          {navigatingId ? (
+            <span className="loading loading-spinner loading-sm" />
+          ) : (
+            "Thêm testcase"
+          )}
         </button>
       </div>
       <div className="flex flex-row justify-between items-center gap-4">

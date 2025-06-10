@@ -7,6 +7,7 @@ import { Activity, Pencil } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import UpdateInfoProductModal from "./update-info-product-modal";
+import ProductModuleModal from "./product-detail-modal";
 
 function reshapeData(data: ProductDto[] | null, userData: UserDto[] | null) {
   if (!data || !userData) {
@@ -40,6 +41,7 @@ function ProductTable({ project_id }: { project_id: number }) {
   } = useApi<"", { id: string; status: string }>();
   const [selectedProduct, setSelectedProduct] = useState<ProductDto>();
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
+  const [showModuleDetail, setShowModuleDetail] = useState<string>();
   const endpointUser = "/user/" + encodeBase64({ type: "all" });
   const openEditDialog = (product: ProductDto) => {
     setSelectedProduct(product);
@@ -136,7 +138,8 @@ function ProductTable({ project_id }: { project_id: number }) {
                 </td>
                 <td className="flex gap-1 justify-center items-center">
                   <button
-                    className="btn btn-sm btn-outline btn-primary"
+                    className="btn btn-sm btn-outline btn-primary tooltip"
+                    data-tip="Cập nhật phần mềm"
                     onClick={() =>
                       openEditDialog({
                         id: item.id,
@@ -149,6 +152,14 @@ function ProductTable({ project_id }: { project_id: number }) {
                     }
                   >
                     <Pencil className="w-4 h-4" />
+                  </button>
+                  <button
+                    className="btn btn-outline btn-soft"
+                    onClick={() => {
+                      setShowModuleDetail(item.id);
+                    }}
+                  >
+                    Module
                   </button>
                   {item.status != "active" && (
                     <div
@@ -175,6 +186,12 @@ function ProductTable({ project_id }: { project_id: number }) {
           onClose={() => setEditDialogOpen(false)}
           onUpdate={onUpdate}
           product={selectedProduct}
+        />
+      )}
+      {showModuleDetail && (
+        <ProductModuleModal
+          onClose={() => setShowModuleDetail(undefined)}
+          product_id={showModuleDetail}
         />
       )}
     </div>

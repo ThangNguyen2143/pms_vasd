@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
-import { TaskDTO } from "~/lib/types";
+import { ProductModule, TaskDTO } from "~/lib/types";
 import { EnviromentTest } from "~/lib/types/testcase";
 type CreateTestcaseData = {
   product_id: string;
@@ -40,11 +40,13 @@ function CreateTestcaseForm({
       description: string;
       environment: string;
       tags: string[];
+      module_id: string;
       result_expect: string;
       task_id?: number;
       test_data?: string;
     };
     steps: {
+      id: string;
       step: number;
       name: string;
       description: string;
@@ -59,10 +61,14 @@ function CreateTestcaseForm({
       description: "",
       environment: "TEST",
       tags: [],
+      module_id: "",
       result_expect: "",
+      task_id: 0,
+      test_data: "",
     },
     steps: [
       {
+        id: crypto.randomUUID(),
         step: 1,
         name: "",
         description: "",
@@ -87,6 +93,7 @@ function CreateTestcaseForm({
     data: tasks,
     errorData: errorGetTask,
   } = useApi<TaskDTO[]>();
+  const { getData: getModule, data: modules } = useApi<ProductModule[]>();
   useEffect(() => {
     getEnv(
       "/system/config/eyJ0eXBlIjoidGVzdF9lbnZpcm9ubWVudCJ9",
@@ -95,6 +102,7 @@ function CreateTestcaseForm({
   }, []);
   useEffect(() => {
     getlistTasks("/tasks/" + encodeBase64({ product_id }));
+    getModule("/product/" + encodeBase64({ type: "module", product_id }));
   }, [product_id]);
   useEffect(() => {
     if (errorLoadEnv) {
@@ -139,15 +147,20 @@ function CreateTestcaseForm({
         environment: "TEST",
         tags: [],
         result_expect: "",
-        task_id: undefined,
-        test_data: undefined,
+        task_id: 0,
+        module_id: "",
+        test_data: "",
       },
       steps: [
         {
+          id: crypto.randomUUID(),
           step: 1,
           name: "",
           description: "",
           expected_result: "",
+          input_data: "",
+          note: "",
+          output_data: "",
         },
       ],
     });
@@ -188,10 +201,14 @@ function CreateTestcaseForm({
       steps: [
         ...formData.steps,
         {
+          id: crypto.randomUUID(), // ✅ Tạo id duy nhất
           step: formData.steps.length + 1,
           name: "",
           description: "",
           expected_result: "",
+          input_data: "",
+          output_data: "",
+          note: "",
         },
       ],
     });
@@ -238,222 +255,240 @@ function CreateTestcaseForm({
 
   return (
     <div className="flex flex-col  gap-4 p-4 rounded-lg">
-      <div className="grid grid-cols-2 gap-2">
-        <fieldset className="fieldset">
+      <div className="grid gap-2">
+        <fieldset className="fieldset md:grid-cols-2">
           <legend className="fieldset-legend">Thông tin Testcase</legend>
-          <div className="space-y-4">
-            <div>
-              <label className="label">Tên testcase</label>
+          <label>
+            <label className="label">Tên testcase</label>
+            <input
+              className="input input-bordered w-full"
+              type="text"
+              placeholder="Tên testcase"
+              value={formData.info.name}
+              onChange={(e) => handleInfoChange("name", e.target.value)}
+            />
+          </label>
+          <div>
+            <label className="label">Kết quả mong đợi</label>
+            <input
+              type="text"
+              className="input w-full"
+              placeholder="Kết quả mong đợi"
+              value={formData.info.result_expect}
+              onChange={(e) =>
+                handleInfoChange("result_expect", e.target.value)
+              }
+            />
+          </div>
+          <div className="md:col-span-2">
+            <label className="label">Mô tả</label>
+            <RichTextEditor
+              placeholder="Mô tả testcase"
+              value={formData.info.description}
+              onChange={(description) =>
+                handleInfoChange("description", description)
+              }
+            />
+          </div>
+          <div>
+            <label className="label">Dữ liệu đầu vào</label>
+            <input
+              type="text"
+              className="input input-bordered w-full"
+              placeholder="Nhập dữ liệu đầu vào"
+              value={formData.info.test_data}
+              onChange={(e) => handleInfoChange("test_data", e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="label">Môi trường</label>
+            <select
+              className="select select-bordered w-full"
+              value={formData.info.environment}
+              onChange={(e) => handleInfoChange("environment", e.target.value)}
+            >
+              {environmentTest ? (
+                environmentTest.map((env) => (
+                  <option value={env.code} key={env.code}>
+                    {env.display}
+                  </option>
+                ))
+              ) : (
+                <option>Lỗi tải môi trường</option>
+              )}
+            </select>
+          </div>
+          <div>
+            <label className="label">Liên kết task</label>
+            <select
+              className="select select-bordered w-full"
+              value={formData.info.task_id}
+              onChange={(e) =>
+                handleInfoChange("task_id", parseInt(e.target.value))
+              }
+            >
+              <option value={0}>Chọn task</option>
+              {tasks ? (
+                tasks.map((task) => (
+                  <option key={task.id + "-ref"} value={task.id}>
+                    {task.title}
+                  </option>
+                ))
+              ) : errorGetTask ? (
+                <option value="">{errorGetTask.message}</option>
+              ) : (
+                <option>Không có task nào</option>
+              )}
+            </select>
+          </div>
+          <div>
+            <label className="label">Module</label>
+            <select
+              className="select select-bordered w-full"
+              value={formData.info.module_id}
+              onChange={(e) =>
+                handleInfoChange("module_id", parseInt(e.target.value))
+              }
+            >
+              <option value={0}>Chọn moudle</option>
+              {modules ? (
+                modules.map((module) => (
+                  <option key={module.id + "-ref-module"} value={module.id}>
+                    {module.display}
+                  </option>
+                ))
+              ) : (
+                <option>Không có module nào</option>
+              )}
+            </select>
+          </div>
+          <div>
+            <label className="label">Tags</label>
+            <div className="flex gap-2">
               <input
-                className="input input-bordered w-full"
+                className="input input-bordered flex-1"
                 type="text"
-                placeholder="Tên testcase"
-                value={formData.info.name}
-                onChange={(e) => handleInfoChange("name", e.target.value)}
+                placeholder="Thêm tag"
+                value={currentTag}
+                onChange={(e) => setCurrentTag(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && addTag()}
               />
+              <button className="btn btn-outline" onClick={addTag}>
+                Thêm
+              </button>
             </div>
-
-            <div>
-              <label className="label">Mô tả</label>
-              <RichTextEditor
-                placeholder="Mô tả testcase"
-                value={formData.info.description}
-                onChange={(description) =>
-                  handleInfoChange("description", description)
-                }
-              />
-            </div>
-            <div>
-              <label className="label">Dữ liệu đầu vào</label>
-              <input
-                type="text"
-                className="input input-bordered w-full"
-                placeholder="Nhập dữ liệu đầu vào"
-                value={formData.info.test_data}
-                onChange={(e) => handleInfoChange("test_data", e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="label">Kết quả mong đợi</label>
-              <RichTextEditor
-                placeholder="Kết quả mong đợi"
-                value={formData.info.result_expect}
-                onChange={(result) => handleInfoChange("result_expect", result)}
-              />
-            </div>
-            <div className="flex justify-between">
-              <div>
-                <label className="label">Môi trường</label>
-                <select
-                  className="select select-bordered w-full"
-                  value={formData.info.environment}
-                  onChange={(e) =>
-                    handleInfoChange("environment", e.target.value)
-                  }
-                >
-                  {environmentTest ? (
-                    environmentTest.map((env) => (
-                      <option value={env.code} key={env.code}>
-                        {env.display}
-                      </option>
-                    ))
-                  ) : (
-                    <option>Lỗi tải môi trường</option>
-                  )}
-                </select>
-              </div>
-              <div>
-                <label className="label">Liên kết task</label>
-                <select
-                  className="select select-bordered w-full"
-                  value={formData.info.task_id}
-                  onChange={(e) =>
-                    handleInfoChange("task_id", parseInt(e.target.value))
-                  }
-                >
-                  <option value={0}>Chọn task</option>
-                  {tasks ? (
-                    tasks.map((task) => (
-                      <option key={task.id + "-ref"} value={task.id}>
-                        {task.title}
-                      </option>
-                    ))
-                  ) : errorGetTask ? (
-                    <option value="">{errorGetTask.message}</option>
-                  ) : (
-                    <option>Không có task nào</option>
-                  )}
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label className="label">Tags</label>
-              <div className="flex gap-2">
-                <input
-                  className="input input-bordered flex-1"
-                  type="text"
-                  placeholder="Thêm tag"
-                  value={currentTag}
-                  onChange={(e) => setCurrentTag(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && addTag()}
-                />
-                <button className="btn btn-outline" onClick={addTag}>
-                  Thêm
-                </button>
-              </div>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {formData.info.tags.map((tag) => (
-                  <span key={tag} className="badge badge-primary">
-                    {tag}
-                    <button className="ml-2" onClick={() => removeTag(tag)}>
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {formData.info.tags.map((tag) => (
+                <span key={tag} className="badge badge-primary">
+                  {tag}
+                  <button className="ml-2" onClick={() => removeTag(tag)}>
+                    ×
+                  </button>
+                </span>
+              ))}
             </div>
           </div>
         </fieldset>
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Các bước thực hiện</legend>
-          <div className="space-y-4">
-            {formData.steps.map((step, index) => (
-              <div key={index} className="border p-4 rounded-lg relative">
-                <div className="absolute top-2 right-2 text-sm font-bold">
-                  Bước {step.step}
+
+          {formData.steps.map((step, index) => (
+            <div
+              key={"step" + step.id}
+              className="border p-4 rounded-lg relative"
+            >
+              <div className="absolute top-2 right-2 text-sm font-bold">
+                Bước {step.step}
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                  <label className="label">Tên bước</label>
+                  <input
+                    className="input input-bordered w-full"
+                    type="text"
+                    placeholder="Tên bước"
+                    value={step.name}
+                    onChange={(e) =>
+                      handleStepChange(index, "name", e.target.value)
+                    }
+                  />
                 </div>
-                <div className="grid grid-cols-1 gap-4">
-                  <div>
-                    <label className="label">Tên bước</label>
-                    <input
-                      className="input input-bordered w-full"
-                      type="text"
-                      placeholder="Tên bước"
-                      value={step.name}
-                      onChange={(e) =>
-                        handleStepChange(index, "name", e.target.value)
-                      }
-                    />
-                  </div>
-                  <div>
-                    <label className="label">Mô tả</label>
-                    <RichTextEditor
-                      placeholder="Mô tả bước"
-                      value={step.description}
-                      onChange={(des) =>
-                        handleStepChange(index, "description", des)
-                      }
-                    />
-                  </div>
-                  <div>
-                    <label className="label">Dữ liệu đầu vào</label>
-                    <input
-                      type="text"
-                      className="input input-bordered w-full"
-                      placeholder="Dữ liệu đầu vào (nếu có)"
-                      value={step.input_data || ""}
-                      onChange={(e) =>
-                        handleStepChange(index, "input_data", e.target.value)
-                      }
-                    />
-                  </div>
-                  <div>
-                    <label className="label">Dữ liệu đầu ra</label>
-                    <input
-                      type="text"
-                      className="input input-bordered w-full"
-                      placeholder="Dữ liệu đầu ra (nếu có)"
-                      value={step.output_data || ""}
-                      onChange={(e) =>
-                        handleStepChange(index, "output_data", e.target.value)
-                      }
-                    />
-                  </div>
-                  <div>
-                    <label className="label">Kết quả mong đợi</label>
-                    <input
-                      type="text"
-                      className="input input-bordered w-full"
-                      placeholder="Kết quả mong đợi"
-                      value={step.expected_result}
-                      onChange={(e) =>
-                        handleStepChange(
-                          index,
-                          "expected_result",
-                          e.target.value
-                        )
-                      }
-                    />
-                  </div>
-                  <div>
-                    <label className="label">Ghi chú</label>
-                    <input
-                      type="text"
-                      className="input input-bordered w-full"
-                      placeholder="Nhập Ghi chú"
-                      value={step.note}
-                      onChange={(e) =>
-                        handleStepChange(index, "note", e.target.value)
-                      }
-                    />
-                  </div>
+                <div>
+                  <label className="label">Kết quả mong đợi</label>
+                  <input
+                    type="text"
+                    className="input input-bordered w-full"
+                    placeholder="Kết quả mong đợi"
+                    value={step.expected_result}
+                    onChange={(e) =>
+                      handleStepChange(index, "expected_result", e.target.value)
+                    }
+                  />
                 </div>
-                <div className="flex justify-end mt-2">
-                  <button
-                    className="btn btn-error btn-sm"
-                    onClick={() => removeStep(index)}
-                    disabled={formData.steps.length <= 1}
-                  >
-                    Xóa bước
-                  </button>
+                <div>
+                  <label className="label">Dữ liệu đầu vào</label>
+                  <input
+                    type="text"
+                    className="input input-bordered w-full"
+                    placeholder="Dữ liệu đầu vào (nếu có)"
+                    value={step.input_data || ""}
+                    onChange={(e) =>
+                      handleStepChange(index, "input_data", e.target.value)
+                    }
+                  />
+                </div>
+
+                <div className="col-span-2 row-span-2">
+                  <label className="label">Mô tả</label>
+                  <RichTextEditor
+                    placeholder="Mô tả bước"
+                    value={step.description}
+                    onChange={(des) =>
+                      handleStepChange(index, "description", des)
+                    }
+                  />
+                </div>
+
+                <div>
+                  <label className="label">Dữ liệu đầu ra</label>
+                  <input
+                    type="text"
+                    className="input input-bordered w-full"
+                    placeholder="Dữ liệu đầu ra (nếu có)"
+                    value={step.output_data || ""}
+                    onChange={(e) =>
+                      handleStepChange(index, "output_data", e.target.value)
+                    }
+                  />
+                </div>
+
+                <div>
+                  <label className="label">Ghi chú</label>
+                  <input
+                    type="text"
+                    className="input input-bordered w-full"
+                    placeholder="Nhập Ghi chú"
+                    value={step.note}
+                    onChange={(e) =>
+                      handleStepChange(index, "note", e.target.value)
+                    }
+                  />
                 </div>
               </div>
-            ))}
-            <button className="btn btn-primary" onClick={addStep}>
-              Thêm bước mới
-            </button>
-          </div>
+              <div className="flex justify-end mt-2">
+                <button
+                  className="btn btn-error btn-sm"
+                  onClick={() => removeStep(index)}
+                  disabled={formData.steps.length <= 1}
+                >
+                  Xóa bước
+                </button>
+              </div>
+            </div>
+          ))}
+          <button className="btn btn-primary" onClick={addStep}>
+            Thêm bước mới
+          </button>
         </fieldset>
       </div>
       <div className="flex justify-between">

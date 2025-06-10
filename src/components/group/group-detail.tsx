@@ -1,5 +1,5 @@
 "use client";
-import { GroupDto } from "~/lib/types";
+import { GroupDto, RoleType } from "~/lib/types";
 import ListofRole from "../employees/list-role";
 import ActionInfoGroup from "./action-info-group";
 import MemberGroup from "./member-group";
@@ -12,7 +12,7 @@ interface UserInGroup {
   display_name: string;
   date_join: string;
 }
-function GroupDetail({ group }: { group: GroupDto }) {
+function GroupDetail({ group, roles }: { group: GroupDto; roles: RoleType[] }) {
   const {
     data: userGroup,
     getData,
@@ -95,7 +95,7 @@ function GroupDetail({ group }: { group: GroupDto }) {
             defaultChecked
           />
           <div className="tab-content border-base-300 bg-base-100 p-10">
-            <ListofRole group_id={group.group_id} />
+            <ListofRole group_id={group.group_id} roles={roles} />
           </div>
         </div>
       </div>
