@@ -43,6 +43,7 @@ export default function RootLayout({
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/frappe-gantt/dist/frappe-gantt.css"
         />
+        <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
       </body>
     </html>
   );

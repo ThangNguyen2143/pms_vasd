@@ -5,16 +5,16 @@ import { toast } from "sonner";
 import DateTimePicker from "~/components/ui/date-time-picker";
 import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
-import { IncidentType, BugSeverity } from "~/lib/types";
+import { IncidentType, BugSeverity, IncidentDetail } from "~/lib/types";
 
 interface AddIncidentProps {
-  product_id: string;
+  incident?: IncidentDetail;
   onClose: () => void;
   onCreated: () => Promise<void>;
 }
 
-interface DataCreate {
-  product_id: string;
+interface DataUpdate {
+  id: number;
   title: string;
   description: string;
   type: string;
@@ -25,20 +25,22 @@ interface DataCreate {
   time_end: string;
 }
 
-export default function AddIncidentModal({
-  product_id,
+export default function UpdateIncidentInfoModal({
+  incident = {} as IncidentDetail,
   onClose,
   onCreated,
 }: AddIncidentProps) {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [severitySelect, setSeveritySelected] = useState("");
-  const [typeSelected, setTypeSelected] = useState("");
-  const [reporter, setReporter] = useState("");
-  const [handle, setHandle] = useState("");
-  const [timeEnd, setTimeEnd] = useState("");
-  const [occurredAt, setOccurredAt] = useState("");
-  const { postData, isLoading, errorData } = useApi<"", DataCreate>();
+  const [title, setTitle] = useState(incident.title || "");
+  const [description, setDescription] = useState(incident.description || "");
+  const [severitySelect, setSeveritySelected] = useState(
+    incident.severity || ""
+  );
+  const [typeSelected, setTypeSelected] = useState(incident.type || "");
+  const [reporter, setReporter] = useState(incident.reporter || "");
+  const [handle, setHandle] = useState(incident.handle || "");
+  const [timeEnd, setTimeEnd] = useState(incident.time_end || "");
+  const [occurredAt, setOccurredAt] = useState(incident.occurred_at || "");
+  const { putData, isLoading, errorData } = useApi<"", DataUpdate>();
   const {
     data: typeList,
     getData: getType,
@@ -78,8 +80,8 @@ export default function AddIncidentModal({
       toast.warning("Vui lòng điền đầy đủ thông tin.");
       return;
     }
-    const data: DataCreate = {
-      product_id,
+    const data: DataUpdate = {
+      id: incident.id,
       title,
       description,
       type: typeSelected,
@@ -89,7 +91,7 @@ export default function AddIncidentModal({
       reporter,
       time_end: timeEnd,
     };
-    const re = await postData("/incident", data);
+    const re = await putData("/incident", data);
 
     if (re != "") return;
     else {

@@ -64,6 +64,13 @@ function TestcaseInfo({
           {testcase.status === "INPROGRESS" && (
             <>
               <button
+                className="btn btn-outline btn-accent tooltip mr-2"
+                data-tip={"Đánh dấu đang thực hiện"}
+                onClick={() => handleStatusChange("INPROGRESS")}
+              >
+                <span className="flex items-center"></span>
+              </button>
+              <button
                 className="btn btn-outline btn-success tooltip mr-2"
                 data-tip={"Đánh dấu đã kiểm tra"}
                 onClick={() => handleStatusChange("PASSED")}
