@@ -2,6 +2,7 @@
 import { Plus, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
+import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
 import { DataRating, Task } from "~/lib/types";
 
@@ -109,11 +110,10 @@ export default function UpdateInfoTaskModal({
           </fieldset>
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Mô tả</legend>
-            <textarea
-              className="textarea textarea-bordered"
+            <RichTextEditor
               placeholder="Mô tả công việc"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={setDescription}
             />
           </fieldset>
           <fieldset className="fieldset">

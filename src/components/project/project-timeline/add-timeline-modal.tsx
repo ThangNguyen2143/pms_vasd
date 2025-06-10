@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
 import { ProjectTimeLine } from "~/lib/types";
 
@@ -101,11 +102,10 @@ export default function CreateTimelineForm({
         <div className="md:col-span-2">
           <label className="floating-label">
             <span className="label">Mô tả</span>
-            <textarea
+            <RichTextEditor
               placeholder="Mô tả"
-              className="textarea textarea-bordered w-full"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={setDescription}
             />
           </label>
         </div>

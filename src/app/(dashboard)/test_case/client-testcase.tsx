@@ -20,7 +20,12 @@ function ClientTestCasesPage() {
     "/testcase/" + encodeBase64({ product_id });
   const endpointUser = "/user/" + encodeBase64({ type: "all" });
   const endpointStatus = "/system/config/eyJ0eXBlIjoidGVzdF9zdGF0dXMifQ==";
-  const { data: tests, getData: getTestList } = useApi<TestcaseDto[]>();
+  const {
+    data: tests,
+    getData: getTestList,
+    isLoading,
+    errorData,
+  } = useApi<TestcaseDto[]>();
   const { data: userList, getData: getUser } = useApi<UserDto[]>();
   const { data: statusList, getData: getStatus } = useApi<WorkStatus[]>();
   useEffect(() => {
@@ -92,12 +97,22 @@ function ClientTestCasesPage() {
           </label>
         </div>
       </div>
-      <TestList
-        product_id={selectProduct}
-        statusList={statusList || []}
-        testList={testList}
-        userList={userList || []}
-      />
+      {isLoading ? (
+        <div className="flex text-center justify-center">
+          <span className="loading loading-infinity loading-xl" />
+        </div>
+      ) : errorData && errorData.code != 404 ? (
+        <div className="alert alert-error justify-center">
+          {errorData.message}
+        </div>
+      ) : (
+        <TestList
+          product_id={selectProduct}
+          statusList={statusList || []}
+          testList={testList}
+          userList={userList || []}
+        />
+      )}
 
       <dialog
         className={clsx(

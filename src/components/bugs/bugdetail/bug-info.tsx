@@ -7,6 +7,7 @@ import { BugSeverity, BugStatus, Priority } from "~/lib/types";
 import { useApi } from "~/hooks/use-api";
 import { toast } from "sonner";
 import { format_date } from "~/utils/fomat-date";
+import SafeHtmlViewer from "~/components/ui/safeHTMLviewer";
 
 type BugInfoProps = {
   bug: {
@@ -158,9 +159,9 @@ export default function BugInfo({
         <p>
           <strong>Tiêu đề:</strong> {bug.title}
         </p>
-        <p>
-          <strong>Mô tả:</strong> {bug.description}
-        </p>
+        <div>
+          <strong>Mô tả:</strong> <SafeHtmlViewer html={bug.description} />
+        </div>
         <div className="flex gap-2">
           <p className="tooltip tooltip-bottom" data-tip={priority?.hints}>
             <strong>Ưu tiên:</strong> {priority?.display || bug.priority}

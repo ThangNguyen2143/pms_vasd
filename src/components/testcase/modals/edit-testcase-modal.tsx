@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { EnviromentTest, TaskDTO, TestcaseDetail } from "~/lib/types";
@@ -73,13 +74,9 @@ export default function EditTestcaseModal({
             </div>
             <div className="md:col-span-2">
               <label className="block mb-1">Mô tả</label>
-              <textarea
-                className="textarea textarea-bordered w-full"
+              <RichTextEditor
                 value={formData.description}
-                onChange={(e) =>
-                  setFormData({ ...formData, description: e.target.value })
-                }
-                required
+                onChange={(e) => setFormData({ ...formData, description: e })}
               />
             </div>
             <div>
@@ -145,13 +142,9 @@ export default function EditTestcaseModal({
             </div>
             <div className="md:col-span-2">
               <label className="block mb-1">Kết quả mong đợi</label>
-              <textarea
-                className="textarea textarea-bordered w-full"
+              <RichTextEditor
                 value={formData.result_expect}
-                onChange={(e) =>
-                  setFormData({ ...formData, result_expect: e.target.value })
-                }
-                required
+                onChange={(e) => setFormData({ ...formData, result_expect: e })}
               />
             </div>
           </div>

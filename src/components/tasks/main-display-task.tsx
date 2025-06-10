@@ -18,7 +18,12 @@ function MainDisplayTask() {
     "/tasks/" + encodeBase64({ product_id });
   const endpointStatus = "/system/config/eyJ0eXBlIjoidGFza19zdGF0dXMifQ==";
   const [taskList, setTaskList] = useState([] as TaskDTO[]);
-  const { data: tasks, getData: getTaskList } = useApi<TaskDTO[]>();
+  const {
+    data: tasks,
+    getData: getTaskList,
+    isLoading,
+    errorData,
+  } = useApi<TaskDTO[]>();
   const { data: statusList, getData: getStatus } = useApi<WorkStatus[]>();
   useEffect(() => {
     getStatus(endpointStatus);
@@ -85,11 +90,21 @@ function MainDisplayTask() {
           </label>
         </div>
       </div>
-      <TaskList
-        product_id={selectProduct}
-        statusList={statusList || []}
-        taskList={taskList || undefined}
-      />
+      {isLoading ? (
+        <div className="flex text-center justify-center">
+          <span className="loading loading-infinity loading-xl" />
+        </div>
+      ) : errorData && errorData.code != 404 ? (
+        <div className="alert alert-error justify-center">
+          {errorData.message}
+        </div>
+      ) : (
+        <TaskList
+          product_id={selectProduct}
+          statusList={statusList || []}
+          taskList={taskList || undefined}
+        />
+      )}
 
       <dialog
         className={clsx(

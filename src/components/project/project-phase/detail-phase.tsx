@@ -9,6 +9,7 @@ import AddAttachmentPhaseModal from "./add-attachment-phase";
 import { openGzipBase64FileInNewTab } from "~/utils/file-to-base64";
 import { toast } from "sonner";
 import UpdatePhaseInfo from "./update-phase-info";
+import SafeHtmlViewer from "~/components/ui/safeHTMLviewer";
 
 function DetailPhase({
   project_id,
@@ -106,7 +107,7 @@ function DetailPhase({
         {phaseData && (
           <div>
             <h1 className="text-2xl font-bold mb-4">{phaseData.name}</h1>
-            <p>{phaseData.description}</p>
+            <SafeHtmlViewer html={phaseData.description} />
             <p>
               <strong>Bắt đầu:</strong> {phaseData.start_date}
             </p>

@@ -16,7 +16,12 @@ function BugsClient() {
   const endpoint = (product_id: string) =>
     "/bugs/" + encodeBase64({ product_id });
   const [bugList, setBugList] = useState([] as BugDto[]);
-  const { data: bugs, getData: getBugList } = useApi<BugDto[]>();
+  const {
+    data: bugs,
+    getData: getBugList,
+    isLoading,
+    errorData,
+  } = useApi<BugDto[]>();
   useEffect(() => {
     if (selectProduct != "") getBugList(endpoint(selectProduct), "reload");
   }, [selectProduct]);
@@ -115,7 +120,18 @@ function BugsClient() {
           />
         </form>
       </div>
-      <BugList product_id={selectProduct} bugList={bugList} />
+
+      {isLoading ? (
+        <div className="flex text-center justify-center">
+          <span className="loading loading-infinity loading-xl" />
+        </div>
+      ) : errorData && errorData.code != 404 ? (
+        <div className="alert alert-error justify-center">
+          {errorData.message}
+        </div>
+      ) : (
+        <BugList product_id={selectProduct} bugList={bugList} />
+      )}
 
       {showModal && (
         <AddBugModal

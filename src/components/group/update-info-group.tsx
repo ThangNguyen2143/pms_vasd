@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { updateData } from "~/lib/api-client";
+import RichTextEditor from "../ui/rich-text-editor";
 
 interface GroupInfor {
   group_id: string;
@@ -52,13 +53,7 @@ function UpdateInfoGroup({
           </label>
           <label className="floating-label">
             <span>Mô tả</span>
-            <textarea
-              placeholder="Nhập mô tả nhóm"
-              className="textarea textarea-md w-full"
-              required
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
+            <RichTextEditor value={description} onChange={setDescription} />
           </label>
           <button className="btn btn-primary" onClick={handlderClick}>
             Thay đổi

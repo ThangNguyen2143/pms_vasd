@@ -4,6 +4,7 @@ import { useApi } from "~/hooks/use-api";
 import { toast } from "sonner";
 import { TestStep } from "~/lib/types";
 import { useUser } from "~/providers/user-context";
+import RichTextEditor from "~/components/ui/rich-text-editor";
 
 interface AddTestRunModalProps {
   steps: TestStep[];
@@ -175,12 +176,9 @@ export default function AddTestRunModal({
             </div>
             <div>
               <label className="block mb-1">Ghi chú tổng thể</label>
-              <textarea
-                className="textarea textarea-bordered w-full"
+              <RichTextEditor
                 value={formData.tester_note}
-                onChange={(e) =>
-                  setFormData({ ...formData, tester_note: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, tester_note: e })}
                 placeholder="Nhập ghi chú về lần test này..."
               />
             </div>

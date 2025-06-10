@@ -1,6 +1,7 @@
 import { CheckCircle, FileCheck, FileX, Wrench } from "lucide-react";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import SafeHtmlViewer from "~/components/ui/safeHTMLviewer";
 import { useApi } from "~/hooks/use-api";
 import { TestcaseDetail } from "~/lib/types";
 
@@ -113,9 +114,9 @@ function TestcaseInfo({
         <p>
           <strong>Tên:</strong> {testcase.name}
         </p>
-        <p>
-          <strong>Mô tả:</strong> {testcase.description}
-        </p>
+        <div>
+          <strong>Mô tả:</strong> <SafeHtmlViewer html={testcase.description} />
+        </div>
         <p>
           <strong>Tags:</strong>
           {testcase.tags.map((tag) => (

@@ -8,6 +8,7 @@ import { useApi } from "~/hooks/use-api";
 import { RequirementStatus } from "~/lib/types";
 import { toast } from "sonner";
 import { format_date } from "~/utils/fomat-date";
+import SafeHtmlViewer from "~/components/ui/safeHTMLviewer";
 
 export default function RequirementInfo({
   info,
@@ -135,9 +136,10 @@ export default function RequirementInfo({
             {info.status}
           </span>
         </p>
-        <p>
-          <span className="font-bold">Mô tả:</span> {info.description}
-        </p>
+        <div>
+          <span className="font-bold">Mô tả:</span>{" "}
+          <SafeHtmlViewer html={info.description} />
+        </div>
         <p>
           <span className="font-bold">Ưu tiên:</span>{" "}
           <span className="text-error font-semibold">{info.priority}</span>

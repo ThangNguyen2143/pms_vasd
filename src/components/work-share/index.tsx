@@ -86,20 +86,20 @@ function MainWork() {
           />
         )}
       </div>
-      {workList ? (
+      {loadingWork ? (
+        <span className="loading loading-infinity loading-lg"></span>
+      ) : errorWorkList && errorWorkList.code != 404 ? (
+        <div className="flex justify-center items-center h-screen">
+          {errorWorkList.message}
+        </div>
+      ) : projectSelected != 0 ? (
         <TableWork
-          workList={workList}
+          workList={workList || []}
           priorityList={priorityList}
           statusList={statusList}
           isGuess={isGuess}
           onUpdate={() => fetchData()}
         />
-      ) : loadingWork ? (
-        <span className="loading loading-infinity loading-lg"></span>
-      ) : errorWorkList ? (
-        <div className="flex justify-center items-center h-screen">
-          {errorWorkList.message}
-        </div>
       ) : (
         <div className="flex justify-center items-center h-screen">
           Chưa dự án nào được chọn

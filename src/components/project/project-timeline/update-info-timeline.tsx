@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import RichTextEditor from "~/components/ui/rich-text-editor";
 import { ProjectTimeLine, ProjectTimeLineDetail } from "~/lib/types";
 interface UpdateTimelineData {
   project_id: number; //ID dự án (truyền từ component cha)
@@ -82,11 +83,10 @@ function UpdateInfoForm({
       <div className="md:col-span-2">
         <label className="floating-label">
           <span className="label">Mô tả</span>
-          <textarea
+          <RichTextEditor
             placeholder="Mô tả"
-            className="textarea textarea-bordered w-full"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={setDescription}
           />
         </label>
       </div>

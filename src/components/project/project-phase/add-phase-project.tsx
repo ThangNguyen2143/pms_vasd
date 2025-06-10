@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
 interface AddPhaseData {
   project_id: number;
@@ -88,14 +89,11 @@ function AddPhaseProjectModal({
         </fieldset>
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Mô tả</legend>
-          <textarea
-            className="textarea w-full validator"
+          <RichTextEditor
             placeholder="Nhập mô tả giai đoạn"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            required
+            onChange={setDescription}
           />
-          <p className="validator-hint">Mô tả giai đoạn không được trống</p>
         </fieldset>
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Thời gian bắt đầu</legend>
@@ -143,7 +141,7 @@ function AddPhaseProjectModal({
             Thêm
           </button>
         </label>
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap mt-2">
           {tagsChoose.map((tag, index) => (
             <div key={index} className="badge badge-info gap-2">
               {tag}

@@ -19,7 +19,7 @@ export default function AddAttachmentModal({
     if (!file) return;
     const re = await uploadFile({
       file,
-      uploadUrl: "/project/requirement/file",
+      uploadUrl: "/requirements/file",
       meta: { id: requirement_id },
     });
     if (re?.value != "") return;

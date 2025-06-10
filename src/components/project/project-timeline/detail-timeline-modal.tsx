@@ -12,6 +12,7 @@ import {
 } from "~/lib/types";
 import { sendEmail } from "~/utils/send-notify";
 import UpdateInfoForm from "./update-info-timeline";
+import SafeHtmlViewer from "~/components/ui/safeHTMLviewer";
 interface ResponseNotify {
   action: string;
   content: {
@@ -175,9 +176,11 @@ export default function TimelineDetailModal({
                 {timeline.status || "Chưa cập nhật"}
               </span>
             </div>
-            <p className="mt-2 text-sm whitespace-pre-line">
-              {timeline.info.description || "(Không có mô tả)"}
-            </p>
+            <div className="mt-2 text-sm whitespace-pre-line">
+              <SafeHtmlViewer
+                html={timeline.info.description || "(Không có mô tả)"}
+              />
+            </div>
             {/* Name + Assign */}
             <div className="flex justify-between items-center mt-4">
               {timeline.info.assignto_name ? (

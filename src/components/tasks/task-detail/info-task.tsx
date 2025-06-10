@@ -15,6 +15,7 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 import { format_date } from "~/utils/fomat-date";
+import SafeHtmlViewer from "~/components/ui/safeHTMLviewer";
 export default function TaskInfo({
   task,
   onEdit,
@@ -122,10 +123,10 @@ export default function TaskInfo({
           <span className="font-bold w-32 inline-block">Tiêu đề:</span>{" "}
           {task.title}
         </p>
-        <p>
+        <div>
           <span className="font-bold w-32 inline-block">Mô tả:</span>{" "}
-          {task.description}
-        </p>
+          <SafeHtmlViewer html={task.description} />
+        </div>
         <p>
           <span className="font-bold w-32 inline-block">Ngày tạo:</span>{" "}
           {format_date(task.create_at)}

@@ -62,9 +62,9 @@ function PhaseProjectTable({
         .map((phase) => (
           <div
             key={phase.id}
-            className="card bg-base-100 shadow-md border border-base-300"
+            className="bg-base-100 shadow-md border border-base-300 flex flex-row"
           >
-            <div className="collapse">
+            <div className="collapse w-full">
               <input
                 type="checkbox"
                 id={phase.id + "phase-col"}
@@ -93,35 +93,6 @@ function PhaseProjectTable({
                         )?.display || "Chưa xác định"
                       : phase.status || "Chưa xác định"}
                   </p>
-                  <div className="shrink-0">
-                    <div className="drawer drawer-end">
-                      <input
-                        id={`detail-phase-drawer-${phase.id}`}
-                        type="checkbox"
-                        className="drawer-toggle"
-                      />
-                      <div className="drawer-content">
-                        <label
-                          htmlFor={`detail-phase-drawer-${phase.id}`}
-                          className="btn btn-secondary btn-sm"
-                        >
-                          Xem chi tiết
-                        </label>
-                      </div>
-                      <div className="drawer-side z-40">
-                        <label
-                          htmlFor={`detail-phase-drawer-${phase.id}`}
-                          aria-label="close sidebar"
-                          className="drawer-overlay"
-                        ></label>
-                        <DetailPhase
-                          phase_id={phase.id}
-                          onUpdate={onUpdate}
-                          project_id={project_id}
-                        />
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
 
@@ -157,6 +128,34 @@ function PhaseProjectTable({
                 )}
 
                 {/* <Timeline phaseId={phase.id} projectId={project_id} /> */}
+              </div>
+            </div>
+            <div className="drawer drawer-end z-50 w-24">
+              <input
+                id={`detail-phase-drawer-${phase.id}`}
+                type="checkbox"
+                className="drawer-toggle"
+              />
+              <div className="drawer-content">
+                <div className="flex justify-end p-4 w-fit">
+                  <label
+                    htmlFor={`detail-phase-drawer-${phase.id}`}
+                    className="btn btn-secondary btn-sm"
+                  >
+                    Xem chi tiết
+                  </label>
+                </div>
+              </div>
+              <div className="drawer-side">
+                <label
+                  htmlFor={`detail-phase-drawer-${phase.id}`}
+                  className="drawer-overlay"
+                />
+                <DetailPhase
+                  phase_id={phase.id}
+                  onUpdate={onUpdate}
+                  project_id={project_id}
+                />
               </div>
             </div>
           </div>

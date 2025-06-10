@@ -1,4 +1,5 @@
 import { useState } from "react";
+import RichTextEditor from "~/components/ui/rich-text-editor";
 import { TestStep } from "~/lib/types";
 type StepTest = {
   step: number;
@@ -140,12 +141,11 @@ function UpdateStepTestModal({
                   </div>
                   <div>
                     <label className="label">Mô tả</label>
-                    <textarea
-                      className="textarea textarea-bordered w-full"
+                    <RichTextEditor
                       placeholder="Mô tả bước"
                       value={step.description}
                       onChange={(e) =>
-                        handleStepChange(index, "description", e.target.value)
+                        handleStepChange(index, "description", e)
                       }
                     />
                   </div>

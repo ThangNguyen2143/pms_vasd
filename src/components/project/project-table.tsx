@@ -85,9 +85,7 @@ function ProjectTable() {
             <tr>
               <td colSpan={7} className="text-center py-4">
                 <span className="alert alert-error justify-center">
-                  {projectErrorData?.code == 500
-                    ? "Lỗi server"
-                    : projectErrorData?.message}
+                  {projectErrorData?.message}
                 </span>
               </td>
             </tr>

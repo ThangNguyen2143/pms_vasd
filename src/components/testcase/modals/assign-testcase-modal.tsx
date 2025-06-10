@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { Contact, ProjectMember } from "~/lib/types";
@@ -151,12 +152,9 @@ export default function AssignTestcaseModal({
             </div>
             <div>
               <label className="block mb-1">Ghi chú</label>
-              <textarea
-                className="textarea textarea-bordered w-full"
+              <RichTextEditor
                 value={assignData.note}
-                onChange={(e) =>
-                  setAssignData({ ...assignData, note: e.target.value })
-                }
+                onChange={(note) => setAssignData({ ...assignData, note })}
               />
             </div>
           </div>

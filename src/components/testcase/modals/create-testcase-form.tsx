@@ -2,6 +2,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { TaskDTO } from "~/lib/types";
@@ -254,12 +255,11 @@ function CreateTestcaseForm({
 
             <div>
               <label className="label">Mô tả</label>
-              <textarea
-                className="textarea textarea-bordered w-full"
+              <RichTextEditor
                 placeholder="Mô tả testcase"
                 value={formData.info.description}
-                onChange={(e) =>
-                  handleInfoChange("description", e.target.value)
+                onChange={(description) =>
+                  handleInfoChange("description", description)
                 }
               />
             </div>
@@ -275,13 +275,10 @@ function CreateTestcaseForm({
             </div>
             <div>
               <label className="label">Kết quả mong đợi</label>
-              <textarea
-                className="textarea textarea-bordered w-full"
+              <RichTextEditor
                 placeholder="Kết quả mong đợi"
                 value={formData.info.result_expect}
-                onChange={(e) =>
-                  handleInfoChange("result_expect", e.target.value)
-                }
+                onChange={(result) => handleInfoChange("result_expect", result)}
               />
             </div>
             <div className="flex justify-between">
@@ -381,12 +378,11 @@ function CreateTestcaseForm({
                   </div>
                   <div>
                     <label className="label">Mô tả</label>
-                    <textarea
-                      className="textarea textarea-bordered w-full"
+                    <RichTextEditor
                       placeholder="Mô tả bước"
                       value={step.description}
-                      onChange={(e) =>
-                        handleStepChange(index, "description", e.target.value)
+                      onChange={(des) =>
+                        handleStepChange(index, "description", des)
                       }
                     />
                   </div>

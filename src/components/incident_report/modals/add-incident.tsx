@@ -1,14 +1,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
-import { encodeBase64 } from "~/lib/services";
-import { BugSeverity, Priority, TestcaseDto } from "~/lib/types";
+import { IncidentType, BugSeverity } from "~/lib/types";
 
-interface AddBugProps {
+interface AddIncidentProps {
   product_id: string;
 
   onClose: () => void;
@@ -19,52 +17,52 @@ interface DataCreate {
   product_id: string;
   title: string;
   description: string;
-  priority: string;
+  type: string;
   severity: string;
-  test_case_ref_id?: number;
-  tags: string[];
+  occurred_at: string;
+  reporter: string;
+  handle: string;
+  time_end: string;
 }
 
-export default function AddBugModal({
+export default function AddIncidentModal({
   product_id,
   onClose,
   onCreated,
-}: AddBugProps) {
+}: AddIncidentProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [severitySelect, setSeveritySelected] = useState("");
-  const [prioritySelected, setPrioritySelected] = useState("");
-  const [tags, setTags] = useState<string[]>([]);
-  const [newTag, setNewTag] = useState("");
-  const [testcaseSelected, setTestcaseSelected] = useState("");
+  const [typeSelected, setTypeSelected] = useState("");
+  const [reporter, setReporter] = useState("");
+  const [handle, setHandle] = useState("");
+  const [timeEnd, setTimeEnd] = useState("");
+  const [occurredAt, setOccurredAt] = useState("");
   const { postData, isLoading, errorData } = useApi<"", DataCreate>();
+  const {
+    data: typeList,
+    getData: getType,
+    errorData: errorType,
+  } = useApi<IncidentType[]>();
   const {
     data: severityList,
     getData: getSeverity,
     errorData: errorSeverity,
   } = useApi<BugSeverity[]>();
-  const {
-    data: priorityList,
-    getData: getPriority,
-    errorData: errorType,
-  } = useApi<Priority[]>();
-  const { data: testcaseList, getData: getTestCase } = useApi<TestcaseDto[]>();
   useEffect(() => {
-    getPriority("/system/config/eyJ0eXBlIjoicHJpb3JpdHkifQ==", "force-cache");
+    getType("/system/config/eyJ0eXBlIjoiaW5jaWRlbnRfdHlwZSJ9", "force-cache");
     getSeverity(
       "/system/config/eyJ0eXBlIjoiYnVnX3NldmVyaXR5In0=",
       "force-cache"
     );
   }, []);
   useEffect(() => {
-    getTestCase("/testcase/" + encodeBase64({ product_id }), "reload");
-  }, [product_id]);
-  useEffect(() => {
     if (errorData) toast.error(errorData.message);
-  }, [errorData]);
-  if (!severityList || !priorityList) {
-    if (errorSeverity) toast.error(errorSeverity.message);
     if (errorType) toast.error(errorType.message);
+    if (errorSeverity) toast.error(errorSeverity.message);
+  }, [errorData, errorSeverity, errorType]);
+
+  if (!severityList || !typeSelected) {
     return (
       <div className="modal modal-open">
         <div className="modal-box">
@@ -73,19 +71,17 @@ export default function AddBugModal({
       </div>
     );
   }
-  const handleAddTag = () => {
-    if (newTag.trim() && !tags.includes(newTag)) {
-      setTags((prev) => [...prev, newTag.trim()]);
-      setNewTag("");
-    }
-  };
-
-  const handleRemoveTag = (tag: string) => {
-    setTags(tags.filter((t) => t !== tag));
-  };
-
   const handleSubmit = async () => {
-    if (!title || !description || !severitySelect || !prioritySelected) {
+    if (
+      !title ||
+      !description ||
+      !severitySelect ||
+      !typeSelected ||
+      !reporter ||
+      !handle ||
+      !timeEnd ||
+      !occurredAt
+    ) {
       toast.warning("Vui lòng điền đầy đủ thông tin.");
       return;
     }
@@ -93,19 +89,18 @@ export default function AddBugModal({
       product_id,
       title,
       description,
-      priority: prioritySelected,
-      tags,
+      type: typeSelected,
       severity: severitySelect,
-      // Nếu không có testcaseSelected thì sẽ là chuỗi rỗng
-      // Nếu có thì sẽ là id của testcase
-      test_case_ref_id: Number(testcaseSelected),
+      handle,
+      occurred_at: occurredAt,
+      reporter,
+      time_end: timeEnd,
     };
-    if (!data.test_case_ref_id) delete data.test_case_ref_id;
-    const re = await postData("/bugs", data);
+    const re = await postData("/incident", data);
 
     if (re != "") return;
     else {
-      toast.success("Tạo yêu cầu thành công");
+      toast.success("Tạo sự kiện thành công");
       onCreated();
       onClose();
     }
@@ -114,7 +109,7 @@ export default function AddBugModal({
   return (
     <div className="modal modal-open ">
       <div className="modal-box w-96">
-        <h3 className="font-bold text-lg pb-2">Báo bug mới</h3>
+        <h3 className="font-bold text-lg pb-2">Báo sự kiện mới</h3>
         <div className="flex flex-col gap-2 px-4">
           <label className="floating-label">
             <span>Tiêu đề</span>
@@ -135,16 +130,16 @@ export default function AddBugModal({
             />
           </fieldset>
           <label className="floating-label">
-            <span>Mức độ ưu tiên</span>
+            <span>Loại sự kiện</span>
             <select
               className="select select-neutral"
-              value={prioritySelected}
-              onChange={(e) => setPrioritySelected(e.target.value)}
+              value={typeSelected}
+              onChange={(e) => setTypeSelected(e.target.value)}
             >
               <option value="" disabled>
-                Chọn mức độ
+                Chọn loại
               </option>
-              {priorityList.map((type) => (
+              {typeList?.map((type) => (
                 <option key={type.code} value={type.code}>
                   {type.display}
                 </option>
@@ -168,55 +163,38 @@ export default function AddBugModal({
               ))}
             </select>
           </label>
-
-          <div className="join w-full">
+          <label className="floating-label">
+            <span className="label"></span>
             <input
               type="text"
-              className="input join-item input-neutral"
-              value={newTag}
-              onChange={(e) => setNewTag(e.target.value)}
-              onKeyUp={(e) => {
-                if (e.key == "Enter") handleAddTag();
-              }}
-              placeholder="Nhập thẻ và nhấn Thêm"
+              value={reporter}
+              onChange={(e) => setReporter(e.target.value)}
             />
-            <button
-              type="button"
-              className="btn join-item btn-outline btn-neutral"
-              onClick={handleAddTag}
-            >
-              Thêm
-            </button>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {tags.map((tag, idx) => (
-              <div key={idx} className="badge badge-info gap-2">
-                {tag}
-                <button
-                  type="button"
-                  className="text-xs ml-1"
-                  onClick={() => handleRemoveTag(tag)}
-                >
-                  ✕
-                </button>
-              </div>
-            ))}
-          </div>
-          <fieldset className="fieldset">
-            <legend className="fieldset-legend">Test case liên quan</legend>
-            <select
-              className="select select-neutral"
-              value={testcaseSelected}
-              onChange={(e) => setTestcaseSelected(e.target.value)}
-            >
-              <option value="">Chọn test case liên kết</option>
-              {testcaseList?.map((testcase) => (
-                <option key={testcase.id} value={testcase.id}>
-                  {testcase.name}
-                </option>
-              ))}
-            </select>
-          </fieldset>
+          </label>
+          <label className="floating-label">
+            <span className="label"></span>
+            <input
+              type="text"
+              value={handle}
+              onChange={(e) => setHandle(e.target.value)}
+            />
+          </label>
+          <label className="floating-label">
+            <span className="label"></span>
+            <input
+              type="text"
+              value={timeEnd}
+              onChange={(e) => setTimeEnd(e.target.value)}
+            />
+          </label>
+          <label className="floating-label">
+            <span className="label"></span>
+            <input
+              type="text"
+              value={occurredAt}
+              onChange={(e) => setOccurredAt(e.target.value)}
+            />
+          </label>
         </div>
         <div className="modal-action">
           <button className="btn btn-ghost" onClick={onClose}>

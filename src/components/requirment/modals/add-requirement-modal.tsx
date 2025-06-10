@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
 import { ProductDto, RequirementType } from "~/lib/types";
 
@@ -171,11 +172,10 @@ export default function AddRequirementModal({
           </label>
           <label className="floating-label sm:col-span-2">
             <span>Mô tả</span>
-            <textarea
-              className="textarea textarea-neutral w-full h-52"
+            <RichTextEditor
               placeholder="Mô tả"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={setDescription}
             />
           </label>
 

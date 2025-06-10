@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
+import RichTextEditor from "../ui/rich-text-editor";
 interface Criteria {
   id: string;
   title: string;
@@ -127,11 +128,10 @@ function CreateTaskForm({
       </fieldset>
       <fieldset className="fieldset md:col-span-2 ">
         <legend className="fieldset-legend">Mô tả</legend>
-        <textarea
-          className="textarea textarea-bordered w-full"
+        <RichTextEditor
           placeholder="Mô tả công việc"
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          onChange={setDescription}
         />
       </fieldset>
 
