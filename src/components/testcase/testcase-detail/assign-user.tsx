@@ -54,7 +54,7 @@ function AssignedUser({
         assignTo.map(({ assignInfo, code, status }) => (
           <div
             className="bg-base-100 p-3 rounded-lg border-l-4 border-info"
-            key={assignInfo.assign_name}
+            key={code}
           >
             <p>
               <strong>{assignInfo.assign_name}</strong>{" "}

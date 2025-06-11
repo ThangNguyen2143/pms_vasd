@@ -81,6 +81,7 @@ export default function ReTestBugAssignModal({
       //     .catch((err) => toast.error(err));
 
       await onUpdate();
+      toast.success("Giao việc thành công");
       onClose();
     }
   };

@@ -1,3 +1,4 @@
+import SafeHtmlViewer from "~/components/ui/safeHTMLviewer";
 import { TestcaseDetail } from "~/lib/types";
 import { format_date } from "~/utils/fomat-date";
 
@@ -47,7 +48,9 @@ function TestHistory({ testcase }: { testcase: TestcaseDetail }) {
                       </div>
                     </td>
                     <td>{run.result ? "✅ Pass" : "❌ Fail"}</td>
-                    <td>{run.tester_note || "-"}</td>
+                    <td>
+                      <SafeHtmlViewer html={run.tester_note || "-"} />
+                    </td>
                   </tr>
                 ))
               )}

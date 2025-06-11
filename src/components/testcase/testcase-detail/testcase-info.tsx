@@ -1,4 +1,10 @@
-import { CheckCircle, FileCheck, FileX, Wrench } from "lucide-react";
+import {
+  CheckCircle,
+  EqualApproximately,
+  FileCheck,
+  FileX,
+  Wrench,
+} from "lucide-react";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import SafeHtmlViewer from "~/components/ui/safeHTMLviewer";
@@ -68,7 +74,9 @@ function TestcaseInfo({
                 data-tip={"Đánh dấu đang thực hiện"}
                 onClick={() => handleStatusChange("INPROGRESS")}
               >
-                <span className="flex items-center"></span>
+                <span className="flex items-center">
+                  <EqualApproximately />
+                </span>
               </button>
               <button
                 className="btn btn-outline btn-success tooltip mr-2"

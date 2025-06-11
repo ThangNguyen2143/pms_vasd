@@ -1,14 +1,17 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-import { useApi } from "~/hooks/use-api";
-import { encodeBase64 } from "~/lib/services";
 import { ProductDto, UserDto } from "~/lib/types";
 import { Activity, Pencil } from "lucide-react";
-import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import UpdateInfoProductModal from "./update-info-product-modal";
-import ProductModuleModal from "./product-detail-modal";
+import { useApi } from "~/hooks/use-api";
+import { useEffect } from "react";
 
+interface ProductTableProps {
+  productList: ProductDto[];
+  userList: UserDto[];
+  setShowModuleDetail: (id: string) => void;
+  openEditDialog: (id: string) => void;
+  onUpdate: () => Promise<void>;
+}
 function reshapeData(data: ProductDto[] | null, userData: UserDto[] | null) {
   if (!data || !userData) {
     return [];
@@ -27,54 +30,21 @@ function reshapeData(data: ProductDto[] | null, userData: UserDto[] | null) {
   });
 }
 
-function ProductTable({ project_id }: { project_id: number }) {
-  const {
-    data: productList,
-    getData: getProduct,
-    errorData,
-  } = useApi<ProductDto[]>();
-  const { data: userList, getData: getUser } = useApi<UserDto[]>();
+function ProductTable({
+  productList,
+  userList,
+  setShowModuleDetail,
+  onUpdate,
+  openEditDialog,
+}: ProductTableProps) {
   const {
     putData,
     errorData: errorUpdateStatus,
     isLoading: activeLoading,
   } = useApi<"", { id: string; status: string }>();
-  const [selectedProduct, setSelectedProduct] = useState<ProductDto>();
-  const [isEditDialogOpen, setEditDialogOpen] = useState(false);
-  const [showModuleDetail, setShowModuleDetail] = useState<string>();
-  const endpointUser = "/user/" + encodeBase64({ type: "all" });
-  const openEditDialog = (product: ProductDto) => {
-    setSelectedProduct(product);
-    setEditDialogOpen(true);
-  };
-  const endpointProduct =
-    "/product/" + encodeBase64({ type: "all", project_id });
-  useEffect(() => {
-    getUser(endpointUser, "reload");
-  }, []);
   useEffect(() => {
     if (errorUpdateStatus) toast.error(errorUpdateStatus.message);
   }, [errorUpdateStatus]);
-  useEffect(() => {
-    if (project_id != 0) {
-      getProduct(endpointProduct, "reload");
-    }
-  }, [project_id]);
-  const onUpdate = async () => {
-    if (selectedProduct) {
-      await getProduct(endpointProduct, "reload");
-      setEditDialogOpen(false);
-      setSelectedProduct(undefined);
-    }
-  };
-  if (project_id == 0) {
-    return (
-      <div className="alert alert-warning">
-        Vui lòng chọn phần mềm để xem danh sách sản phẩm.
-      </div>
-    );
-  }
-
   const handlderClickActive = async (id_product: string) => {
     const re = await putData("/product/status", {
       id: id_product,
@@ -82,9 +52,9 @@ function ProductTable({ project_id }: { project_id: number }) {
     });
     if (re == "") {
       toast.success("Cập nhật trạng thái thành công");
-      // Reload danh sách sản phẩm sau khi cập nhật
-      await getProduct(endpointProduct, "reload");
-      // Cập nhật trạng thái của sản phẩm trong danh sách hiện tại
+      // Reload danh sách phần mềm sau khi cập nhật
+      await onUpdate();
+      // Cập nhật trạng thái của phần mềm trong danh sách hiện tại
       const updatedProduct = productList?.find(
         (product) => product.id === id_product
       );
@@ -95,15 +65,6 @@ function ProductTable({ project_id }: { project_id: number }) {
       return;
     }
   };
-
-  if (errorData && !productList) {
-    return (
-      <div className="alert alert-error">
-        <span>{errorData.message}</span>
-      </div>
-    );
-  }
-
   const dataList = reshapeData(productList, userList);
   return (
     <div className="overflow-x-auto">
@@ -112,7 +73,7 @@ function ProductTable({ project_id }: { project_id: number }) {
         <thead>
           <tr>
             <th>STT</th>
-            <th>Tên sản phẩm</th>
+            <th>Tên phần mềm</th>
             <th>Mô tả</th>
             <th>Người tạo</th>
             <th>Trạng thái</th>
@@ -140,16 +101,7 @@ function ProductTable({ project_id }: { project_id: number }) {
                   <button
                     className="btn btn-sm btn-outline btn-primary tooltip"
                     data-tip="Cập nhật phần mềm"
-                    onClick={() =>
-                      openEditDialog({
-                        id: item.id,
-                        name: item.name,
-                        description: item.description,
-                        create_by: 0,
-                        createdAt: "",
-                        status: item.status,
-                      })
-                    }
+                    onClick={() => openEditDialog(item.id)}
                   >
                     <Pencil className="w-4 h-4" />
                   </button>
@@ -181,19 +133,6 @@ function ProductTable({ project_id }: { project_id: number }) {
           })}
         </tbody>
       </table>
-      {isEditDialogOpen && selectedProduct && (
-        <UpdateInfoProductModal
-          onClose={() => setEditDialogOpen(false)}
-          onUpdate={onUpdate}
-          product={selectedProduct}
-        />
-      )}
-      {showModuleDetail && (
-        <ProductModuleModal
-          onClose={() => setShowModuleDetail(undefined)}
-          product_id={showModuleDetail}
-        />
-      )}
     </div>
   );
 }

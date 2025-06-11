@@ -9,6 +9,7 @@ import { ProductModule, TaskDTO } from "~/lib/types";
 import { EnviromentTest } from "~/lib/types/testcase";
 type CreateTestcaseData = {
   product_id: string;
+  module: string;
   info: {
     name: string;
     description: string;
@@ -35,12 +36,12 @@ function CreateTestcaseForm({
   onSuccess: () => void;
 }) {
   const [formData, setFormData] = useState<{
+    module: string;
     info: {
       name: string;
       description: string;
       environment: string;
       tags: string[];
-      module_id: string;
       result_expect: string;
       task_id?: number;
       test_data?: string;
@@ -56,12 +57,12 @@ function CreateTestcaseForm({
       expected_result: string;
     }[];
   }>({
+    module: "",
     info: {
       name: "",
       description: "",
       environment: "TEST",
       tags: [],
-      module_id: "",
       result_expect: "",
       task_id: 0,
       test_data: "",
@@ -110,7 +111,10 @@ function CreateTestcaseForm({
     }
     // if (errorGetTask && errorGetTask.code != 404)
     //   toast.error("Danh sách task:" + errorGetTask.message);
-    if (errorPost) toast.error(errorPost.message);
+    if (errorPost) {
+      console.error(errorPost);
+      toast.error(errorPost.message || errorPost.title);
+    }
   }, [errorLoadEnv, errorPost]);
   const handleSubmit = async () => {
     const data = {
@@ -123,14 +127,13 @@ function CreateTestcaseForm({
       delete data.info.test_data;
     }
     data.steps = data.steps.map((step) => {
-      const { input_data, output_data, note, ...rest } = step;
-      return {
-        ...rest,
-        input_data: input_data?.trim() || undefined,
-        output_data: output_data?.trim() || undefined,
-        note: note?.trim() || undefined,
-      };
+      const temp = step;
+      if (temp.input_data?.trim().length == 0) delete temp.input_data;
+      if (temp.output_data?.trim().length == 0) delete temp.output_data;
+      if (temp.note?.trim().length == 0) delete temp.note;
+      return temp;
     });
+    console.log(data);
     const result = await postData("/testcase", data);
     if (result !== null) {
       toast.success("Tạo testcase thành công");
@@ -141,6 +144,7 @@ function CreateTestcaseForm({
 
   const resetForm = () => {
     setFormData({
+      module: "",
       info: {
         name: "",
         description: "",
@@ -148,7 +152,6 @@ function CreateTestcaseForm({
         tags: [],
         result_expect: "",
         task_id: 0,
-        module_id: "",
         test_data: "",
       },
       steps: [
@@ -345,12 +348,12 @@ function CreateTestcaseForm({
             <label className="label">Module</label>
             <select
               className="select select-bordered w-full"
-              value={formData.info.module_id}
+              value={formData.module}
               onChange={(e) =>
-                handleInfoChange("module_id", parseInt(e.target.value))
+                setFormData((pre) => ({ ...pre, module: e.target.value }))
               }
             >
-              <option value={0}>Chọn moudle</option>
+              <option value={""}>Chọn moudle</option>
               {modules ? (
                 modules.map((module) => (
                   <option key={module.id + "-ref-module"} value={module.id}>
@@ -438,13 +441,14 @@ function CreateTestcaseForm({
                   />
                 </div>
 
-                <div className="col-span-2 row-span-2">
+                <div className="col-span-2 row-span-2 flex flex-col">
                   <label className="label">Mô tả</label>
-                  <RichTextEditor
+                  <textarea
+                    className="textarea w-full"
                     placeholder="Mô tả bước"
                     value={step.description}
-                    onChange={(des) =>
-                      handleStepChange(index, "description", des)
+                    onChange={(e) =>
+                      handleStepChange(index, "description", e.target.value)
                     }
                   />
                 </div>

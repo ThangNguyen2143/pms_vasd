@@ -34,5 +34,5 @@ export async function handleAddProduct(
       },
     };
   }
-  redirect("/products");
+  redirect("/project");
 }

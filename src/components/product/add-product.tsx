@@ -66,6 +66,12 @@ function AddProductBtn({ project_id }: { project_id: number }) {
                   {state.errors.description}
                 </div>
               )}
+              <div className="flex flex-col gap-2">
+                <div className="flex gap-2">
+                  <button className="btn btn-dash">Sao chép module</button>
+                  <button className="btn btn-primary">Thêm module</button>
+                </div>
+              </div>
               <div className="flex justify-between items-center gap-4">
                 <button
                   type="submit"

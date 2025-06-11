@@ -86,6 +86,7 @@ export default function AssignTestcaseModal({
       //     .catch((err) => toast.error(err));
 
       await onUpdate();
+      toast.success("Giao việc thành công");
       onClose();
     }
   };

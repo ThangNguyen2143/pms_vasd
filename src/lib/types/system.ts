@@ -11,6 +11,7 @@ export interface ResponseError {
   hint: string;
   message: string;
   value: string;
+  title?: string;
 }
 export type FieldDto = {
   code: string;

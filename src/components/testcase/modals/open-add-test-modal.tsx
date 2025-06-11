@@ -25,7 +25,6 @@ export default function AddTestRunModal({
   const { putData, isLoading, errorData } = useApi();
   const [formData, setFormData] = useState({
     run_at: new Date().toISOString().slice(0, 16),
-    result: "true",
     tester_note: "",
     step_results: steps.map((step) => ({
       code: step.code,
@@ -40,11 +39,14 @@ export default function AddTestRunModal({
     e.preventDefault();
 
     try {
+      const totalResult = formData.step_results.every(
+        (step) => step.result === "true"
+      );
       const payload = {
         testcase_id,
         assign_code,
         run_at: formData.run_at,
-        result: formData.result === "true",
+        result: totalResult,
         tester_note: formData.tester_note,
         step_result: formData.step_results.map((step) => ({
           code: step.code,
@@ -52,7 +54,6 @@ export default function AddTestRunModal({
           note: step.note,
         })),
       };
-
       const re = await putData("/testcase/testing/run", payload);
       if (re != "") return;
       else {
@@ -182,8 +183,6 @@ export default function AddTestRunModal({
                 placeholder="Nhập ghi chú về lần test này..."
               />
             </div>
-
-            {/* Kết quả từng bước */}
           </div>
 
           <div className="flex justify-end gap-2 mt-6">
