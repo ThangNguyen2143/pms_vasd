@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import DateTimePicker from "~/components/ui/date-time-picker";
 import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
@@ -143,14 +144,10 @@ export default function AssignTestcaseModal({
             </div>
             <div>
               <label className="block mb-1">Deadline</label>
-              <input
-                type="datetime-local"
-                className="input input-bordered w-full"
+              <DateTimePicker
                 value={assignData.dead_line}
-                onChange={(e) =>
-                  setAssignData({ ...assignData, dead_line: e.target.value })
-                }
-                required
+                onChange={(e) => setAssignData({ ...assignData, dead_line: e })}
+                className="input-neutral w-full"
               />
             </div>
             <div>

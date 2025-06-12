@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
+import DateTimePicker from "../ui/date-time-picker";
 function UpdateWork({
   display,
   work_id,
@@ -36,8 +37,7 @@ function UpdateWork({
   };
 
   const pad = (val: string | number) => String(val).padStart(2, "0");
-  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+  const handleChange = async (value: string) => {
     const re = await putData("/work/time", {
       work_id: work_id,
       update_time: value,
@@ -52,12 +52,11 @@ function UpdateWork({
 
   return (
     <div className="flex flex-col gap-4">
-      <input
-        type="datetime-local"
-        id={work_id + "update"}
-        className="input"
+      <DateTimePicker
         value={date || display || ""}
+        placeholder="Chưa cập nhật"
         onChange={handleChange}
+        className="w-full"
       />
     </div>
   );

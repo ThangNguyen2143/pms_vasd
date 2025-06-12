@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import RichTextEditor from "../ui/rich-text-editor";
+import DateTimePicker from "../ui/date-time-picker";
 interface Criteria {
   id: string;
   title: string;
@@ -119,11 +120,10 @@ function CreateTaskForm({
       </fieldset>
       <fieldset className="fieldset">
         <legend className="fieldset-legend">Deadline</legend>
-        <input
-          className="input input-bordered w-full"
-          type="datetime-local"
+        <DateTimePicker
           value={deadline}
-          onChange={(e) => setDeadline(e.target.value)}
+          onChange={setDeadline}
+          className="input-neutral w-full"
         />
       </fieldset>
       <fieldset className="fieldset md:col-span-2 ">

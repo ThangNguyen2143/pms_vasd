@@ -67,17 +67,19 @@ function TestcaseInfo({
               </span>
             </button>
           )}
+          {testcase.status === "READY" && (
+            <button
+              className="btn btn-outline btn-accent tooltip mr-2"
+              data-tip={"Đánh dấu đang thực hiện"}
+              onClick={() => handleStatusChange("INPROGRESS")}
+            >
+              <span className="flex items-center">
+                <EqualApproximately />
+              </span>
+            </button>
+          )}
           {testcase.status === "INPROGRESS" && (
             <>
-              <button
-                className="btn btn-outline btn-accent tooltip mr-2"
-                data-tip={"Đánh dấu đang thực hiện"}
-                onClick={() => handleStatusChange("INPROGRESS")}
-              >
-                <span className="flex items-center">
-                  <EqualApproximately />
-                </span>
-              </button>
               <button
                 className="btn btn-outline btn-success tooltip mr-2"
                 data-tip={"Đánh dấu đã kiểm tra"}
@@ -127,7 +129,8 @@ function TestcaseInfo({
 
       <div className="space-y-3">
         <p>
-          <strong>Tên:</strong> {testcase.name}
+          <strong>Tên:</strong> {testcase.name}{" "}
+          <span className="badge">{testcase.status}</span>
         </p>
         <div>
           <strong>Mô tả:</strong> <SafeHtmlViewer html={testcase.description} />

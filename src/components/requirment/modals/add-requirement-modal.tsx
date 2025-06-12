@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import DateTimePicker from "~/components/ui/date-time-picker";
 import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
 import { ProductDto, RequirementType } from "~/lib/types";
@@ -181,12 +182,11 @@ export default function AddRequirementModal({
 
           <label className="floating-label">
             <span>Ngày ghi nhận</span>
-            <input
-              type="datetime-local"
-              className="input input-neutral w-full"
-              placeholder="Ngày ghi nhận"
+            <DateTimePicker
               value={dateReceive}
-              onChange={(e) => setDateReceive(e.target.value)}
+              onChange={setDateReceive}
+              placeholder="Ngày ghi nhận"
+              className="input-neutral w-full"
             />
           </label>
           <div>

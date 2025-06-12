@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
+import DateTimePicker from "~/components/ui/date-time-picker";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { Contact, ProjectMember } from "~/lib/types";
@@ -123,12 +124,10 @@ export default function ReTestBugAssignModal({
         </fieldset>
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Deadline</legend>
-          <input
-            type="datetime-local"
+          <DateTimePicker
             value={deadline}
-            className="input"
-            id=""
-            onChange={(e) => setDeadline(e.target.value)}
+            onChange={setDeadline}
+            className="input-neutral w-full"
           />
         </fieldset>
         <div className="modal-action">

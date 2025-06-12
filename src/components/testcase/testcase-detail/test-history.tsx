@@ -10,7 +10,7 @@ function TestHistory({ testcase }: { testcase: TestcaseDetail }) {
       </h2>
 
       {testcase.testCaseAssigns.length > 0 ? (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto max-h-96 overflow-y-auto">
           <table className="table w-full">
             <thead>
               <tr>

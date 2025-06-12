@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
+import DateTimePicker from "../ui/date-time-picker";
 function UpdateDeadline({
   display,
   work_id,
@@ -36,8 +37,7 @@ function UpdateDeadline({
   };
 
   const pad = (val: string | number) => String(val).padStart(2, "0");
-  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+  const handleChange = async (value: string) => {
     const re = await putData("/work/time", {
       work_id: work_id,
       deadline: value,
@@ -52,12 +52,10 @@ function UpdateDeadline({
 
   return (
     <div className="flex flex-col gap-4">
-      <input
-        type="datetime-local"
-        id={work_id + "deadline"}
-        className="input"
+      <DateTimePicker
         value={date || display || ""}
         onChange={handleChange}
+        className="input-neutral w-full"
       />
     </div>
   );

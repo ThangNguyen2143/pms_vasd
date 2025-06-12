@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import DateTimePicker from "~/components/ui/date-time-picker";
 import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
 interface AddPhaseData {
@@ -97,27 +98,19 @@ function AddPhaseProjectModal({
         </fieldset>
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Thời gian bắt đầu</legend>
-          <input
-            type="datetime-local"
-            className="input w-full validator"
-            placeholder="Chọn thời gian bắt đầu"
+          <DateTimePicker
             value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            required
+            onChange={setStartDate}
+            className="w-full"
           />
-          <p className="validator-hint">Thời gian bắt đầu không được trống</p>
         </fieldset>
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Thời gian kết thúc</legend>
-          <input
-            type="datetime-local"
-            className="input w-full validator"
-            placeholder="Chọn thời gian kết thúc"
+          <DateTimePicker
             value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            required
+            onChange={setEndDate}
+            className="w-full"
           />
-          <p className="validator-hint">Thời gian kết thúc không được trống</p>
         </fieldset>
         <label className="join w-full">
           <span className="join-item border w-1/5 flex justify-center items-center border-blue-200">

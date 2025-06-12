@@ -2,6 +2,7 @@
 import { Plus, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
+import DateTimePicker from "~/components/ui/date-time-picker";
 import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
 import { DataRating, Task } from "~/lib/types";
@@ -118,11 +119,10 @@ export default function UpdateInfoTaskModal({
           </fieldset>
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Deadline</legend>
-            <input
-              className="input input-bordered"
-              type="datetime-local"
+            <DateTimePicker
               value={deadline}
-              onChange={(e) => setDeadline(e.target.value)}
+              onChange={setDeadline}
+              className="input-neutral w-full"
             />
           </fieldset>
         </div>

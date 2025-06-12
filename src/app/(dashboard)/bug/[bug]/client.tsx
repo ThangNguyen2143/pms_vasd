@@ -17,6 +17,7 @@ import AddFileAttachmentModal from "~/components/bugs/modal/add-file-attachment"
 import AssignBugModal from "~/components/bugs/modal/assign-bug-modal";
 import ReTestBugAssignModal from "~/components/bugs/modal/re-test-assign";
 import LinkTaskOrTestToBugModal from "~/components/bugs/modal/ref-update-modal";
+import UpdateBugModal from "~/components/bugs/modal/edit-info-bug";
 
 function BugDetailClient({
   bug_id,
@@ -26,7 +27,7 @@ function BugDetailClient({
   product_id: string;
 }) {
   const [retestAssign, setRetestAssign] = useState(false);
-  const [, setShowUpdateModal] = useState(false);
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showLinkModal, setShowLinkModal] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [showAddFile, setShowAddFile] = useState(false);
@@ -149,6 +150,13 @@ function BugDetailClient({
           bug_id={bug_id}
           product_id={product_id}
           onClose={() => setRetestAssign(false)}
+          onUpdate={reloadDataBug}
+        />
+      )}
+      {showUpdateModal && (
+        <UpdateBugModal
+          bug={bugData}
+          onClose={() => setShowUpdateModal(false)}
           onUpdate={reloadDataBug}
         />
       )}

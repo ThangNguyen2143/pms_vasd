@@ -8,6 +8,7 @@ import { encodeBase64 } from "~/lib/services";
 import { useApi } from "~/hooks/use-api";
 import { Priority, WorkShareDto, WorkStatus, WorkType } from "~/lib/types";
 import { useUser } from "~/providers/user-context";
+import OverviewWork from "./orverview-work";
 
 function MainWork() {
   const { user } = useUser();
@@ -93,13 +94,41 @@ function MainWork() {
           {errorWorkList.message}
         </div>
       ) : projectSelected != 0 ? (
-        <TableWork
-          workList={workList || []}
-          priorityList={priorityList}
-          statusList={statusList}
-          isGuess={isGuess}
-          onUpdate={() => fetchData()}
-        />
+        <div className="relative shadow-md sm:rounded-lg">
+          <div className="tabs tabs-lift">
+            <input
+              type="radio"
+              name="tab_swap"
+              className="tab"
+              defaultChecked
+              id="overview"
+              aria-label="Tổng quan"
+            />
+            <div className="tab-content">
+              <OverviewWork
+                priorityList={priorityList}
+                statusList={statusList}
+                dataRaw={workList}
+              />
+            </div>
+            <input
+              type="radio"
+              name="tab_swap"
+              id="detail"
+              aria-label="Danh sách"
+              className="tab"
+            />
+            <div className="tab-content">
+              <TableWork
+                workList={workList || []}
+                priorityList={priorityList}
+                statusList={statusList}
+                isGuess={isGuess}
+                onUpdate={() => fetchData()}
+              />
+            </div>
+          </div>
+        </div>
       ) : (
         <div className="flex justify-center items-center h-screen">
           Chưa dự án nào được chọn

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import DateTimePicker from "~/components/ui/date-time-picker";
 import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
 import { ProjectTimeLine } from "~/lib/types";
@@ -33,7 +34,9 @@ export default function CreateTimelineForm({
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [weight, setWeight] = useState(1);
-  const [tags, setTags] = useState<string[]>([]);
+  // const [tags, setTags] = useState<string[]>([]);
+  const [tagsChoose, setTagsChoose] = useState<string[]>([]);
+  const [newTag, setNewTag] = useState<string>("");
   const [parent, setParent] = useState<number>();
   const { postData, errorData, isLoading } = useApi<
     string,
@@ -53,7 +56,7 @@ export default function CreateTimelineForm({
       end_date: endDate,
       parent_id: parent && parent > 0 ? parent : undefined,
       weight,
-      tags,
+      tags: tagsChoose.length > 0 ? tagsChoose : [],
     };
     const re = await postData("/project/timeline", timelineData);
     if (re != "") return;
@@ -65,9 +68,18 @@ export default function CreateTimelineForm({
     setEndDate("");
     setWeight(1);
     setParent(0);
-    setTags([]);
+    setTagsChoose([]);
+  };
+  const handleAddTag = () => {
+    if (newTag.trim() && !tagsChoose.includes(newTag)) {
+      setTagsChoose((prev) => [...prev, newTag.trim()]);
+      setNewTag("");
+    }
   };
 
+  const handleRemoveTag = (tagToRemove: string) => {
+    setTagsChoose(tagsChoose.filter((tag) => tag !== tagToRemove));
+  };
   return (
     <div className="p-4 border border-dashed rounded-md bg-base-200 mb-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -112,35 +124,61 @@ export default function CreateTimelineForm({
 
         <label className="floating-label">
           <span className="label">Ngày bắt đầu</span>
-          <input
-            type="datetime-local"
-            className="input input-bordered w-full"
+          <DateTimePicker
             value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
+            placeholder="Chọn ngày bắt đầu"
+            onChange={setStartDate}
+            className="w-full"
           />
         </label>
         <label className="floating-label">
           <span className="label">Ngày kết thúc</span>
-          <input
-            type="datetime-local"
-            className="input input-bordered w-full"
-            placeholder="Ngày kết thúc"
+          <DateTimePicker
             value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
+            onChange={setEndDate}
+            placeholder="Chọn ngày kết thúc"
+            className="input-neutral w-full"
           />
         </label>
 
-        <label className="floating-label">
-          <span className="label">Tags</span>
-          <input
-            type="text"
-            placeholder="Nhãn (cách nhau bởi dấu phẩy)"
-            className="input input-bordered w-full"
-            onChange={(e) =>
-              setTags(e.target.value.split(",").map((tag) => tag.trim()))
-            }
-          />
-        </label>
+        <div>
+          <label className="join w-full">
+            <span className="join-item border w-1/5 flex justify-center items-center border-blue-200">
+              Tags
+            </span>
+            <input
+              type="text"
+              value={newTag}
+              className="join-item input"
+              onChange={(e) => setNewTag(e.target.value)}
+              onKeyUp={(e) => {
+                if (e.key == "Enter") handleAddTag();
+              }}
+              placeholder="Nhập thẻ và nhấn nút Thêm"
+            />
+            <button
+              type="button"
+              className="btn btn-outline join-item"
+              onClick={handleAddTag}
+            >
+              Thêm
+            </button>
+          </label>
+          <div className="flex gap-2 flex-wrap mt-2">
+            {tagsChoose.map((tag, index) => (
+              <div key={index} className="badge badge-info gap-2">
+                {tag}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveTag(tag)}
+                  className="ml-1 text-xs"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
         <label className="floating-label">
           <span className="label">Phụ thuộc</span>
           <select

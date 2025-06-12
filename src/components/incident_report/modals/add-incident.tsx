@@ -192,6 +192,7 @@ export default function AddIncidentModal({
               <span className="label">Thời gian xảy ra</span>
               <DateTimePicker
                 value={occurredAt}
+                placeholder="Thời gian xảy ra"
                 onChange={setOccurredAt}
                 className="input-neutral w-full"
               />
@@ -200,6 +201,7 @@ export default function AddIncidentModal({
               <span className="label">Thời gian hoàn thành</span>
               <DateTimePicker
                 value={timeEnd}
+                placeholder="Thời gian hoàn thành"
                 onChange={setTimeEnd}
                 className="input-neutral w-full"
               />

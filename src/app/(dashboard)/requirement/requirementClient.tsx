@@ -21,6 +21,7 @@ import AddRequirementModal from "~/components/requirment/modals/add-requirement-
 import { format_date, toISOString } from "~/utils/fomat-date";
 import { startOfDay, subDays } from "date-fns";
 import { toast } from "sonner";
+import DateTimePicker from "~/components/ui/date-time-picker";
 
 function ContructionTable({ children }: { children: ReactNode }) {
   return (
@@ -132,9 +133,8 @@ function RequirementsClient() {
   }, [projectSelect]);
   useEffect(() => {
     if (projectSelect !== 0) {
-      const from = fromDate;
-      const to = toDate;
-      console.log(from, to);
+      const from = toISOString(fromDate);
+      const to = toISOString(toDate);
       let endpoint =
         "/requirements/" +
         encodeBase64({ type: "project", project_id: projectSelect, from, to });
@@ -156,8 +156,8 @@ function RequirementsClient() {
     }
   }, [projectSelect, productSelect, fromDate, toDate]);
   const onLoadRequire = async () => {
-    const from = fromDate.slice(0, 19).replace("T", " ");
-    const to = toDate.slice(0, 19).replace("T", " ");
+    const from = fromDate;
+    const to = toDate;
     let endpoint =
       "/requirements/" +
       encodeBase64({ type: "project", project_id: projectSelect, from, to });
@@ -185,7 +185,7 @@ function RequirementsClient() {
         <span className="loading loading-dots loading-xl"></span>
       ) : (
         <div className="flex justify-between shadow w-full">
-          <div className="flex-1 gap-2">
+          <div className="flex flex-1 gap-2">
             <select
               name="project"
               className="select"
@@ -220,24 +220,22 @@ function RequirementsClient() {
                 ))}
               </select>
             )}
-            <label className="input">
+            <div className="flex">
               <span className="label">Từ</span>
-              <input
-                type="datetime-local"
-                name="from"
+              <DateTimePicker
                 value={fromDate}
-                onChange={(e) => setFromDate(toISOString(e.target.value))}
+                onChange={setFromDate}
+                className="w-full"
               />
-            </label>
-            <label className="input">
+            </div>
+            <div className="flex">
               <span className="label">Đến</span>
-              <input
-                type="datetime-local"
-                name={"to"}
+              <DateTimePicker
                 value={toDate}
-                onChange={(e) => settoDate(toISOString(e.target.value))}
+                onChange={settoDate}
+                className="w-full"
               />
-            </label>
+            </div>
           </div>
           <div className="join">
             <input
