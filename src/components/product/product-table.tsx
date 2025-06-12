@@ -92,9 +92,24 @@ function ProductTable({
                   {item.status == "active" ? (
                     <span className="badge badge-info">Đang hoạt động</span>
                   ) : (
-                    <span className="badge badge-outline badge-secondary">
-                      Nháp
-                    </span>
+                    <div>
+                      <span className="badge badge-outline badge-secondary">
+                        {" "}
+                        Nháp
+                      </span>{" "}
+                      <div
+                        className="tooltip"
+                        data-tip="Chuyển trạng thái hoạt động"
+                      >
+                        <button
+                          className="btn btn-outline btn-sm btn-secondary"
+                          onClick={() => handlderClickActive(item.id)}
+                          disabled={activeLoading}
+                        >
+                          <Activity />
+                        </button>
+                      </div>
+                    </div>
                   )}
                 </td>
                 <td className="flex gap-1 justify-center items-center">
@@ -113,20 +128,6 @@ function ProductTable({
                   >
                     Module
                   </button>
-                  {item.status != "active" && (
-                    <div
-                      className="tooltip"
-                      data-tip="Chuyển trạng thái hoạt động"
-                    >
-                      <button
-                        className="btn btn-outline btn-sm btn-secondary"
-                        onClick={() => handlderClickActive(item.id)}
-                        disabled={activeLoading}
-                      >
-                        <Activity />
-                      </button>
-                    </div>
-                  )}
                 </td>
               </tr>
             );

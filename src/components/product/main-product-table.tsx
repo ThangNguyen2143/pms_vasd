@@ -13,6 +13,7 @@ function MainProductTable({ project_id }: { project_id: number }) {
   const {
     data: productList,
     getData: getProduct,
+    isLoading,
     errorData,
   } = useApi<ProductDto[]>();
   const { data: userList, getData: getUser } = useApi<UserDto[]>();
@@ -60,21 +61,30 @@ function MainProductTable({ project_id }: { project_id: number }) {
     );
   }
   return (
-    <div className="flex flex-col gap-4 p-6 max-w-7xl mx-auto">
+    <div className="flex flex-col gap-4 max-w-7xl mx-auto">
       <div className="flex justify-between gap-2">
         <h2 className="text-2xl font-bold">Danh sách phần mềm</h2>
         {/* <LitsProject project_id={projectId} setProjectId={setprojectId} /> */}
-        <AddProductBtn project_id={project_id} />
+        <AddProductBtn
+          project_id={project_id}
+          onUpdate={async () => {
+            await getUser(endpointUser, "reload");
+          }}
+        />
       </div>
-      <ProductTable
-        onUpdate={async () => {
-          await getUser(endpointUser, "reload");
-        }}
-        openEditDialog={(id) => openEditDialog(id)}
-        productList={productList || []}
-        setShowModuleDetail={(id) => setShowModuleDetail(id)}
-        userList={userList || []}
-      />
+      {isLoading ? (
+        <span className="loading loading-infinity" />
+      ) : (
+        <ProductTable
+          onUpdate={async () => {
+            await getUser(endpointUser, "reload");
+          }}
+          openEditDialog={(id) => openEditDialog(id)}
+          productList={productList || []}
+          setShowModuleDetail={(id) => setShowModuleDetail(id)}
+          userList={userList || []}
+        />
+      )}
       {isEditDialogOpen && selectedProduct && (
         <UpdateInfoProductModal
           onClose={() => setEditDialogOpen(false)}

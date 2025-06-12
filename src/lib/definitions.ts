@@ -108,6 +108,12 @@ export const CreateProductSchema = z.object({
   project_id: z.number(),
   name: z.string().trim().min(1, "Tên sản phẩm không được để trống"),
   description: z.string().trim().min(1, "Mô tả không được để trống"),
+  productModules: z.array(
+    z.object({
+      code: z.string(),
+      display: z.string(),
+    })
+  ),
 });
 export type CreateProductState =
   | {
