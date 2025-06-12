@@ -1,5 +1,5 @@
 "use client";
-import { Download, Paperclip, X } from "lucide-react";
+import { Download, ExternalLink, Paperclip, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
@@ -82,13 +82,13 @@ export default function Attachments({
                   >
                     <Download></Download>
                   </span>
-                  {/* <span
+                  <span
                     className="link text-blue-500 btn btn-ghost tooltip"
                     data-tip={"Mở file"}
                     onClick={() => handleDownfile(f.file_id, "open")}
                   >
                     <ExternalLink />
-                  </span> */}
+                  </span>
                   <span
                     className="btn btn-ghost text-error tooltip"
                     data-tip="Xóa tệp"

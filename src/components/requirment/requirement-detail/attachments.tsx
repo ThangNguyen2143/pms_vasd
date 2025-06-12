@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Download, Paperclip, X } from "lucide-react";
+import { Download, ExternalLink, Paperclip, X } from "lucide-react";
 import {
   downloadGzipBase64File,
   openGzipBase64FileInNewTab,
@@ -85,13 +85,13 @@ export default function Attachments({
                   >
                     <Download></Download>
                   </span>
-                  {/* <span
+                  <span
                     className="btn btn-circle text-blue-500 tooltip"
                     data-tip="Mở trong tab mới"
                     onClick={() => handleDownfile(f.file_id, "open")}
                   >
                     <ExternalLink />
-                  </span> */}
+                  </span>
                   <span
                     className="btn btn-circle text-red-500 tooltip"
                     data-tip="Xóa tài liệu"

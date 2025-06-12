@@ -141,39 +141,38 @@ export async function openGzipBase64FileInNewTab({
   contentType?: string;
   fileData: string;
 }) {
-  // Xác định loại nội dung dựa trên phần mở rộng tệp nếu contentType không được cung cấp
   const actualContentType = contentType || getContentTypeFromFileName(fileName);
+  const isGzipped =
+    fileName.endsWith(".gz") || actualContentType === "application/gzip";
 
-  // Xử lý hình ảnh (không phải gzip)
-  if (
-    !actualContentType.includes("application/gzip") &&
-    (actualContentType.startsWith("image/") ||
-      actualContentType == "application/pdf")
-  ) {
-    const base64Data = `data:${actualContentType};base64,${fileData}`;
-    const newWindow = window.open("", "_blank");
-    if (newWindow) {
-      newWindow.document.write(`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>${fileName.replace(/\.gz$/, "")}</title>
-            <style>
-              body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f0f0f0; }
-              img { max-width: 100%; max-height: 100%; object-fit: contain; }
-            </style>
-          </head>
-          <body>
-            <img src="${base64Data}" alt="${fileName}" />
-          </body>
-        </html>
-      `);
-      newWindow.document.close();
+  let rawBlob: Blob;
+  let finalContentType = actualContentType;
+
+  if (isGzipped) {
+    // Giải nén gzip
+    const byteCharacters = atob(fileData);
+    const byteArray = new Uint8Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteArray[i] = byteCharacters.charCodeAt(i);
     }
-    return;
-  }
-  if (contentType !== "application/gzip") {
-    // Nếu không phải gzip thì tạo blob và mở tab
+
+    if (!("DecompressionStream" in window)) {
+      throw new Error("Trình duyệt không hỗ trợ DecompressionStream");
+    }
+
+    const decompressedResponse = new Response(
+      new Blob([byteArray])
+        .stream()
+        .pipeThrough(new DecompressionStream("gzip"))
+    );
+
+    rawBlob = await decompressedResponse.blob();
+
+    // Đoán lại loại file nếu contentType chưa rõ
+    const cleanName = fileName.replace(/\.gz$/, "");
+    finalContentType = getContentTypeFromFileName(cleanName);
+  } else {
+    // Nếu không gzip, decode base64
     const byteCharacters = atob(fileData);
     const byteArrays = [];
 
@@ -185,38 +184,36 @@ export async function openGzipBase64FileInNewTab({
       byteArrays.push(new Uint8Array(byteNumbers));
     }
 
-    const blob = new Blob(byteArrays, {
-      type: contentType || "application/octet-stream",
+    rawBlob = new Blob(byteArrays, {
+      type: actualContentType || "application/octet-stream",
     });
-    const cleanName = fileName.replace(/\.gz$/, ""); // ✅ Loại bỏ đuôi .gz
-    const url = URL.createObjectURL(blob);
-    const newWindow = window.open(url, "_blank");
+  }
 
-    // Xử lý tiêu đề tab nếu mở được
-    if (newWindow && fileName) {
-      newWindow.document.title = cleanName;
-    }
-  } else {
-    // Nếu là gzip → giải nén và mở nội dung
-    const byteCharacters = atob(fileData);
-    const byteArray = new Uint8Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteArray[i] = byteCharacters.charCodeAt(i);
-    }
+  const url = URL.createObjectURL(rawBlob);
 
-    if (!("DecompressionStream" in window)) {
-      throw new Error("Trình duyệt không hỗ trợ DecompressionStream");
-    }
-
-    const decompressedStream = new Response(
-      new Blob([byteArray])
-        .stream()
-        .pipeThrough(new DecompressionStream("gzip"))
-    );
-
-    const blob = await decompressedStream.blob();
-    const url = URL.createObjectURL(blob);
-    window.open(url, "_blank");
-    URL.revokeObjectURL(url);
+  // Hiển thị dạng iframe với PDF và ảnh
+  const newWindow = window.open("", "_blank");
+  if (newWindow) {
+    newWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>${fileName.replace(/\.gz$/, "")}</title>
+          <style>
+            body { margin: 0; height: 100vh; display: flex; justify-content: center; align-items: center; background: #f3f4f6; }
+            iframe { border: none; width: 100%; height: 100%; }
+            img { max-width: 100%; max-height: 100%; }
+          </style>
+        </head>
+        <body>
+          ${
+            finalContentType.startsWith("image/")
+              ? `<img src="${url}" alt="${fileName}" />`
+              : `<iframe src="${url}" title="${fileName}"></iframe>`
+          }
+        </body>
+      </html>
+    `);
+    newWindow.document.close();
   }
 }

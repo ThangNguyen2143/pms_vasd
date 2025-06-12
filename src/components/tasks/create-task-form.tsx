@@ -7,6 +7,7 @@ import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import RichTextEditor from "../ui/rich-text-editor";
 import DateTimePicker from "../ui/date-time-picker";
+import { ProductModule } from "~/lib/types";
 interface Criteria {
   id: string;
   title: string;
@@ -17,6 +18,7 @@ interface DataPost {
   title: string;
   description: string;
   dead_line: string;
+  module: string;
   requirement_id?: number;
   acceptances?: { title: string; type: string }[];
 }
@@ -38,6 +40,8 @@ function CreateTaskForm({
     },
   ]);
   const [selectedRequirement, setSelectedRequirement] = useState<number>(0);
+  const [selectModule, setSelectModule] = useState<string>("");
+  const { getData: getModule, data: modules } = useApi<ProductModule[]>();
   const { data: requireds, getData: getRequiredList } =
     useApi<{ id: number; title: string }[]>();
   const { postData, isLoading, errorData: postError } = useApi<"">();
@@ -51,6 +55,7 @@ function CreateTaskForm({
   }, []);
   useEffect(() => {
     getRequiredList("/requirements/list/" + encodeBase64({ product_id }));
+    getModule("/product/" + encodeBase64({ type: "module", product_id }));
   }, [product_id]);
   useEffect(() => {
     if (postError) toast.error(postError.message);
@@ -60,6 +65,7 @@ function CreateTaskForm({
       product_id,
       title,
       description,
+      module: selectModule,
       dead_line: deadline,
       requirement_id: selectedRequirement,
       acceptances: criteriaList.map((crit) => ({
@@ -135,7 +141,7 @@ function CreateTaskForm({
         />
       </fieldset>
 
-      <fieldset className="fieldset">
+      <fieldset className="fieldset row-span-2">
         <legend className="fieldset-legend">
           <span>Tiêu chí chấp thuận</span>{" "}
           <span onClick={() => addCriteria()} className="btn">
@@ -187,22 +193,44 @@ function CreateTaskForm({
           ))}
         </div>
       </fieldset>
-      <fieldset className="fieldset">
-        <legend className="fieldset-legend">Liên kết yêu cầu</legend>
-        <select
-          className="select"
-          value={selectedRequirement}
-          onChange={(e) => setSelectedRequirement(parseInt(e.target.value))}
-        >
-          <option value={0}>Chọn yêu cầu</option>
-          {requireds &&
-            requireds.map((req) => (
-              <option key={req.id} value={req.id}>
-                {req.title}
-              </option>
-            ))}
-        </select>
-      </fieldset>
+      <div className="row-span-2">
+        <fieldset className="fieldset">
+          <legend className="fieldset-legend">Module</legend>
+          <select
+            className="select select-bordered w-full"
+            value={selectModule}
+            onChange={(e) => setSelectModule(e.target.value)}
+          >
+            <option value={""}>Chọn moudle</option>
+            {modules ? (
+              modules.map((module) => (
+                <option key={module.id + "-ref-module"} value={module.id}>
+                  {module.display}
+                </option>
+              ))
+            ) : (
+              <option>Không có module nào</option>
+            )}
+          </select>
+        </fieldset>
+        <fieldset className="fieldset">
+          <legend className="fieldset-legend">Liên kết yêu cầu</legend>
+          <select
+            className="select"
+            value={selectedRequirement}
+            onChange={(e) => setSelectedRequirement(parseInt(e.target.value))}
+          >
+            <option value={0}>Chọn yêu cầu</option>
+            {requireds &&
+              requireds.map((req) => (
+                <option key={req.id} value={req.id}>
+                  {req.title}
+                </option>
+              ))}
+          </select>
+        </fieldset>
+      </div>
+
       <div className="flex justify-between md:col-span-2">
         <button
           className="btn btn-primary"

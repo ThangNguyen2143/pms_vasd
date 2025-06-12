@@ -66,11 +66,8 @@ export default function ReTestList({
       {retests.length > 0 ? (
         <ul className="list-disc list-inside list">
           {retests.map((r) => (
-            <>
-              <li
-                key={r.code + "Retest" + r.create_at}
-                className="list-row p-2"
-              >
+            <div key={r.code + "Retest" + r.create_at}>
+              <li className="list-row p-2">
                 <div className="flex flex-col">
                   <div className="text-sm text-gray-600">{r.assignToName}</div>
                   <div>Hạn chót: {format_date(r.deadline)}</div>
@@ -163,7 +160,7 @@ export default function ReTestList({
                   </div>
                 </div>
               )}
-            </>
+            </div>
           ))}
         </ul>
       ) : (

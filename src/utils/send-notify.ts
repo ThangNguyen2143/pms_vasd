@@ -20,12 +20,12 @@ const bodyEmailHtml = (
     <title>Email Notify</title>
   </head>
   <body>
-    <div style='text-align:center;'>
-      <img src='https://pms-ui-vasd.vercel.app/icon.png?a939bbf917091023' alt='VASD' style='max-width:100%;height:auto;'>
+    <div style='display:flex; justify-conten:center;text-align:center;'>
+      <img src='https://pms-ui-vasd.vercel.app/icon.png?a939bbf917091023' alt='VASD' style='width:80px;height:80px;'>
       <h2>${action}</h2>
     </div>
     <p>Có cập nhật mới:</p>
-    <h1 style='letter-spacing: 5px; font-size: 24px;'>${type} id [${id}]: ${name}</h1>
+    <h1 style='font-size: 24px;'>${type} id [${id}]: ${name}</h1>
     <p>${content}</p>
     <div style='text-align: center; margin: 20px 0;'>
       <a href='${link}'style='display: inline-block; padding: 10px 20px; background-color: #1eeafd; color: #ffeeee; text-decoration: none; border-radius: 6px; font-weight: bold; font-family: sans-serif;'>
