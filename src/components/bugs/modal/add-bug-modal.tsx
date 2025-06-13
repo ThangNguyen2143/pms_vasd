@@ -60,11 +60,12 @@ export default function AddBugModal({
     getTestCase("/testcase/" + encodeBase64({ product_id }), "reload");
   }, [product_id]);
   useEffect(() => {
-    if (errorData) toast.error(errorData.message);
+    if (errorData) toast.error(errorData.message || errorData.title);
   }, [errorData]);
   if (!severityList || !priorityList) {
-    if (errorSeverity) toast.error(errorSeverity.message);
-    if (errorType) toast.error(errorType.message);
+    if (errorSeverity)
+      toast.error(errorSeverity.message || errorSeverity.title);
+    if (errorType) toast.error(errorType.message || errorType.title);
     return (
       <div className="modal modal-open">
         <div className="modal-box">
@@ -113,14 +114,14 @@ export default function AddBugModal({
 
   return (
     <div className="modal modal-open ">
-      <div className="modal-box w-96">
+      <div className="modal-box max-w-xl w-full">
         <h3 className="font-bold text-lg pb-2">Báo bug mới</h3>
         <div className="flex flex-col gap-2 px-4">
           <label className="floating-label">
             <span>Tiêu đề</span>
             <input
               type="text"
-              className="input input-neutral"
+              className="input input-neutral w-full"
               placeholder="Tiêu đề"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -137,7 +138,7 @@ export default function AddBugModal({
           <label className="floating-label">
             <span>Mức độ ưu tiên</span>
             <select
-              className="select select-neutral"
+              className="select select-neutral w-full"
               value={prioritySelected}
               onChange={(e) => setPrioritySelected(e.target.value)}
             >
@@ -154,7 +155,7 @@ export default function AddBugModal({
           <label className="floating-label">
             <span>Mức độ nghiêm trọng</span>
             <select
-              className="select select-neutral"
+              className="select select-neutral w-full"
               value={severitySelect}
               onChange={(e) => setSeveritySelected(e.target.value)}
             >
@@ -172,7 +173,7 @@ export default function AddBugModal({
           <div className="join w-full">
             <input
               type="text"
-              className="input join-item input-neutral"
+              className="input join-item input-neutral w-full"
               value={newTag}
               onChange={(e) => setNewTag(e.target.value)}
               onKeyUp={(e) => {

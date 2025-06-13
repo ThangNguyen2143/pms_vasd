@@ -36,7 +36,8 @@ function ClientIncidentPage() {
       getDetailIncident(endpointIncidentDetail(showIncidentDetail), "reload");
   }, [showIncidentDetail]);
   useEffect(() => {
-    if (errorGetDetail) toast.error(errorGetDetail.message);
+    if (errorGetDetail)
+      toast.error(errorGetDetail.message || errorGetDetail.title);
   }, [errorGetDetail]);
   const reloadDetailData = async (id: number) => {
     await getDetailIncident(endpointIncidentDetail(id), "reload");

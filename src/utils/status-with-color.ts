@@ -4,31 +4,26 @@ export const status_with_color = (status: string) => {
     case "COMPLETED":
       return "success";
     case "NEW":
+    case "DRAFT":
       return "secondary";
     case "CANCELED":
+    case "READY":
+    case "RESOLVED":
       return "neutral";
     case "FAILED":
     case "REJECTED":
       return "error";
     case "INPROGRESS":
     case "IN_PROGRESS":
+    case "PASSED":
       return "info";
     case "WAITING_REVIEW":
     case "ASSIGNED":
+    case "CONFIRMED":
       return "accent";
     case "ON_HOLD":
       return "warning";
     default:
-      return "ghost";
+      return "base-200";
   }
 };
-// [
-//   {
-//     code: "WAITING_REVIEW",
-//     display: "Chờ đánh giá",
-//   },
-//   {
-//     code: "ON_HOLD",
-//     display: "Tạm dừng",
-//   },
-// ];

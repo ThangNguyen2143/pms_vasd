@@ -66,7 +66,9 @@ export default function RequirementDetailClient({
       "default"
     );
   }, []);
-  if (errorNote) if (errorNote.code != 404) toast.error(errorNote.message);
+  if (errorNote)
+    if (errorNote.code != 404)
+      toast.error(errorNote.message || errorNote.title);
   if (!requirement) {
     if (errorRequired)
       if (errorRequired.code == 404) notFound();

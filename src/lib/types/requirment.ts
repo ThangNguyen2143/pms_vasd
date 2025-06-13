@@ -45,7 +45,8 @@ export type RequirementCritreia = {
   title: string;
   description: string;
   weight: number;
-  scale: RatingRequired[];
+  scale?: RatingRequired[];
+  is_active?: boolean;
 };
 export type RatingRequired = {
   code: string;

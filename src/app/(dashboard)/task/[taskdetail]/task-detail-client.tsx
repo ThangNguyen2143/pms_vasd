@@ -85,7 +85,7 @@ export default function TaskDetailClient({
       if (errorComment.code == 404) {
         setComments([]);
       } else {
-        toast.error(errorComment.message);
+        toast.error(errorComment.message || errorComment.title);
       }
     }
   }, [errorComment]);

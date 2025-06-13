@@ -58,6 +58,7 @@ export default function AssignTestcaseModal({
 
   const handleSubmit = async () => {
     const re = await postData("/testcase/assign", assignData);
+    console.log(re);
     if (!re) return;
     else {
       const email = re.contact.find((ct) => ct.code == "email")?.value;
@@ -93,25 +94,15 @@ export default function AssignTestcaseModal({
   };
   useEffect(() => {
     if (errorData) toast.error(errorData.message);
+    console.log(errorData);
   }, [errorData]);
-  if (errorUser) {
-    return (
-      <div className="modal modal-open">
-        <div className="modal-box">
-          <h3 className="font-bold text-lg">Lỗi {errorUser.code}</h3>
-          <p className="p-4">{errorUser.message}</p>
-        </div>
-      </div>
-    );
-  }
-
   if (!isOpen) return null;
 
   return (
     <div className="modal modal-open">
       <div className="modal-box">
         <h2 className="text-xl font-bold mb-4">Giao testcase cho tester</h2>
-        <form onSubmit={handleSubmit}>
+        <div>
           <div className="space-y-4">
             <div>
               <label className="block mb-1">Người nhận</label>
@@ -126,19 +117,19 @@ export default function AssignTestcaseModal({
                 }
                 required
               >
+                <option value={0} disabled>
+                  Chọn nhân viên
+                </option>
                 {users ? (
-                  <>
-                    <option value={0} disabled>
-                      Chọn nhân viên
+                  users.map((us) => (
+                    <option value={us.id} key={us.id + "sl"}>
+                      {us.name}
                     </option>
-                    {users.map((us) => (
-                      <option value={us.id} key={us.id + "sl"}>
-                        {us.name}
-                      </option>
-                    ))}
-                  </>
+                  ))
+                ) : errorUser ? (
+                  <option>Lỗi: {errorUser.message}</option>
                 ) : (
-                  <option>Lỗi tải danh sách người dùng</option>
+                  <option>Không xác định</option>
                 )}
               </select>
             </div>
@@ -163,7 +154,7 @@ export default function AssignTestcaseModal({
               Hủy
             </button>
             <button
-              type="submit"
+              onClick={handleSubmit}
               className="btn btn-primary"
               disabled={isLoading}
             >
@@ -174,7 +165,7 @@ export default function AssignTestcaseModal({
               )}
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

@@ -87,14 +87,14 @@ export default function ReTestBugAssignModal({
     }
   };
   useEffect(() => {
-    if (errorData) toast.error(errorData.message);
+    if (errorData) toast.error(errorData.message || errorData.title);
   }, [errorData]);
   if (errorUser) {
     return (
       <div className="modal modal-open">
         <div className="modal-box">
           <h3 className="font-bold text-lg">Lỗi {errorUser.code}</h3>
-          <p className="p-4">{errorUser.message}</p>
+          <p className="p-4">{errorUser.message || errorUser.title}</p>
         </div>
       </div>
     );

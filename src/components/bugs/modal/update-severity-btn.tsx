@@ -25,7 +25,7 @@ function UpdateSeverityComponent({
   >();
 
   useEffect(() => {
-    if (errorData) toast.error(errorData.message);
+    if (errorData) toast.error(errorData.message || errorData.title);
   }, [errorData]);
   const handlerUpdateSeverity = async () => {
     const dataSend = {

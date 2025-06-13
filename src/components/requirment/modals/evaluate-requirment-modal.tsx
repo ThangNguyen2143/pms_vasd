@@ -128,7 +128,7 @@ export default function EvaluateRequirementModal({
                       </div>
                     </div>
                     <div className="rating rating-sm join-item items-center">
-                      {crit.scale.map((rate) => {
+                      {crit.scale?.map((rate) => {
                         return (
                           <input
                             type="radio"

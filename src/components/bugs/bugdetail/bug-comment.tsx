@@ -37,7 +37,7 @@ export default function BugComments({
     { bug_id: number; comment: string }
   >();
   useEffect(() => {
-    if (errorData) toast.error(errorData.message);
+    if (errorData) toast.error(errorData.message || errorData.title);
   }, [errorData]);
   const handleAddComment = async () => {
     // API post comment here

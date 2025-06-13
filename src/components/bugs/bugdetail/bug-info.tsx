@@ -83,8 +83,9 @@ export default function BugInfo({
   };
   useEffect(() => {
     if (errorData) {
-      toast.error("Cập nhật trạng thái thất bại " + errorData.message);
-      console.error("Error updating bug status:", errorData);
+      toast.error(
+        "Cập nhật trạng thái thất bại: " + errorData.message || errorData.title
+      );
     }
   }, [errorData]);
   const priority = priorityList?.find((pri) => pri.code == bug.priority);

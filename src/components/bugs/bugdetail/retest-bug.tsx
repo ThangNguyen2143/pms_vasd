@@ -51,7 +51,8 @@ export default function ReTestList({
   useEffect(() => {
     if (errorData) {
       toast.error(
-        "Có lỗi xảy ra khi cập nhật trạng thái: " + errorData.message
+        "Có lỗi xảy ra khi cập nhật trạng thái: " + errorData.message ||
+          errorData.title
       );
     }
   }, [errorData]);

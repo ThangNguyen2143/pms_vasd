@@ -37,10 +37,11 @@ export default function BugAttachments({
     }
   };
   useEffect(() => {
-    if (errorRemoveFile) toast.error(errorRemoveFile.message);
+    if (errorRemoveFile)
+      toast.error(errorRemoveFile.message || errorRemoveFile.title);
   }, [errorRemoveFile]);
   useEffect(() => {
-    if (errorData) toast.error(errorData.message);
+    if (errorData) toast.error(errorData.message || errorData.title);
   }, [errorData]);
   const handleDownfile = async (file_id: number, type: string) => {
     setLoadingMap((prev) => ({ ...prev, [file_id]: true }));

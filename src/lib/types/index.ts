@@ -10,3 +10,4 @@ export * from "./testcase";
 export * from "./requirment";
 export * from "./dashboard";
 export * from "./incident";
+export * from "./statistical";

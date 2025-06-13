@@ -57,7 +57,8 @@ export default function AssignBug({
   useEffect(() => {
     if (errorData) {
       toast.error(
-        "Có lỗi xảy ra khi cập nhật trạng thái giao việc: " + errorData.message
+        "Có lỗi xảy ra khi cập nhật trạng thái giao việc: " +
+          errorData.message || errorData.title
       );
     }
   }, [errorData]);

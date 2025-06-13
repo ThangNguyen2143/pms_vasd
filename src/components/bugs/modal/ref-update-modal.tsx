@@ -30,10 +30,10 @@ function LinkTaskOrTestToBugModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product_id]);
   useEffect(() => {
-    if (errorData) toast.error(errorData.message);
+    if (errorData) toast.error(errorData.message || errorData.title);
   }, [errorData]);
   useEffect(() => {
-    if (errorPut) toast.error(errorPut.message);
+    if (errorPut) toast.error(errorPut.message || errorPut.title);
   }, [errorPut]);
   const handleSubmit = async () => {
     if (selectData == 0) {

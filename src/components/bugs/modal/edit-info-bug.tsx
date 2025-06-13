@@ -55,11 +55,12 @@ export default function UpdateBugModal({
   }, []);
 
   useEffect(() => {
-    if (errorData) toast.error(errorData.message);
+    if (errorData) toast.error(errorData.message || errorData.title);
   }, [errorData]);
   if (!severityList || !priorityList) {
-    if (errorSeverity) toast.error(errorSeverity.message);
-    if (errorType) toast.error(errorType.message);
+    if (errorSeverity)
+      toast.error(errorSeverity.message || errorSeverity.title);
+    if (errorType) toast.error(errorType.message || errorType.title);
     return (
       <div className="modal modal-open">
         <div className="modal-box">

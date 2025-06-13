@@ -67,9 +67,8 @@ export default function TestcaseDetailClient({
     );
   }, []);
   useEffect(() => {
-    if (errorLoadEnv) toast.error(errorLoadEnv.message);
-    if (errorPost) toast.error(errorPost.message);
-    console.log(errorLoadEnv, errorPost);
+    if (errorLoadEnv) toast.error(errorLoadEnv.message || errorLoadEnv.title);
+    if (errorPost) toast.error(errorPost.message || errorPost.title);
   }, [errorLoadEnv, errorPost]);
   useEffect(() => {
     fetchTestcase();

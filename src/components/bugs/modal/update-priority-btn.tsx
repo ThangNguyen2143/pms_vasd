@@ -25,7 +25,7 @@ function UpdatePriorytyComponent({
   >();
 
   useEffect(() => {
-    if (errorData) toast.error(errorData.message);
+    if (errorData) toast.error(errorData.message || errorData.title);
   }, [errorData]);
   const handlerUpdatePriority = async () => {
     const dataSend = {

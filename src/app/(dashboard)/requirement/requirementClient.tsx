@@ -87,8 +87,7 @@ function RequirementsClient() {
   }, []);
   useEffect(() => {
     if (errorData && errorData.code != 404) {
-      console.log(errorData);
-      toast.error(errorData.message);
+      toast.error(errorData.message || errorData.title);
     }
   }, [errorData]);
   useEffect(() => {

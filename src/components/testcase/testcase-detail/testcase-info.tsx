@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import {
   CheckCircle,
   EqualApproximately,
@@ -10,6 +11,7 @@ import { toast } from "sonner";
 import SafeHtmlViewer from "~/components/ui/safeHTMLviewer";
 import { useApi } from "~/hooks/use-api";
 import { TestcaseDetail } from "~/lib/types";
+import { status_with_color } from "~/utils/status-with-color";
 
 function TestcaseInfo({
   testcase,
@@ -130,7 +132,14 @@ function TestcaseInfo({
       <div className="space-y-3">
         <p>
           <strong>Tên:</strong> {testcase.name}{" "}
-          <span className="badge">{testcase.status}</span>
+          <span
+            className={clsx(
+              "badge badge-soft",
+              `badge-${status_with_color(testcase.status)}`
+            )}
+          >
+            {testcase.status}
+          </span>
         </p>
         <div>
           <strong>Mô tả:</strong> <SafeHtmlViewer html={testcase.description} />

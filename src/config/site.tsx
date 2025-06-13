@@ -1,12 +1,15 @@
 import {
   Bug,
   ChartLine,
+  ChartPie,
   FolderSearch,
   Globe,
   ListCheck,
   type LucideIcon,
+  MessageSquareWarning,
   NotebookPen,
   Projector,
+  Settings,
   Users,
 } from "lucide-react";
 import { MenuNav } from "~/lib/types";
@@ -47,6 +50,15 @@ export const setNavigation = (menu: MenuNav[]) => {
           break;
         case "user_manage":
           icon = Users;
+          break;
+        case "settings":
+          icon = Settings;
+          break;
+        case "statistical":
+          icon = ChartPie;
+          break;
+        case "incident_report":
+          icon = MessageSquareWarning;
           break;
         default:
           icon = Globe; // Default icon if no match
