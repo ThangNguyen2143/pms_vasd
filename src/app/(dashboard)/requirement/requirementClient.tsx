@@ -19,7 +19,7 @@ import clsx from "clsx";
 import AddLocationModal from "~/components/requirment/modals/add-location-modal";
 import AddRequirementModal from "~/components/requirment/modals/add-requirement-modal";
 import { format_date, toISOString } from "~/utils/fomat-date";
-import { startOfDay, subDays } from "date-fns";
+import { endOfDay, startOfDay, subDays } from "date-fns";
 import { toast } from "sonner";
 import DateTimePicker from "~/components/ui/date-time-picker";
 
@@ -55,7 +55,7 @@ function RequirementsClient() {
     toISOString(startOfDay(subDays(new Date(), 7))) //Mặc định 1 tuần trước
   );
   const [toDate, settoDate] = useState<string>(
-    toISOString(new Date().toString())
+    toISOString(endOfDay(new Date()))
   );
   const {
     data: requiredList,

@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import clsx from "clsx";
@@ -5,9 +6,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import TableStatist from "~/components/statistical/table-statist";
 import { useApi } from "~/hooks/use-api";
-import { encodeBase64 } from "~/lib/services";
+import { decodeBase64, encodeBase64 } from "~/lib/services";
 import { Config, StatistPara } from "~/lib/types";
-// import { toISOString } from "~/utils/fomat-date";
 
 function ClientStatisticalPage() {
   const router = useRouter();
@@ -15,25 +15,51 @@ function ClientStatisticalPage() {
   const [statistTable, setStatistTable] = useState<Config>();
   const { data: configGeneral, getData } = useApi<Config[]>();
   const { getData: getDataTabel } = useApi<any[]>();
-  useEffect(() => {
-    const code = searchParams.get("code");
-    if (code && configGeneral) {
-      const found = configGeneral.find((c) => c.code === code);
-      if (found) {
-        setStatistTable(found);
-      }
+  const initialFilterParas: Record<string, any> = (() => {
+    const q = searchParams.get("q");
+    if (!q) return {};
+
+    try {
+      return decodeBase64(q); // Phải trả về object từ chuỗi encodeBase64()
+    } catch (err) {
+      console.warn("Không thể decode 'q'", err);
+      return {};
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [configGeneral]);
+  })();
+
+  const [filterParas, setFilterParas] =
+    useState<Record<string, any>>(initialFilterParas);
+  useEffect(() => {
+    const query = searchParams.get("q");
+    if (!query) return;
+    try {
+      const { code } = decodeBase64(query) as { code: string; any: any };
+      if (code && configGeneral) {
+        const found = configGeneral.find((c) => c.code === code);
+        if (found) {
+          setStatistTable(found);
+        }
+      }
+    } catch (e) {
+      console.warn("Không thể decode 'q'", e);
+      return;
+    }
+  }, [configGeneral, searchParams]);
+  useEffect(() => {
+    const base64Str = encodeBase64({
+      code: statistTable?.code,
+      ...filterParas,
+    });
+    const params = new URLSearchParams();
+    if (statistTable) {
+      params.set("q", base64Str);
+      router.replace(`?${params.toString()}`);
+    }
+  }, [filterParas, statistTable]);
+
   useEffect(() => {
     getData("/statistic");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const handleSelectReport = (config: Config) => {
-    setStatistTable(config);
-    const newUrl = `?code=${encodeURIComponent(config.code)}`;
-    router.replace(newUrl); // dùng replace để không thêm vào history stack
-  };
   const fetchStatisticData = async (
     config: Config,
     paras: StatistPara[],
@@ -44,10 +70,10 @@ function ClientStatisticalPage() {
       paras.forEach((para) => {
         const { field, type } = para;
         const rawValue = extraParams[field] || config[field as keyof Config];
-        console.log("field:", field, "value:", rawValue);
         switch (type) {
           case "number":
-            queryObj[field] = Number(rawValue);
+          case "int":
+            queryObj[field] = rawValue;
             break;
           case "boolean":
             queryObj[field] = Boolean(rawValue);
@@ -74,11 +100,13 @@ function ClientStatisticalPage() {
         {/* Page content here */}
         {statistTable ? (
           <TableStatist
-            key={statistTable?.id}
+            key={statistTable.id}
             config={statistTable}
-            fetchData={(paras, extra) =>
-              fetchStatisticData(statistTable, paras, extra)
-            }
+            filterParas={filterParas}
+            setFilterParas={setFilterParas}
+            fetchData={(paras, extra) => {
+              return fetchStatisticData(statistTable, paras, extra);
+            }}
           />
         ) : (
           <div className="flex items-center justify-center">
@@ -103,22 +131,24 @@ function ClientStatisticalPage() {
         <ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4">
           {/* Sidebar content here */}
           {configGeneral ? (
-            configGeneral.map((config) => {
-              return (
-                <li key={config.id} onClick={() => handleSelectReport(config)}>
-                  <a
-                    className={clsx(
-                      "flex",
-                      "truncate max-w-[300px]",
-                      statistTable?.code === config.code ? "menu-active" : ""
-                    )}
-                  >
-                    <div className="grow">{config.code}</div>
-                    <div className="truncate">{config.name}</div>
-                  </a>
-                </li>
-              );
-            })
+            configGeneral
+              .sort((a, b) => a.id - b.id)
+              .map((config) => {
+                return (
+                  <li key={config.id} onClick={() => setStatistTable(config)}>
+                    <a
+                      className={clsx(
+                        "flex",
+                        "truncate max-w-[300px]",
+                        statistTable?.code === config.code ? "menu-active" : ""
+                      )}
+                    >
+                      <div className="shrink">{config.code}</div>
+                      <div className="truncate grow">{config.name}</div>
+                    </a>
+                  </li>
+                );
+              })
           ) : (
             <li>Không tải được danh sách</li>
           )}
