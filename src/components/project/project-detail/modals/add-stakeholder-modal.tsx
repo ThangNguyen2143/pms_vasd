@@ -61,8 +61,7 @@ function AddStakeholderModal({
     };
 
     const res = await postData("/project/stakeholders", dataSend);
-    //  console.log(dataSend);
-    //  const res = "";
+
     if (res == "") {
       toast.success("Xử lý thành công");
       await onUpdate();

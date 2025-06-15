@@ -56,7 +56,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
             role: userAuth.role,
             expires: userAuth.expires,
           });
-        }
+        } else await logout();
       } catch (error) {
         console.error("Session check failed:", error);
       } finally {
@@ -64,6 +64,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       }
     };
     checkSession();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const isAuthenticated = !!user && new Date(user.expires) > new Date();

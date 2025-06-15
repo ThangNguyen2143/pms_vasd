@@ -58,7 +58,6 @@ export default function AssignTestcaseModal({
 
   const handleSubmit = async () => {
     const re = await postData("/testcase/assign", assignData);
-    console.log(re);
     if (!re) return;
     else {
       const email = re.contact.find((ct) => ct.code == "email")?.value;
@@ -94,7 +93,6 @@ export default function AssignTestcaseModal({
   };
   useEffect(() => {
     if (errorData) toast.error(errorData.message);
-    console.log(errorData);
   }, [errorData]);
   if (!isOpen) return null;
 

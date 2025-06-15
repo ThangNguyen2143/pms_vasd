@@ -46,8 +46,6 @@ function IncidentDetailModal({
         toast.success("Đã đóng sự kiện");
       }
     }
-
-    console.log(data);
   };
   const { removeData, errorData } = useApi();
   const handleRemove = async () => {

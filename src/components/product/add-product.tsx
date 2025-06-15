@@ -47,7 +47,6 @@ function AddProductBtn({
       });
       return;
     }
-    // console.log(validatedFields.data);
     const data = await postData("/product", validatedFields.data);
     if (data == "") {
       document.getElementById("AddGroupDialog")?.click();

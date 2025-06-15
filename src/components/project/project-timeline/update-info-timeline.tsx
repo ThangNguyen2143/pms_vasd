@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { toast } from "sonner";
 import DateTimePicker from "~/components/ui/date-time-picker";
 import RichTextEditor from "~/components/ui/rich-text-editor";
 import { ProjectTimeLine, ProjectTimeLineDetail } from "~/lib/types";
@@ -53,7 +54,8 @@ function UpdateInfoForm({
       weight,
       parent_id,
     };
-    await onPut(data);
+    const re = await onPut(data);
+    if (re) toast.success("Xử lý thành công");
   };
   const handleAddTag = () => {
     if (newTag.trim() && !tagsChoose.includes(newTag)) {
@@ -161,7 +163,6 @@ function UpdateInfoForm({
         <select
           className="select w-full"
           title="Timeline cha"
-          defaultValue={""}
           value={parent}
           onChange={(e) => setParent(parseInt(e.target.value))}
         >

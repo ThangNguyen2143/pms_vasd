@@ -11,10 +11,11 @@ import {
 // import TotalOverviewTable from "./total-overview-table";
 import StatusPieChartGroup from "./status-pie-chart-group";
 import StaffTabs from "./staff-tab";
-import GanttChart from "../ui/gantt-chart";
+// import GanttChart from "../ui/gantt-chart";
 import { toast } from "sonner";
 import ListProject from "../work-share/project-list-select";
 import StaffTreeView from "./tab-tree-view";
+import GanttWrapper from "./gantt-wrrapper";
 
 interface GanttTask {
   id: string;
@@ -23,7 +24,6 @@ interface GanttTask {
   end: string;
   progress: number;
   dependencies?: string;
-  custom_class?: string; // dùng để tô màu nếu muốn
 }
 export function sortAndMapGanttData(
   data: GanttDTO[],
@@ -50,10 +50,9 @@ export function sortAndMapGanttData(
       result.push({
         id: phase.id.toString(),
         name: phase.name,
-        start: phase.start.split("T")[0],
-        end: phase.end.split("T")[0],
+        start: phase.start,
+        end: phase.end,
         progress: progressItem?.progress_percent || 0,
-        custom_class: "gantt-phase",
       });
 
       // Find and attach related timelines
@@ -64,11 +63,10 @@ export function sortAndMapGanttData(
         result.push({
           id: timeline.id.toString() + "tl",
           name: timeline.name,
-          start: timeline.start.split("T")[0],
-          end: timeline.end.split("T")[0],
+          start: timeline.start,
+          end: timeline.end,
           progress: statusToProgress(timeline.status),
           dependencies: timeline.parent?.toString() + "tl",
-          custom_class: "gantt-timeline",
         });
       }
     }
@@ -107,41 +105,6 @@ function ClientDashboardPage() {
     const saved = sessionStorage.getItem("projectSelected");
     if (saved) setProjectId(parseInt(saved));
   }, []);
-  // useEffect(() => {
-  //   if (!overview) return;
-  //   const getGanttStartDate = (data: GanttDTO[]): Date => {
-  //     const allDates = data.map((item) => new Date(item.start));
-  //     return new Date(Math.min(...allDates.map((d) => +d)));
-  //   };
-
-  //   const scrollToPhaseStart = () => {
-  //     const ganttContainer = document.querySelector(
-  //       ".gantt-container"
-  //     ) as HTMLElement;
-  //     if (!ganttContainer || !ganttData || ganttData.length === 0) return;
-
-  //     const chartStartDate = getGanttStartDate(ganttData);
-  //     const firstPhaseStart = new Date(overview.progress_percent[0].start_date);
-  //     const dayDiff = Math.floor(
-  //       (+firstPhaseStart - +chartStartDate) / (1000 * 60 * 60 * 24)
-  //     );
-
-  //     const stepWidth = 45; // đúng với style: --gv-column-width
-  //     const offset = Math.max(
-  //       0,
-  //       dayDiff * stepWidth - ganttContainer.clientWidth / 2
-  //     );
-
-  //     ganttContainer.scrollTo({ left: offset, behavior: "smooth" });
-  //     console.log("Chart Start:", chartStartDate);
-  //     console.log("Phase Start:", firstPhaseStart);
-  //     console.log("Offset to scroll:", offset);
-  //   };
-
-  //   if (!overview || !ganttData?.length) return;
-  //   setTimeout(scrollToPhaseStart, 300);
-  // }, [overview, ganttData]);
-
   useEffect(() => {
     if (projectId != 0) {
       sessionStorage.setItem("projectSelected", projectId.toString());
@@ -186,7 +149,7 @@ function ClientDashboardPage() {
       {/* Gantt Chart */}
       {overview && (
         <div className="border rounded shadow max-h-[500px]">
-          <GanttChart
+          <GanttWrapper
             tasks={sortAndMapGanttData(
               ganttData || [],
               overview.progress_percent
