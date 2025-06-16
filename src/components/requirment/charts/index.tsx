@@ -197,17 +197,19 @@ function ChartOverviewRequirement({ tab, paraTab }: ChartOverviewProps) {
             })}
         </div>
       )}
-      {tab == "reqByDate" && (
+      {tab == "reqByDate" && productSelect != "" && (
         <div className="mt-6">
           <ChartByDate data={dataOverView || []} />
         </div>
       )}
-      {tab == "reqByStatus" && (
+      {tab == "reqByStatus" && productSelect != "" && (
         <div className="mt-6">
           <ChartByStatus data={dataOverView || []} />
         </div>
       )}
-      {tab == "reqByType" && <ChartByType data={dataOverView || []} />}
+      {tab == "reqByType" && productSelect != "" && (
+        <ChartByType data={dataOverView || []} />
+      )}
     </div>
   );
 }

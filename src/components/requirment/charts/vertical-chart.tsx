@@ -28,7 +28,6 @@ export function ChartByStatus({ data }: { data: any[] }) {
   const options = {
     responsive: true,
     ticks: {
-      display: false, // ⬅ Ẩn hoàn toàn số liệu trên vòng tròn
       stepSize: 1,
       precision: 0, // ⬅ nếu bạn vẫn muốn hiện số, dùng cái này để tránh số thập phân
     },

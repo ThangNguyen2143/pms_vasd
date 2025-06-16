@@ -8,6 +8,7 @@ import {
   LineElement,
   Tooltip,
   Legend,
+  LineController,
 } from "chart.js";
 import { Chart } from "react-chartjs-2";
 
@@ -16,6 +17,7 @@ ChartJS.register(
   LinearScale,
   BarElement,
   PointElement,
+  LineController,
   LineElement,
   Tooltip,
   Legend
