@@ -1,13 +1,15 @@
-import { TaskDTO, WorkStatus } from "~/lib/types";
+import { ProductModule, TaskDTO, WorkStatus } from "~/lib/types";
 import TaskRow from "./task-row";
 interface TaskListProps {
   product_id: string;
+  modules: ProductModule[];
   taskList?: TaskDTO[];
   statusList: WorkStatus[];
   externalTaskCreated?: TaskDTO;
 }
 function TaskList({
   product_id,
+  modules,
   taskList,
   statusList,
   externalTaskCreated,
@@ -22,14 +24,14 @@ function TaskList({
   const fieldTable = [
     { code: "id", display: "ID" },
     { code: "title", display: "Công việc" },
+    { code: "module", display: "Module" },
     { code: "update", display: "Tình trạng" },
     { code: "create_at", display: "Ngày tạo" },
-    { code: "date_start", display: "Ngày bắt đầu" },
     { code: "dead_line", display: "Deadline" },
     { code: "status", display: "Trạng thái" },
     { code: "", display: "Thao tác" },
+    { code: "check_update", display: "" },
   ];
-
   return (
     <div className="overflow-x-auto shadow-md sm:rounded-lg">
       <table className="min-w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -37,7 +39,13 @@ function TaskList({
           <tr>
             {fieldTable.map((field) => (
               <th key={field.code} className="px-4 py-3">
-                {field.display}
+                {field.display != "" ? (
+                  field.display
+                ) : (
+                  <label>
+                    <input type="checkbox" className="checkbox" />
+                  </label>
+                )}
               </th>
             ))}
           </tr>
@@ -48,6 +56,7 @@ function TaskList({
               <TaskRow
                 task={task}
                 statusList={statusList || []}
+                modules={modules}
                 key={task.id}
                 product_id={product_id}
               />

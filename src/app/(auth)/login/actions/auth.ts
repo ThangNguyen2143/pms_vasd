@@ -68,6 +68,7 @@ export async function setMenuRoute() {
   });
 }
 export async function logout(path?: string) {
-  deleteSession();
-  redirect(`/login?callbackUrl=${path}`);
+  await deleteSession();
+  if (path) redirect(`/login?callbackUrl=${path}`);
+  else redirect("/login");
 }

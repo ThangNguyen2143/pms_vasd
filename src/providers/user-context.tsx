@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import {
   createContext,
   useContext,
@@ -10,7 +10,8 @@ import {
   useMemo,
 } from "react";
 import { getUser } from "~/lib/dal";
-import { deleteSession } from "~/lib/session";
+import { logout as logOut } from "~/app/(auth)/login/actions/auth";
+import { usePathname } from "next/navigation";
 
 type User = {
   userId: number;
@@ -30,15 +31,18 @@ type UserContextType = {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
+  // const router = useRouter();
   const logout = async () => {
     try {
       // await logout(); // Gọi API logout nếu cần
-      await deleteSession();
       setUser(null);
-      router.refresh();
+      // await deleteSession();
+      // router.refresh();
+
+      await logOut();
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -56,7 +60,12 @@ export function UserProvider({ children }: { children: ReactNode }) {
             role: userAuth.role,
             expires: userAuth.expires,
           });
-        } else await logout();
+        } else {
+          const currentUrl = window.location.href;
+          // const host = window.location.origin;
+          if (pathname.includes("/login")) return;
+          await logOut(currentUrl);
+        }
       } catch (error) {
         console.error("Session check failed:", error);
       } finally {
@@ -64,8 +73,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
       }
     };
     checkSession();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [pathname]);
 
   const isAuthenticated = !!user && new Date(user.expires) > new Date();
 

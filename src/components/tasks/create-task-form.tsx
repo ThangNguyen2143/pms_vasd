@@ -24,9 +24,11 @@ interface DataPost {
 }
 function CreateTaskForm({
   product_id,
+  modules,
   onSuccess,
 }: {
   product_id: string;
+  modules: ProductModule[];
   onSuccess: () => void;
 }) {
   const [title, setTitle] = useState("");
@@ -41,7 +43,7 @@ function CreateTaskForm({
   ]);
   const [selectedRequirement, setSelectedRequirement] = useState<number>(0);
   const [selectModule, setSelectModule] = useState<string>("");
-  const { getData: getModule, data: modules } = useApi<ProductModule[]>();
+
   const { data: requireds, getData: getRequiredList } =
     useApi<{ id: number; title: string }[]>();
   const { postData, isLoading, errorData: postError } = useApi<"">();
@@ -55,7 +57,6 @@ function CreateTaskForm({
   }, []);
   useEffect(() => {
     getRequiredList("/requirements/list/" + encodeBase64({ product_id }));
-    getModule("/product/" + encodeBase64({ type: "module", product_id }));
   }, [product_id]);
   useEffect(() => {
     if (postError) toast.error(postError.message);

@@ -5,12 +5,13 @@ import SelectProject from "./select-project";
 import TaskList from "./task-list";
 import CreateTaskForm from "./create-task-form";
 import clsx from "clsx";
-import { TaskDTO, WorkStatus } from "~/lib/types";
+import { ProductModule, TaskDTO, WorkStatus } from "~/lib/types";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 
 function MainDisplayTask() {
   const [selectProduct, setSelectProduct] = useState<string>("");
+  const { getData: getModule, data: modules } = useApi<ProductModule[]>();
   const [showModal, setShowModal] = useState(false);
   const [findTask, setFindTask] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
@@ -29,7 +30,13 @@ function MainDisplayTask() {
     getStatus(endpointStatus);
   }, []);
   useEffect(() => {
-    if (selectProduct != "") getTaskList(endpoint(selectProduct), "reload");
+    if (selectProduct != "") {
+      getTaskList(endpoint(selectProduct), "reload");
+      getModule(
+        "/product/" +
+          encodeBase64({ type: "module", product_id: selectProduct })
+      );
+    }
   }, [selectProduct]);
   useEffect(() => {
     if (tasks) {
@@ -101,6 +108,7 @@ function MainDisplayTask() {
       ) : (
         <TaskList
           product_id={selectProduct}
+          modules={modules || []}
           statusList={statusList || []}
           taskList={taskList || undefined}
         />
@@ -122,6 +130,7 @@ function MainDisplayTask() {
           <h3 className="text-lg">Thêm task</h3>
           <CreateTaskForm
             product_id={selectProduct}
+            modules={modules || []}
             onSuccess={() => {
               getTaskList(endpoint(selectProduct), "reload");
               setShowModal(false);

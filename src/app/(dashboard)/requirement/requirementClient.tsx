@@ -179,116 +179,113 @@ function RequirementsClient() {
   };
   return (
     <main className="flex flex-col gap-4 p-4 items-center">
-      <h1 className="text-2xl font-bold">Danh sách yêu cầu</h1>
-      {!projectList && !errorProjectGet ? (
-        <span className="loading loading-dots loading-xl"></span>
-      ) : (
-        <div className="flex justify-between shadow w-full">
-          <div className="flex flex-1 gap-2">
-            <select
-              name="project"
-              className="select"
-              value={projectSelect}
-              onChange={(e) =>
-                setprojectSelect(Number.parseInt(e.target.value))
-              }
-            >
-              <option value={0} disabled>
-                Chọn dự án
-              </option>
-              {projectList?.map((pj) => {
-                return (
-                  <option value={pj.id} key={"project_" + pj.id}>
-                    {pj.name}
-                  </option>
-                );
-              })}
-            </select>
-            {projectSelect != 0 && productList && (
-              <select
-                className="select w-fit"
-                name="product"
-                value={productSelect}
-                onChange={(e) => setproductSelect(e.target.value)}
-              >
-                <option value="">Tất cả</option>
-                {productList?.map((pd) => (
-                  <option value={pd.id} key={"product_" + pd.id}>
-                    {pd.name}
-                  </option>
-                ))}
-              </select>
+      <h1 className="text-2xl font-bold">Ghi nhận yêu cầu</h1>
+      <div className="flex justify-between w-full">
+        <div className="tabs tabs-box" role="tablist">
+          <a
+            role="tab"
+            className={clsx(
+              "tab",
+              tabContent == "Overview" ? "tab-active" : ""
             )}
-            <div className="flex">
-              <span className="label">Từ</span>
-              <DateTimePicker
-                value={fromDate}
-                onChange={setFromDate}
-                className="w-full"
-              />
-            </div>
-            <div className="flex">
-              <span className="label">Đến</span>
-              <DateTimePicker
-                value={toDate}
-                onChange={settoDate}
-                className="w-full"
-              />
-            </div>
-          </div>
-          <div className="join">
-            <input
-              type="text"
-              className="input join-item"
-              placeholder="Tìm kiếm..."
-            />
-            <button className="btn join-item">
-              <Search />
-            </button>
-          </div>
+            onClick={() => setTabContent("Overview")}
+          >
+            Tổng quan
+          </a>
+          <a
+            role="tab"
+            className={clsx("tab", tabContent == "List" ? "tab-active" : "")}
+            onClick={() => setTabContent("List")}
+          >
+            Danh sách
+          </a>
         </div>
-      )}
-      {projectSelect != 0 ? (
-        <>
-          <div className="flex justify-between w-full">
-            <div className="tabs tabs-box" role="tablist">
-              <a
-                role="tab"
-                className={clsx(
-                  "tab",
-                  tabContent == "Overview" ? "tab-active" : ""
-                )}
-                onClick={() => setTabContent("Overview")}
-              >
-                Tổng quan
-              </a>
-              <a
-                role="tab"
-                className={clsx(
-                  "tab",
-                  tabContent == "List" ? "tab-active" : ""
-                )}
-                onClick={() => setTabContent("List")}
-              >
-                Danh sách
-              </a>
-            </div>
-            <div className="flex gap-2">
-              <button
-                className="btn btn-primary"
-                onClick={() => setShowAddRequirment(true)}
-              >
-                Thêm yêu cầu
-              </button>
-            </div>
+      </div>
+      <div className="container">
+        {tabContent == "Overview" && (
+          <div className="bg-base-100 border-base-300 p-6">
+            <OverviewRequirement />
           </div>
-          <div className="container">
-            {tabContent == "Overview" && (
-              <div className="bg-base-100 border-base-300 p-6">
-                <OverviewRequirement />
+        )}
+        {tabContent == "List" && (
+          <>
+            {!projectList && !errorProjectGet ? (
+              <span className="loading loading-dots loading-xl"></span>
+            ) : (
+              <div className="flex justify-between shadow w-full gap-2">
+                <div className="flex flex-1 gap-2">
+                  <select
+                    name="project"
+                    className="select"
+                    value={projectSelect}
+                    onChange={(e) =>
+                      setprojectSelect(Number.parseInt(e.target.value))
+                    }
+                  >
+                    <option value={0} disabled>
+                      Chọn dự án
+                    </option>
+                    {projectList?.map((pj) => {
+                      return (
+                        <option value={pj.id} key={"project_" + pj.id}>
+                          {pj.name}
+                        </option>
+                      );
+                    })}
+                  </select>
+                  {projectSelect != 0 && productList && (
+                    <select
+                      className="select w-fit"
+                      name="product"
+                      value={productSelect}
+                      onChange={(e) => setproductSelect(e.target.value)}
+                    >
+                      <option value="">Tất cả</option>
+                      {productList?.map((pd) => (
+                        <option value={pd.id} key={"product_" + pd.id}>
+                          {pd.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  <div className="flex">
+                    <span className="label">Từ</span>
+                    <DateTimePicker
+                      value={fromDate}
+                      onChange={setFromDate}
+                      className="w-full"
+                    />
+                  </div>
+                  <div className="flex">
+                    <span className="label">Đến</span>
+                    <DateTimePicker
+                      value={toDate}
+                      onChange={settoDate}
+                      className="w-full"
+                    />
+                  </div>
+                </div>
+                <div className="join">
+                  <input
+                    type="text"
+                    className="input join-item"
+                    placeholder="Tìm kiếm..."
+                  />
+                  <button className="btn join-item">
+                    <Search />
+                  </button>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => setShowAddRequirment(true)}
+                  >
+                    Thêm yêu cầu
+                  </button>
+                </div>
               </div>
             )}
-            {tabContent == "List" && (
+            {projectSelect != 0 ? (
               <div className="bg-base-100 border-base-300 p-6">
                 <ContructionTable>
                   {requiredList && requiredList.length > 0 ? (
@@ -345,13 +342,12 @@ function RequirementsClient() {
                   )}
                 </ContructionTable>
               </div>
+            ) : (
+              <div className="alert alert-info mt-4">Chưa chọn dự án nào</div>
             )}
-          </div>
-        </>
-      ) : (
-        <div className="alert alert-info">Chưa chọn dự án nào</div>
-      )}
-
+          </>
+        )}
+      </div>
       {showAddRequirment && (
         <AddRequirementModal
           product_list={productList || []}

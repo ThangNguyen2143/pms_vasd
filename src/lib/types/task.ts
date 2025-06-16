@@ -11,6 +11,7 @@ export type TaskDTO = {
   date_start?: string;
   dead_line: string;
   is_update: boolean;
+  module?: string;
   status: string;
 };
 export type Task = Exclude<TaskDTO, "id"> & {
