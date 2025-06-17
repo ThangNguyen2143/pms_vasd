@@ -38,5 +38,5 @@ export async function HandleAddProject(
       },
     };
   }
-  redirect("/projects/");
+  redirect("/project");
 }

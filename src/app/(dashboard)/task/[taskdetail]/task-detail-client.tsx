@@ -22,13 +22,7 @@ import TaskLinks from "~/components/tasks/task-detail/task-link";
 import CriteriaTask from "~/components/tasks/task-detail/criterial-task";
 import AddCriterialModal from "~/components/tasks/modals/add-criterial-modal";
 
-export default function TaskDetailClient({
-  task_id,
-  product_id,
-}: {
-  task_id: number;
-  product_id: string;
-}) {
+export default function TaskDetailClient({ task_id }: { task_id: number }) {
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showLinkModal, setShowLinkModal] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState(false);
@@ -175,7 +169,7 @@ export default function TaskDetailClient({
       {showLinkModal && (
         <LinkRequirementModal
           onClose={() => setShowLinkModal(false)}
-          product_id={product_id}
+          product_id={task.product_id}
           task_id={task_id}
           linked={task.requirementTasks}
           onUpdate={reloadTaskData}
@@ -184,7 +178,7 @@ export default function TaskDetailClient({
       {showAssignModal && (
         <AssignUserModal
           onClose={() => setShowAssignModal(false)}
-          product_id={product_id}
+          product_id={task.product_id}
           hasAssign={task.userAssigns || []}
           onUpdate={reloadTaskData}
           task_id={task_id}

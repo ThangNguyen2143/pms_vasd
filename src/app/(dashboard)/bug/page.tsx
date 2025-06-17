@@ -1,15 +1,53 @@
+import { redirect } from "next/navigation";
+import BugOverview from "~/components/bugs/bug-overview";
 import BugsClient from "~/components/bugs/bugs-client";
 
 export const metadata = {
   title: "Bugs",
-  description: "Danh sách bug trên phần mềm",
+  description: "Trang quản lý bug",
 };
+interface BugsPageProps {
+  searchParams: Promise<{ [key: string]: string }>;
+}
+async function BugsPage(props: BugsPageProps) {
+  const searchParams = await props.searchParams;
+  const tab = searchParams.tab || "list";
 
-function BugsPage() {
+  // Nếu cần ép về tab hợp lệ
+  if (!["list", "overview"].includes(tab)) {
+    redirect("/bug?tab=list");
+  }
   return (
     <main className="flex flex-col gap-4 p-4">
-      <h1 className="text-3xl font-bold">Danh sách bugs</h1>
-      <BugsClient />
+      <div role="tablist" className="tabs tabs-box mb-4">
+        <a
+          href="?tab=overview"
+          role="tab"
+          className={`tab ${tab === "overview" ? "tab-active" : ""}`}
+        >
+          Tổng quan
+        </a>
+        <a
+          href="?tab=list"
+          role="tab"
+          className={`tab ${tab === "list" ? "tab-active" : ""}`}
+        >
+          Danh sách
+        </a>
+      </div>
+
+      {tab === "list" && (
+        <>
+          <h1 className="text-3xl font-bold">Danh sách bugs</h1>
+          <BugsClient />
+        </>
+      )}
+      {tab === "overview" && (
+        <>
+          <h1 className="text-2xl text-center font-bold">Tổng quan</h1>
+          <BugOverview />
+        </>
+      )}
     </main>
   );
 }

@@ -54,14 +54,14 @@ export function ChartByLocation({
   const options = {
     indexAxis: "y" as const,
     responsive: true,
-    ticks: {
-      display: false, // ⬅ Ẩn hoàn toàn số liệu trên vòng tròn
-      stepSize: 1,
-      precision: 0, // ⬅ nếu bạn vẫn muốn hiện số, dùng cái này để tránh số thập phân
-    },
     plugins: {
       title: { display: true, text: name },
       legend: { display: false },
+    },
+    scale: {
+      x: {
+        ticks: { stepSize: 1 },
+      },
     },
   };
 

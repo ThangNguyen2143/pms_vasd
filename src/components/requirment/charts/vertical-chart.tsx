@@ -27,14 +27,15 @@ export function ChartByStatus({ data }: { data: any[] }) {
 
   const options = {
     responsive: true,
-    ticks: {
-      stepSize: 1,
-      precision: 0, // ⬅ nếu bạn vẫn muốn hiện số, dùng cái này để tránh số thập phân
-    },
     plugins: {
       legend: { display: false },
       datalabels: {
         color: "#fff",
+      },
+    },
+    scale: {
+      y: {
+        ticks: { stepSize: 1 },
       },
     },
   };

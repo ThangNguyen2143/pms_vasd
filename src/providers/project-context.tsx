@@ -48,18 +48,6 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     },
     [setProject]
   );
-  const fetchProjects = async () => {
-    //Hàm lấy danh sách dự án đang tham gia
-    const response = await fetchData<ProjectDto[]>({
-      endpoint: "/system/config/" + encodeBase64({ type: "project" }),
-      cache: "default",
-    });
-    if (!response.value) return;
-    setProject(response.value);
-    response.value.map((project) => {
-      fetchSoftware(project.id);
-    });
-  };
 
   const fetchSoftware = async (project_id: number) => {
     // Gọi API để lấy danh sách phần mềm
@@ -72,6 +60,18 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
     setProduct(response.value, project_id);
   };
   useEffect(() => {
+    const fetchProjects = async () => {
+      //Hàm lấy danh sách dự án đang tham gia
+      const response = await fetchData<ProjectDto[]>({
+        endpoint: "/system/config/" + encodeBase64({ type: "project" }),
+        cache: "default",
+      });
+      if (!response.value) return;
+      setProject(response.value);
+      response.value.map((project) => {
+        fetchSoftware(project.id);
+      });
+    };
     fetchProjects();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

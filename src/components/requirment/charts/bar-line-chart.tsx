@@ -22,22 +22,25 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function ChartByDate({ data }: { data: any[] }) {
+type DataChart = {
+  date: string;
+  bar_data: number;
+  line_data: number;
+};
+export function ChartByDate({ data }: { data: DataChart[] }) {
   const chartData = {
     labels: data.map((d) => d.date),
     datasets: [
       {
         type: "bar" as const,
         label: "Đã tạo",
-        data: data.map((d) => d.created_count),
+        data: data.map((d) => d.bar_data),
         backgroundColor: "#3b82f6",
       },
       {
         type: "line" as const,
         label: "Đã xử lý",
-        data: data.map((d) => d.resolved_count),
+        data: data.map((d) => d.line_data),
         borderColor: "#f97316",
         borderWidth: 2,
       },
@@ -47,10 +50,12 @@ export function ChartByDate({ data }: { data: any[] }) {
   const options = {
     responsive: true,
     plugins: { legend: { position: "top" as const } },
-    ticks: {
-      display: false, // ⬅ Ẩn hoàn toàn số liệu trên vòng tròn
-      stepSize: 1,
-      precision: 0, // ⬅ nếu bạn vẫn muốn hiện số, dùng cái này để tránh số thập phân
+    scale: {
+      y: {
+        ticks: {
+          stepSize: 1,
+        },
+      },
     },
   };
 

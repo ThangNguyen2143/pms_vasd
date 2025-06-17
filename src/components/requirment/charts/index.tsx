@@ -43,7 +43,8 @@ function ChartOverviewRequirement({ tab, paraTab }: ChartOverviewProps) {
   const [projectSelect, setprojectSelect] = useState<number>(0);
   const { data: projectList, getData: getProjectJoin } =
     useApi<ProjectMember[]>();
-  const { data: productList, getData: getProducts } = useApi<ProjectMember[]>();
+  const { data: productList, getData: getProducts } =
+    useApi<{ id: string; name: string }[]>();
   const titleReport = useRef("");
   useEffect(() => {
     const fetchData = async () => {
@@ -199,7 +200,17 @@ function ChartOverviewRequirement({ tab, paraTab }: ChartOverviewProps) {
       )}
       {tab == "reqByDate" && productSelect != "" && (
         <div className="mt-6">
-          <ChartByDate data={dataOverView || []} />
+          <ChartByDate
+            data={
+              dataOverView
+                ? dataOverView.map((d) => ({
+                    date: d.date,
+                    bar_data: d.created_count,
+                    line_data: d.resolved_count,
+                  }))
+                : []
+            }
+          />
         </div>
       )}
       {tab == "reqByStatus" && productSelect != "" && (

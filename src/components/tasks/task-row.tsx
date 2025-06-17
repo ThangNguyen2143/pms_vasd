@@ -10,12 +10,7 @@ interface TaskRowProps {
   product_id: string;
 }
 
-export default function TaskRow({
-  task,
-  statusList,
-  modules,
-  product_id,
-}: TaskRowProps) {
+export default function TaskRow({ task, statusList, modules }: TaskRowProps) {
   const statusDisplay = statusList.find((s) => s.code === task.status)?.display;
   const moduleDisplay = task.module
     ? modules.find((m) => m.id == task.module)?.display
@@ -36,7 +31,7 @@ export default function TaskRow({
       <td className="py-2">
         <div className="flex gap-1">
           <Link
-            href={"/task/" + encodeBase64({ task_id: task.id, product_id })}
+            href={"/task/" + encodeBase64({ task_id: task.id })}
             className="btn btn-sm btn-secondary w-full"
           >
             Chi tiết

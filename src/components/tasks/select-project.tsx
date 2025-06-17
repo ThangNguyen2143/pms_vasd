@@ -17,11 +17,6 @@ function SelectProject({
 }) {
   const projectContext = useProject();
   const dataProject = projectContext?.projects;
-  // const endpointProject = "/project/" + encodeBase64({ type: "all" });
-  // const { data: dataProject, getData, errorData } = useApi<ProjectDto[]>();
-  // const { getData: getProductList } = useApi<ProductDto[]>();
-  // const [listSelect, setListSelect] = useState<ProductAndProject[]>([]);
-
   // Lấy lại lựa chọn từ localStorage
   useEffect(() => {
     const storedId = localStorage.getItem(LOCAL_STORAGE_KEY);

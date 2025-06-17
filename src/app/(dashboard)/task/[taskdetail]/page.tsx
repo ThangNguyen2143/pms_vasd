@@ -5,15 +5,10 @@ async function TaskDetailPage(prop: {
   params: Promise<{ taskdetail: string }>;
 }) {
   const { taskdetail } = await prop.params;
-  const taskdecode: { task_id: number; product_id: string } = decodeBase64(
+  const taskdecode: { task_id: number } = decodeBase64(
     decodeURIComponent(taskdetail)
-  ) as { task_id: number; product_id: string };
-  return (
-    <TaskDetailClient
-      task_id={taskdecode.task_id}
-      product_id={taskdecode.product_id}
-    />
-  );
+  ) as { task_id: number };
+  return <TaskDetailClient task_id={taskdecode.task_id} />;
 }
 
 export default TaskDetailPage;

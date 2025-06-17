@@ -54,7 +54,6 @@ function TaskComments({
           "/task/" +
           encodeBase64({
             task_id: task.task_id,
-            product_id: task.product_id,
           }) || "https://pm.vasd.vn/";
       if (email.length > 0)
         email.forEach((e) =>

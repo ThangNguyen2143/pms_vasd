@@ -60,3 +60,27 @@ export interface DataRating {
   is_accepted: boolean;
   created_at: string;
 }
+
+export type DeadlineWarning = {
+  id: number;
+  title: string;
+  status: string;
+  user_id: number;
+  user_name: string;
+  deadline: string;
+  hours_remaining: number;
+  is_overdue: boolean;
+};
+
+export type TaskUnAcceptance = {
+  task_id: number;
+  title: string;
+  status: string;
+  total_criteria: number;
+  unapproved_count: number;
+  unapproved_criteria: {
+    code: string;
+    title: string;
+    type: string;
+  }[];
+};
