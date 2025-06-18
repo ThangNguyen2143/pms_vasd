@@ -55,7 +55,6 @@ function TestList({
                 users={userList || []}
                 statusList={statusList || []}
                 key={testcase.id}
-                product_id={product_id}
               />
             ))
           ) : (

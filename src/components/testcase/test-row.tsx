@@ -8,10 +8,9 @@ interface TestRowProps {
   testcase: TestcaseDto;
   users: UserDto[];
   statusList: WorkStatus[];
-  product_id: string;
 }
 
-function TestRow({ testcase, users, statusList, product_id }: TestRowProps) {
+function TestRow({ testcase, users, statusList }: TestRowProps) {
   const creator = users.find((u) => u.userid === testcase.created_by);
   const statusDisplay = statusList.find(
     (s) => s.code === testcase.status
@@ -33,10 +32,7 @@ function TestRow({ testcase, users, statusList, product_id }: TestRowProps) {
       <td className="px-4 py-2">
         {/* Có thể thêm nút sửa/xoá ở đây */}
         <Link
-          href={
-            "/test_case/" +
-            encodeBase64({ testcase_id: testcase.id, product_id })
-          }
+          href={"/test_case/" + encodeBase64({ testcase_id: testcase.id })}
           className="btn btn-sm btn-secondary"
         >
           Chi tiết

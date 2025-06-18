@@ -64,7 +64,7 @@ function getColorByStatus(status: string): string {
   return colorMap[status] ?? "#a3a3a3";
 }
 
-export function ChartByType({ data }: { data: any[] }) {
+export function ChartByType({ data }: { data: RawItem[] }) {
   const { labels, datasets } = groupChartDataByTypeAndStatus(data);
 
   const options = {
@@ -79,14 +79,16 @@ export function ChartByType({ data }: { data: any[] }) {
         },
       },
     },
-    ticks: {
-      display: true,
-      stepSize: 1,
-      precision: 0, // ⬅ nếu bạn vẫn muốn hiện số, dùng cái này để tránh số thập phân
-    },
     scales: {
       x: { stacked: true },
-      y: { stacked: true },
+      y: {
+        stacked: true,
+        ticks: {
+          display: true,
+          stepSize: 1,
+          precision: 0, // ⬅ nếu bạn vẫn muốn hiện số, dùng cái này để tránh số thập phân
+        },
+      },
     },
   };
 

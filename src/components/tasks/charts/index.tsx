@@ -8,7 +8,7 @@ import { ChartByDate } from "~/components/requirment/charts/bar-line-chart";
 import DateTimePicker from "~/components/ui/date-time-picker";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
-import { ProductModule, ProjectMember } from "~/lib/types";
+import { ProductModule } from "~/lib/types";
 import { toISOString } from "~/utils/fomat-date";
 import { StackedBarChartByModule } from "./group-chart-status";
 import { ChartByStatus } from "~/components/requirment/charts/vertical-chart";
@@ -37,7 +37,8 @@ function ChartOverviewTask({ tab, paraTab }: ChartOverviewProps) {
 
   const { data: moduleProduct, getData: getModules } =
     useApi<ProductModule[]>();
-  const { data: productList, getData: getProducts } = useApi<ProjectMember[]>();
+  const { data: productList, getData: getProducts } =
+    useApi<{ id: string; name: string }[]>();
   const titleReport = useRef("");
 
   useEffect(() => {

@@ -5,17 +5,12 @@ async function TestcaseDetailPage(prop: {
   params: Promise<{ testcasedetail: string }>;
 }) {
   const { testcasedetail } = await prop.params;
-  const testcasedecode: { testcase_id: number; product_id: string } =
-    decodeBase64(decodeURIComponent(testcasedetail)) as {
-      testcase_id: number;
-      product_id: string;
-    };
-  return (
-    <TestcaseDetailClient
-      testcase_id={testcasedecode.testcase_id}
-      product_id={testcasedecode.product_id}
-    />
-  );
+  const testcasedecode: { testcase_id: number } = decodeBase64(
+    decodeURIComponent(testcasedetail)
+  ) as {
+    testcase_id: number;
+  };
+  return <TestcaseDetailClient testcase_id={testcasedecode.testcase_id} />;
 }
 
 export default TestcaseDetailPage;

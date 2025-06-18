@@ -38,10 +38,8 @@ type StepTest = {
 };
 export default function TestcaseDetailClient({
   testcase_id,
-  product_id,
 }: {
   testcase_id: number;
-  product_id: string;
 }) {
   const {
     getData,
@@ -175,7 +173,7 @@ export default function TestcaseDetailClient({
         />
         <div>
           <TestDependComp
-            product_id={product_id}
+            product_id={testcase.product_id}
             testcase_id={testcase_id}
             onUpdate={fetchTestcase}
             testDepend={testcase.test_depend}
@@ -203,7 +201,7 @@ export default function TestcaseDetailClient({
         <CommentTestcase
           testcase_id={testcase_id}
           comments={commentsList || []}
-          product_id={product_id}
+          product_id={testcase.product_id}
           updateComment={fetchComment}
         />
         {/* Assign User Section */}
@@ -225,7 +223,7 @@ export default function TestcaseDetailClient({
         isOpen={showAssignModal}
         onClose={() => setShowAssignModal(false)}
         onUpdate={fetchTestcase}
-        product_id={product_id}
+        product_id={testcase.product_id}
         test_id={testcase_id}
       />
       {openAddTest && (
@@ -246,7 +244,7 @@ export default function TestcaseDetailClient({
       <EditTestcaseModal
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
-        product_id={product_id}
+        product_id={testcase.product_id}
         testcase={testcase}
         environmentTests={environmentTest || []}
         onSubmit={handleEditSubmit}
