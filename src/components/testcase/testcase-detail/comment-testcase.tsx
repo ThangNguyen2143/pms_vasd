@@ -20,12 +20,10 @@ interface ResponseNotify {
 }
 function CommentTestcase({
   testcase_id,
-  product_id,
   comments,
   updateComment,
 }: {
   testcase_id: number;
-  product_id: string;
   comments: TestComment[];
   updateComment: () => Promise<void>;
 }) {
@@ -59,8 +57,8 @@ function CommentTestcase({
       };
       const link =
         window.location.origin +
-          "/bug/" +
-          encodeBase64({ testcase_id, product_id }) || "https://pm.vasd.vn/";
+          "/test_case/" +
+          encodeBase64({ testcase_id }) || "https://pm.vasd.vn/";
       if (email.length > 0)
         email.forEach((e) =>
           sendEmail(content, e, "Thông báo comment", link, "Testcase")

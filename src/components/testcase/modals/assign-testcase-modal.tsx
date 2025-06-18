@@ -69,9 +69,8 @@ export default function AssignTestcaseModal({
       };
       const link =
         window.location.origin +
-          "/bug/" +
-          encodeBase64({ testcase_id: test_id, product_id }) ||
-        "https://pm.vasd.vn/";
+          "/test_case/" +
+          encodeBase64({ testcase_id: test_id }) || "https://pm.vasd.vn/";
       if (email)
         sendEmail(content, email, "Thông báo", link, "testcase")
           .then((mes) => {

@@ -133,7 +133,6 @@ function CreateTestcaseForm({
       if (temp.note?.trim().length == 0) delete temp.note;
       return temp;
     });
-    console.log(data);
     const result = await postData("/testcase", data);
     if (result !== null) {
       toast.success("Tạo testcase thành công");

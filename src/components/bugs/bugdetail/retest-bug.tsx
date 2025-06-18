@@ -37,12 +37,7 @@ export default function ReTestList({
       assign_code: code,
       result,
     });
-    console.log({
-      bug_id,
-      note,
-      assign_code: code,
-      result,
-    });
+
     if (re != "") return;
     await onUpdate();
     setConfirmDone("");

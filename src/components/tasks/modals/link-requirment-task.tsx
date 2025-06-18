@@ -148,7 +148,6 @@ export default function LinkRequirementModal({
         }),
     };
     if (dataRemove.requirement_id.length > 0) {
-      console.log("re:", dataRemove);
       const re = await updateLinkRemove("/tasks/requirement", dataRemove);
       if (!re) return;
       toast.success(re);

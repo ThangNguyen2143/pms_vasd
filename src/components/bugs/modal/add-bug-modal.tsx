@@ -21,6 +21,7 @@ interface DataCreate {
   description: string;
   priority: string;
   severity: string;
+  log?: string;
   test_case_ref_id?: number;
   tags: string[];
 }
@@ -34,6 +35,7 @@ export default function AddBugModal({
   const [description, setDescription] = useState("");
   const [severitySelect, setSeveritySelected] = useState("");
   const [prioritySelected, setPrioritySelected] = useState("");
+  const [logBug, setLogBug] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState("");
   const [testcaseSelected, setTestcaseSelected] = useState("");
@@ -96,12 +98,14 @@ export default function AddBugModal({
       description,
       priority: prioritySelected,
       tags,
+      log: logBug,
       severity: severitySelect,
       // Nếu không có testcaseSelected thì sẽ là chuỗi rỗng
       // Nếu có thì sẽ là id của testcase
       test_case_ref_id: Number(testcaseSelected),
     };
     if (!data.test_case_ref_id) delete data.test_case_ref_id;
+    if (data.log?.trim().length == 0) delete data.log;
     const re = await postData("/bugs", data);
 
     if (re != "") return;
@@ -133,6 +137,16 @@ export default function AddBugModal({
               placeholder="Mô tả"
               value={description}
               onChange={setDescription}
+            />
+          </fieldset>
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">Log</legend>
+            <input
+              type="text"
+              className="input w-full"
+              placeholder="Log gây bug"
+              value={logBug}
+              onChange={(e) => setLogBug(e.target.value)}
             />
           </fieldset>
           <label className="floating-label">

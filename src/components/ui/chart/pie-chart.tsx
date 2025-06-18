@@ -49,7 +49,6 @@ export default function PieChartComp({ data, valueKey }: Props) {
       },
     };
   }, [data, valueKey]);
-  console.log(dataset, labels);
   return (
     <Pie
       data={{ labels, datasets: [dataset] }}

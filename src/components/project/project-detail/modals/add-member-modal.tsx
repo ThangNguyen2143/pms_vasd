@@ -64,7 +64,7 @@ function AddMemberProjectModal({
             required
             onChange={(e) => setuserSelected(Number.parseInt(e.target.value))}
           >
-            <option value="" disabled defaultChecked>
+            <option value={0} disabled>
               Chọn người dùng
             </option>
             {listEmployee ? (

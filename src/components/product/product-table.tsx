@@ -81,57 +81,66 @@ function ProductTable({
           </tr>
         </thead>
         <tbody>
-          {dataList.map((item, index) => {
-            return (
-              <tr key={index}>
-                <th>{index + 1}</th>
-                <td>{item.name}</td>
-                <td>{item.description}</td>
-                <td>{item.createdBy}</td>
-                <td>
-                  {item.status == "active" ? (
-                    <span className="badge badge-info">Đang hoạt động</span>
-                  ) : (
-                    <div>
-                      <span className="badge badge-outline badge-secondary">
-                        {" "}
-                        Nháp
-                      </span>{" "}
-                      <div
-                        className="tooltip"
-                        data-tip="Chuyển trạng thái hoạt động"
-                      >
-                        <button
-                          className="btn btn-outline btn-sm btn-secondary"
-                          onClick={() => handlderClickActive(item.id)}
-                          disabled={activeLoading}
+          {dataList.length > 0 ? (
+            dataList.map((item, index) => {
+              return (
+                <tr key={index}>
+                  <th>{index + 1}</th>
+                  <td>{item.name}</td>
+                  <td>{item.description}</td>
+                  <td>{item.createdBy}</td>
+                  <td>
+                    {item.status == "active" ? (
+                      <span className="badge badge-info">Đang hoạt động</span>
+                    ) : (
+                      <div>
+                        <span className="badge badge-outline badge-secondary">
+                          {" "}
+                          Nháp
+                        </span>{" "}
+                        <div
+                          className="tooltip"
+                          data-tip="Chuyển trạng thái hoạt động"
                         >
-                          <Activity />
-                        </button>
+                          <button
+                            className="btn btn-outline btn-sm btn-secondary"
+                            onClick={() => handlderClickActive(item.id)}
+                            disabled={activeLoading}
+                          >
+                            <Activity />
+                          </button>
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </td>
-                <td className="flex gap-1 justify-center items-center">
-                  <button
-                    className="btn btn-sm btn-outline btn-primary tooltip"
-                    data-tip="Cập nhật phần mềm"
-                    onClick={() => openEditDialog(item.id)}
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </button>
-                  <button
-                    className="btn btn-outline btn-soft"
-                    onClick={() => {
-                      setShowModuleDetail(item.id);
-                    }}
-                  >
-                    Module
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
+                    )}
+                  </td>
+                  <td className="flex gap-1 justify-center items-center">
+                    <button
+                      className="btn btn-sm btn-outline btn-primary tooltip"
+                      data-tip="Cập nhật phần mềm"
+                      onClick={() => openEditDialog(item.id)}
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <label
+                      htmlFor={`detail-module-drawer`}
+                      className="btn btn-outline btn-soft"
+                      onClick={() => {
+                        setShowModuleDetail(item.id);
+                      }}
+                    >
+                      Module
+                    </label>
+                  </td>
+                </tr>
+              );
+            })
+          ) : (
+            <tr>
+              <td colSpan={5} className="alert alert-info w-full">
+                Chưa thêm phần mềm nào
+              </td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>

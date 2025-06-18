@@ -24,7 +24,6 @@ function WorkBox({ title, items }: { title: string; items: any[] }) {
       (item) =>
         `/task/${encodeBase64({
           task_id: item.id,
-          product_id: item.product_id,
         })}`
     );
   else if (title.includes("Bug"))
@@ -48,7 +47,6 @@ function WorkBox({ title, items }: { title: string; items: any[] }) {
       (item) =>
         `/test_case/${encodeBase64({
           testcase_id: item.testcase_id,
-          product_id: item.product_id,
         })}`
     );
 

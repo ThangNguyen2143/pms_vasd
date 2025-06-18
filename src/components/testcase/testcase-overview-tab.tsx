@@ -99,7 +99,6 @@ function TestcaseOverView() {
       "/testcase/overview/" + encodeBase64({ type: "never_run" })
     );
   }, []);
-  console.log(dataOverViewDate);
   return (
     <div className="flex flex-col p-2">
       <div className="flex gap-2">

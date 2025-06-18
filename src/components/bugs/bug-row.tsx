@@ -1,4 +1,3 @@
-// components/task/task-row.tsx
 import clsx from "clsx";
 import Link from "next/link";
 import { encodeBase64 } from "~/lib/services";

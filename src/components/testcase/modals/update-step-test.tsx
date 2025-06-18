@@ -105,7 +105,6 @@ function UpdateStepTestModal({
 
   const handleSubmit = async () => {
     // Simulate API call
-    console.log("Submitting form data:", formData);
     onUpdate({ stepTest: formData.steps });
     onClose();
     // Here you would typically make an API call to save the data

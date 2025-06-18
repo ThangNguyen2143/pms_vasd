@@ -57,8 +57,6 @@ function PhaseTab({ project_id }: { project_id: number }) {
           + Thêm giai đoạn
         </button>
       </div>
-      {/* Additional content can be added here */}
-      {/* This component have a table to show phase of project. The table incluse: name, start date, end date and action to see detail phase */}
       <PhaseProjectTable
         data={data}
         onUpdate={re}

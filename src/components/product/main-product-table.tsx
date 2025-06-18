@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { encodeBase64 } from "~/lib/services";
 import UpdateInfoProductModal from "./update-info-product-modal";
 import ProductModuleModal from "./product-detail-modal";
+import DetailFunctionModule from "./detail-function-module";
 
 function MainProductTable({ project_id }: { project_id: number }) {
   const {
@@ -17,10 +18,10 @@ function MainProductTable({ project_id }: { project_id: number }) {
     errorData,
   } = useApi<ProductDto[]>();
   const { data: userList, getData: getUser } = useApi<UserDto[]>();
-
+  const [showFuncInModule, setShowFuncInModule] = useState<string>();
   const [selectedProduct, setSelectedProduct] = useState<ProductDto>();
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
-  const [showModuleDetail, setShowModuleDetail] = useState<string>();
+  const [showModuleDetail, setShowModuleDetail] = useState<string>("");
   const endpointUser = "/user/" + encodeBase64({ type: "all" });
   const openEditDialog = (product_id: string) => {
     const product = productList?.find((pro) => pro.id == product_id);
@@ -52,16 +53,8 @@ function MainProductTable({ project_id }: { project_id: number }) {
       </div>
     );
   }
-
-  if (errorData && !productList) {
-    return (
-      <div className="alert alert-error">
-        <span>{errorData.message}</span>
-      </div>
-    );
-  }
   return (
-    <div className="flex flex-col gap-4 max-w-7xl mx-auto">
+    <div className="flex flex-col gap-4 max-w-7xl mx-auto mt-6">
       <div className="flex justify-between gap-2">
         <h2 className="text-2xl font-bold">Danh sách phần mềm</h2>
         {/* <LitsProject project_id={projectId} setProjectId={setprojectId} /> */}
@@ -74,6 +67,10 @@ function MainProductTable({ project_id }: { project_id: number }) {
       </div>
       {isLoading ? (
         <span className="loading loading-infinity" />
+      ) : errorData && errorData.code != 404 ? (
+        <div>
+          <div className="alert alert-error">{errorData.message}</div>
+        </div>
       ) : (
         <ProductTable
           onUpdate={async () => {
@@ -92,9 +89,32 @@ function MainProductTable({ project_id }: { project_id: number }) {
           product={selectedProduct}
         />
       )}
-      {showModuleDetail && (
-        <ProductModuleModal
-          onClose={() => setShowModuleDetail(undefined)}
+      <div className="drawer drawer-end z-50 w-24">
+        <input
+          id={`detail-module-drawer`}
+          type="checkbox"
+          className="drawer-toggle"
+        />
+        <div className="drawer-side">
+          <label
+            htmlFor={`detail-module-drawer`}
+            className="drawer-overlay"
+            onClick={() => setShowModuleDetail("")}
+          />
+          <ProductModuleModal
+            onClose={() => {
+              document.getElementById("detail-module-drawer")?.click();
+              setShowModuleDetail("");
+            }}
+            onOpenFunc={(id: string) => setShowFuncInModule(id)}
+            product_id={showModuleDetail}
+          />
+        </div>
+      </div>
+      {showFuncInModule && (
+        <DetailFunctionModule
+          module_id={showFuncInModule}
+          onClose={() => setShowFuncInModule(undefined)}
           product_id={showModuleDetail}
         />
       )}

@@ -201,7 +201,6 @@ export default function TestcaseDetailClient({
         <CommentTestcase
           testcase_id={testcase_id}
           comments={commentsList || []}
-          product_id={testcase.product_id}
           updateComment={fetchComment}
         />
         {/* Assign User Section */}
