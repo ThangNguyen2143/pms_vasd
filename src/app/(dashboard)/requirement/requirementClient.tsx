@@ -17,7 +17,7 @@ import AddLocationModal from "~/components/requirment/modals/add-location-modal"
 import AddRequirementModal from "~/components/requirment/modals/add-requirement-modal";
 import { toISOString } from "~/utils/fomat-date";
 import { endOfDay, startOfDay, subDays } from "date-fns";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 import DateTimePicker from "~/components/ui/date-time-picker";
 import RequirementList from "~/components/requirment/requirment-list";
 
@@ -36,11 +36,8 @@ function RequirementsClient() {
   const [toDate, settoDate] = useState<string>(
     toISOString(endOfDay(new Date()))
   );
-  const {
-    data: requiredList,
-    getData: getRequiredList,
-    errorData,
-  } = useApi<RequirementDto[]>();
+  const { data: requiredList, getData: getRequiredList } =
+    useApi<RequirementDto[]>();
   const { data: userList, getData: getUserList } = useApi<UserDto[]>();
   const {
     data: projectList,
@@ -64,11 +61,6 @@ function RequirementsClient() {
     const saved = sessionStorage.getItem("projectSelected");
     if (saved) setprojectSelect(parseInt(saved));
   }, []);
-  useEffect(() => {
-    if (errorData && errorData.code != 404) {
-      toast.error(errorData.message || errorData.title);
-    }
-  }, [errorData]);
   useEffect(() => {
     if (projectSelect != 0) {
       setloading(true);
