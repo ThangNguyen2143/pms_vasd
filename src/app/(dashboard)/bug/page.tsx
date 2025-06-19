@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import BugOverview from "~/components/bugs/bug-overview";
 import BugsClient from "~/components/bugs/bugs-client";
 
@@ -39,7 +40,9 @@ async function BugsPage(props: BugsPageProps) {
       {tab === "list" && (
         <>
           <h1 className="text-3xl font-bold">Danh sách bugs</h1>
-          <BugsClient />
+          <Suspense fallback={<div>Đang tải dữ liệu...</div>}>
+            <BugsClient />
+          </Suspense>
         </>
       )}
       {tab === "overview" && (
