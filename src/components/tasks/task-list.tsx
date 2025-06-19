@@ -1,5 +1,7 @@
 import { ProductModule, TaskDTO, WorkStatus } from "~/lib/types";
 import TaskRow from "./task-row";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 interface TaskListProps {
   product_id: string;
   modules: ProductModule[];
@@ -12,15 +14,30 @@ function TaskList({
   modules,
   taskList,
   statusList,
-  externalTaskCreated,
 }: TaskListProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [currentPage, setCurrentPage] = useState(1);
   const fullTaskList = taskList ? [...taskList] : [];
-  if (
-    externalTaskCreated &&
-    !fullTaskList.find((t) => t.id === externalTaskCreated.id)
-  ) {
-    fullTaskList.push(externalTaskCreated);
-  }
+  const totalPages = Math.ceil(fullTaskList.length / 10);
+  // ⬅️ Khi load lại, đọc từ URL
+  useEffect(() => {
+    const pageParam = Number(searchParams.get("page")) || 1;
+    if (pageParam >= 1 && pageParam <= totalPages) {
+      setCurrentPage(pageParam);
+    }
+  }, [searchParams, totalPages]);
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", page.toString());
+    router.replace(`?${params.toString()}`);
+    setCurrentPage(page);
+  };
+
+  // 🔄 Cắt dữ liệu theo trang
+  const startIndex = (currentPage - 1) * 10;
+  const currentTasks = fullTaskList.slice(startIndex, startIndex + 10);
   const fieldTable = [
     { code: "id", display: "ID" },
     { code: "title", display: "Công việc" },
@@ -51,8 +68,8 @@ function TaskList({
           </tr>
         </thead>
         <tbody>
-          {fullTaskList.length > 0 ? (
-            fullTaskList.map((task) => (
+          {currentTasks.length > 0 ? (
+            currentTasks.map((task) => (
               <TaskRow
                 task={task}
                 statusList={statusList || []}
@@ -72,6 +89,23 @@ function TaskList({
           )}
         </tbody>
       </table>
+      <div className="flex justify-center">
+        {totalPages > 1 && (
+          <div className="join">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => handlePageChange(page)}
+                className={`join-item btn ${
+                  page === currentPage ? "btn-active" : ""
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

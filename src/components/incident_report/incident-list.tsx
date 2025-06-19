@@ -1,5 +1,7 @@
 import { Incident } from "~/lib/types";
 import IncidentRow from "./incident-row";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 interface IncidentListProps {
   product_id: string;
   incidentList?: Incident[];
@@ -10,7 +12,29 @@ function IncidentList({
   incidentList,
   showIncidentDetail,
 }: IncidentListProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const fullIncidentList = incidentList ? [...incidentList] : [];
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.ceil(fullIncidentList.length / 10);
+  // ⬅️ Khi load lại, đọc từ URL
+  useEffect(() => {
+    const pageParam = Number(searchParams.get("page")) || 1;
+    if (pageParam >= 1 && pageParam <= totalPages) {
+      setCurrentPage(pageParam);
+    }
+  }, [searchParams, totalPages]);
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", page.toString());
+    router.replace(`?${params.toString()}`);
+    setCurrentPage(page);
+  };
+
+  // 🔄 Cắt dữ liệu theo trang
+  const startIndex = (currentPage - 1) * 10;
+  const currentIncidents = fullIncidentList.slice(startIndex, startIndex + 10);
+
   const fieldTable = [
     { code: "id", display: "ID" },
     { code: "title", display: "Tiêu đề" },
@@ -34,8 +58,8 @@ function IncidentList({
           </tr>
         </thead>
         <tbody>
-          {fullIncidentList.length > 0 ? (
-            fullIncidentList.map((incident) => (
+          {currentIncidents.length > 0 ? (
+            currentIncidents.map((incident) => (
               <IncidentRow
                 key={"incident" + incident.id}
                 incident={incident}
@@ -53,6 +77,23 @@ function IncidentList({
           )}
         </tbody>
       </table>
+      <div className="flex justify-center">
+        {totalPages > 1 && (
+          <div className="join">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => handlePageChange(page)}
+                className={`join-item btn ${
+                  page === currentPage ? "btn-active" : ""
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

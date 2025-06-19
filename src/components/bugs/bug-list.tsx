@@ -1,18 +1,43 @@
 import { BugDto } from "~/lib/types";
 import BugRow from "./bug-row";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 interface BugListProps {
   product_id: string;
   bugList?: BugDto[];
   externalBugCreated?: BugDto;
 }
 function BugList({ product_id, bugList, externalBugCreated }: BugListProps) {
+  const [currentPage, setCurrentPage] = useState(1);
   const fullBugList = bugList ? [...bugList] : [];
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const totalPages = Math.ceil(fullBugList.length / 10);
   if (
     externalBugCreated &&
     !fullBugList.find((t) => t.bug_id === externalBugCreated.bug_id)
   ) {
     fullBugList.push(externalBugCreated);
   }
+
+  // ⬅️ Khi load lại, đọc từ URL
+  useEffect(() => {
+    const pageParam = Number(searchParams.get("page")) || 1;
+    if (pageParam >= 1 && pageParam <= totalPages) {
+      setCurrentPage(pageParam);
+    }
+  }, [searchParams, totalPages]);
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", page.toString());
+    router.replace(`?${params.toString()}`);
+    setCurrentPage(page);
+  };
+
+  // 🔄 Cắt dữ liệu theo trang
+  const startIndex = (currentPage - 1) * 10;
+  const currentBugs = fullBugList.slice(startIndex, startIndex + 10);
   const fieldTable = [
     { code: "id", display: "ID" },
     { code: "name", display: "Tiêu đề" },
@@ -36,8 +61,8 @@ function BugList({ product_id, bugList, externalBugCreated }: BugListProps) {
           </tr>
         </thead>
         <tbody>
-          {fullBugList.length > 0 ? (
-            fullBugList.map((bug) => (
+          {currentBugs.length > 0 ? (
+            currentBugs.map((bug) => (
               <BugRow
                 key={"bug" + bug.bug_id}
                 bug={bug}
@@ -55,6 +80,23 @@ function BugList({ product_id, bugList, externalBugCreated }: BugListProps) {
           )}
         </tbody>
       </table>
+      <div className="flex justify-center">
+        {totalPages > 1 && (
+          <div className="join">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => handlePageChange(page)}
+                className={`join-item btn ${
+                  page === currentPage ? "btn-active" : ""
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

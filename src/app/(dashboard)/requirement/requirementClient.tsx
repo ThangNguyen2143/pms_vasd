@@ -11,37 +11,16 @@ import {
   RequirementDto,
   UserDto,
 } from "~/lib/types";
-
-import { ReactNode } from "react";
-import Link from "next/link";
 import OverviewRequirement from "~/components/requirment/overview-required-tab";
 import clsx from "clsx";
 import AddLocationModal from "~/components/requirment/modals/add-location-modal";
 import AddRequirementModal from "~/components/requirment/modals/add-requirement-modal";
-import { format_date, toISOString } from "~/utils/fomat-date";
+import { toISOString } from "~/utils/fomat-date";
 import { endOfDay, startOfDay, subDays } from "date-fns";
 import { toast } from "sonner";
 import DateTimePicker from "~/components/ui/date-time-picker";
+import RequirementList from "~/components/requirment/requirment-list";
 
-function ContructionTable({ children }: { children: ReactNode }) {
-  return (
-    <table className="table overflow-x-auto">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Tiêu đề</th>
-          <th>Ưu tiên</th>
-          <th>Loại yêu cầu</th>
-          <th>Ngày tạo</th>
-          <th>Tác giả</th>
-          <th>Ngày hoàn thành</th>
-          <th>Chi tiết</th>
-        </tr>
-      </thead>
-      <tbody>{children}</tbody>
-    </table>
-  );
-}
 const productCache: Record<number, ProductDto[]> = {};
 const locationCache: Record<number, ProjectLocation[]> = {}; //Để cache dữ liệu khoa phòng trong trường hợp có biểu đồ dùng khoa phòng
 function RequirementsClient() {
@@ -286,62 +265,12 @@ function RequirementsClient() {
               </div>
             )}
             {projectSelect != 0 ? (
-              <div className="bg-base-100 border-base-300 p-6">
-                <ContructionTable>
-                  {requiredList && requiredList.length > 0 ? (
-                    requiredList.map((required) => {
-                      return (
-                        <tr key={required.id}>
-                          <td>{required.id}</td>
-                          <td>{required.title}</td>
-                          <td>{required.priority}</td>
-                          <td>{required.type}</td>
-                          <td>{format_date(required.date_create)}</td>
-                          <td>
-                            {userList
-                              ? userList.find(
-                                  (us) => us.userid == required.created_by
-                                )?.userData.display_name
-                              : required.created_by}
-                          </td>
-                          <td>
-                            {required.date_end
-                              ? format_date(required.date_end)
-                              : "-"}
-                          </td>
-                          <td>
-                            <Link
-                              href={
-                                `/requirement/` +
-                                encodeBase64({
-                                  requirement_id: required.id,
-                                  project_id: projectSelect,
-                                })
-                              }
-                            >
-                              <button className="btn btn-outline btn-primary">
-                                Chi tiết
-                              </button>
-                            </Link>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  ) : loading ? (
-                    <tr>
-                      <td colSpan={8} className="text-center">
-                        <span className="loading loading-dots loading-xl"></span>
-                      </td>
-                    </tr>
-                  ) : (
-                    <tr>
-                      <td colSpan={8} className="text-center">
-                        Chưa có yêu cầu nào
-                      </td>
-                    </tr>
-                  )}
-                </ContructionTable>
-              </div>
+              <RequirementList
+                loading={loading}
+                project_id={projectSelect}
+                requiredList={requiredList}
+                userList={userList}
+              />
             ) : (
               <div className="alert alert-info mt-4">Chưa chọn dự án nào</div>
             )}

@@ -2,6 +2,8 @@
 import { UserDto, WorkStatus } from "~/lib/types";
 import { TestcaseDto } from "~/lib/types/testcase";
 import TestRow from "./test-row";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 interface TestListProps {
   product_id: string;
@@ -17,7 +19,29 @@ function TestList({
   statusList,
   externalTestCreated,
 }: TestListProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const fullTestList = testList ? [...testList] : [];
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.ceil(fullTestList.length / 10);
+  // ⬅️ Khi load lại, đọc từ URL
+  useEffect(() => {
+    const pageParam = Number(searchParams.get("page")) || 1;
+    if (pageParam >= 1 && pageParam <= totalPages) {
+      setCurrentPage(pageParam);
+    }
+  }, [searchParams, totalPages]);
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", page.toString());
+    router.replace(`?${params.toString()}`);
+    setCurrentPage(page);
+  };
+
+  // 🔄 Cắt dữ liệu theo trang
+  const startIndex = (currentPage - 1) * 10;
+  const currentTests = fullTestList.slice(startIndex, startIndex + 10);
+
   if (
     externalTestCreated &&
     !fullTestList.find((t) => t.id === externalTestCreated.id)
@@ -48,8 +72,8 @@ function TestList({
           </tr>
         </thead>
         <tbody>
-          {fullTestList.length > 0 ? (
-            fullTestList.map((testcase) => (
+          {currentTests.length > 0 ? (
+            currentTests.map((testcase) => (
               <TestRow
                 testcase={testcase}
                 users={userList || []}
@@ -68,6 +92,23 @@ function TestList({
           )}
         </tbody>
       </table>
+      <div className="flex justify-center">
+        {totalPages > 1 && (
+          <div className="join">
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => handlePageChange(page)}
+                className={`join-item btn ${
+                  page === currentPage ? "btn-active" : ""
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
