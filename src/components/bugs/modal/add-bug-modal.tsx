@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
+import { useUploadFile } from "~/hooks/use-upload-file";
 import { encodeBase64 } from "~/lib/services";
 import { BugSeverity, Priority, TestcaseDto } from "~/lib/types";
 
@@ -39,7 +40,10 @@ export default function AddBugModal({
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState("");
   const [testcaseSelected, setTestcaseSelected] = useState("");
-  const { postData, isLoading, errorData } = useApi<"", DataCreate>();
+  const [files, setFile] = useState<File[]>([]);
+  const { isUploading, uploadError, uploadMultiFiles } = useUploadFile();
+
+  // const { postData, isLoading, errorData } = useApi<"", DataCreate>();
   const {
     data: severityList,
     getData: getSeverity,
@@ -62,8 +66,9 @@ export default function AddBugModal({
     getTestCase("/testcase/" + encodeBase64({ product_id }), "reload");
   }, [product_id]);
   useEffect(() => {
-    if (errorData) toast.error(errorData.message || errorData.title);
-  }, [errorData]);
+    // if (errorData) toast.error(errorData.message || errorData.title);
+    if (uploadError) toast.error(uploadError);
+  }, [uploadError]);
   if (!severityList || !priorityList) {
     if (errorSeverity)
       toast.error(errorSeverity.message || errorSeverity.title);
@@ -100,17 +105,21 @@ export default function AddBugModal({
       tags,
       log: logBug,
       severity: severitySelect,
-      // Nếu không có testcaseSelected thì sẽ là chuỗi rỗng
-      // Nếu có thì sẽ là id của testcase
       test_case_ref_id: Number(testcaseSelected),
     };
     if (!data.test_case_ref_id) delete data.test_case_ref_id;
     if (data.log?.trim().length == 0) delete data.log;
-    const re = await postData("/bugs", data);
-
-    if (re != "") return;
+    // const re = await postData("/bugs", data);
+    const re = await uploadMultiFiles({
+      files,
+      uploadUrl: "/bugs",
+      meta: {
+        ...data,
+      },
+    });
+    if (re?.value != "") return;
     else {
-      toast.success("Tạo yêu cầu thành công");
+      toast.success("Báo bug thành công");
       onCreated();
       onClose();
     }
@@ -232,6 +241,22 @@ export default function AddBugModal({
               ))}
             </select>
           </fieldset>
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">Tệp đính kèm</legend>
+            <input
+              type="file"
+              className="file-input file-input-primary mt-4"
+              name="fileSend"
+              multiple
+              placeholder="Chọn tệp đính kèm"
+              onChange={(e) => {
+                const selected = e.target.files;
+                if (selected) {
+                  setFile(Array.from(selected));
+                }
+              }}
+            />
+          </fieldset>
         </div>
         <div className="modal-action">
           <button className="btn btn-ghost" onClick={onClose}>
@@ -240,9 +265,9 @@ export default function AddBugModal({
           <button
             className="btn btn-primary"
             onClick={handleSubmit}
-            disabled={isLoading}
+            disabled={isUploading}
           >
-            {isLoading ? (
+            {isUploading ? (
               <span className="loading loading-spinner loading-xs"></span>
             ) : (
               "Lưu"

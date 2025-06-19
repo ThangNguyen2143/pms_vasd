@@ -11,7 +11,11 @@ interface UploadFileParams {
   uploadUrl: string;
   meta: Record<string, number>; // payload động: {id, task_id, bug_id...}
 }
-
+interface UploadFilesParams {
+  files: File[];
+  uploadUrl: string;
+  meta: Record<string, number | string | string[] | object>; // payload động: {id, task_id, bug_id...}
+}
 export function useUploadFile<T = string>(method: "post" | "put" = "post") {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -59,11 +63,58 @@ export function useUploadFile<T = string>(method: "post" | "put" = "post") {
       setIsUploading(false);
     }
   };
-
+  const uploadMultiFiles = async ({
+    files,
+    uploadUrl,
+    meta,
+  }: UploadFilesParams) => {
+    setIsUploading(true);
+    setUploadError(null);
+    setResponse(null);
+    const session = await verifySession();
+    if (!session) {
+      setUploadError("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.");
+      setIsUploading(false);
+      return null;
+    }
+    try {
+      const prepared = files.map((file) => prepareSmartUpload(file));
+      const result = await Promise.all(prepared);
+      const payload = {
+        data: {
+          ...meta,
+          files: result,
+        },
+        token: session.token || "",
+      };
+      let res: AxiosResponse<DataResponse<T>> | null = null;
+      if (method === "put") {
+        res = await axios.put<DataResponse<T>>(DOMAIN + uploadUrl, payload, {
+          headers: { "Content-Type": "application/json" },
+          maxBodyLength: Infinity,
+        });
+      } else {
+        res = await axios.post<DataResponse<T>>(DOMAIN + uploadUrl, payload, {
+          headers: { "Content-Type": "application/json" },
+          maxBodyLength: Infinity,
+        });
+      }
+      if (res.data.code !== 200) setUploadError(res.data.message);
+      setResponse(res.data);
+      return res.data;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      setUploadError(error?.message || "Lỗi không xác định khi upload file.");
+      return null;
+    } finally {
+      setIsUploading(false);
+    }
+  };
   return {
     isUploading,
     uploadError,
     response,
     uploadFile,
+    uploadMultiFiles,
   };
 }

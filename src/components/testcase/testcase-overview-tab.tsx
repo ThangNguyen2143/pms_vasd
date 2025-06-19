@@ -9,7 +9,7 @@ import { toISOString } from "~/utils/fomat-date";
 import DateTimePicker from "../ui/date-time-picker";
 import { ProductModule } from "~/lib/types";
 import { StackedBarChartByModule } from "../tasks/charts/group-chart-status";
-import StackBarChartHorizonal from "../ui/chart/stack-chart-horizonal";
+import StackBarChartHorizonal from "./stack-chart-horizonal";
 import PieChartComp from "../ui/chart/pie-chart";
 import TableTestNeverRun from "./test-never-run-table";
 

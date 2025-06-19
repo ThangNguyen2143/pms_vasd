@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
+import { useUploadFile } from "~/hooks/use-upload-file";
 import { encodeBase64 } from "~/lib/services";
 import { ProductModule, TaskDTO } from "~/lib/types";
 import { EnviromentTest } from "~/lib/types/testcase";
@@ -16,6 +17,7 @@ type CreateTestcaseData = {
     environment: string;
     tags: string[];
     result_expect: string;
+    test_data?: string;
     task_id?: number;
   };
   steps: {
@@ -74,16 +76,21 @@ function CreateTestcaseForm({
         name: "",
         description: "",
         expected_result: "",
+        note: "",
       },
     ],
   });
 
   const [currentTag, setCurrentTag] = useState("");
-  const {
-    postData,
-    isLoading,
-    errorData: errorPost,
-  } = useApi<"", CreateTestcaseData>();
+  const [files, setFile] = useState<File[]>([]);
+
+  const { isUploading, uploadError, uploadMultiFiles } = useUploadFile();
+
+  // const {
+  //   postData,
+  //   isUploading,
+  //   errorData: errorPost,
+  // } = useApi<"", CreateTestcaseData>();
   const {
     getData: getEnv,
     data: environmentTest,
@@ -111,13 +118,14 @@ function CreateTestcaseForm({
     }
     // if (errorGetTask && errorGetTask.code != 404)
     //   toast.error("Danh sách task:" + errorGetTask.message);
-    if (errorPost) {
-      console.error(errorPost);
-      toast.error(errorPost.message || errorPost.title);
-    }
-  }, [errorLoadEnv, errorPost]);
+    // if (errorPost) {
+    //   console.error(errorPost);
+    //   toast.error(errorPost.message || errorPost.title);
+    // }
+    if (uploadError) toast.error(uploadError);
+  }, [errorLoadEnv, uploadError]);
   const handleSubmit = async () => {
-    const data = {
+    const data: CreateTestcaseData = {
       product_id,
       ...formData,
     };
@@ -133,8 +141,15 @@ function CreateTestcaseForm({
       if (temp.note?.trim().length == 0) delete temp.note;
       return temp;
     });
-    const result = await postData("/testcase", data);
-    if (result !== null) {
+    // const result = await postData("/testcase", data);
+    const result = await uploadMultiFiles({
+      files,
+      uploadUrl: "/testcase",
+      meta: {
+        ...data,
+      },
+    });
+    if (result?.value == "") {
       toast.success("Tạo testcase thành công");
       onSuccess();
       resetForm();
@@ -390,6 +405,22 @@ function CreateTestcaseForm({
               ))}
             </div>
           </div>
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">Tệp đính kèm</legend>
+            <input
+              type="file"
+              className="file-input file-input-primary mt-4"
+              name="fileSend"
+              multiple
+              placeholder="Chọn tệp đính kèm"
+              onChange={(e) => {
+                const selected = e.target.files;
+                if (selected) {
+                  setFile(Array.from(selected));
+                }
+              }}
+            />
+          </fieldset>
         </fieldset>
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Các bước thực hiện</legend>
@@ -498,9 +529,13 @@ function CreateTestcaseForm({
         <button
           className="btn btn-primary"
           onClick={handleSubmit}
-          disabled={isLoading}
+          disabled={isUploading}
         >
-          {isLoading ? "Đang tạo..." : "Tạo testcase"}
+          {isUploading ? (
+            <span className="loading loading-spinner"></span>
+          ) : (
+            "Tạo testcase"
+          )}
         </button>
         <button className="btn btn-outline btn-accent" onClick={resetForm}>
           Làm mới

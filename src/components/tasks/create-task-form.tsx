@@ -8,6 +8,7 @@ import { encodeBase64 } from "~/lib/services";
 import RichTextEditor from "../ui/rich-text-editor";
 import DateTimePicker from "../ui/date-time-picker";
 import { ProductModule } from "~/lib/types";
+import { useUploadFile } from "~/hooks/use-upload-file";
 interface Criteria {
   id: string;
   title: string;
@@ -43,10 +44,13 @@ function CreateTaskForm({
   ]);
   const [selectedRequirement, setSelectedRequirement] = useState<number>(0);
   const [selectModule, setSelectModule] = useState<string>("");
+  const [files, setFile] = useState<File[]>([]);
+
+  const { isUploading, uploadError, uploadMultiFiles } = useUploadFile();
 
   const { data: requireds, getData: getRequiredList } =
     useApi<{ id: number; title: string }[]>();
-  const { postData, isLoading, errorData: postError } = useApi<"">();
+  // const { postData, isLoading, errorData: postError } = useApi<"">();
   const { data: criteriaType, getData: getCriterial } =
     useApi<{ code: string; display: string }[]>();
   useEffect(() => {
@@ -59,8 +63,9 @@ function CreateTaskForm({
     getRequiredList("/requirements/list/" + encodeBase64({ product_id }));
   }, [product_id]);
   useEffect(() => {
-    if (postError) toast.error(postError.message);
-  }, [postError]);
+    // if (postError) toast.error(postError.message);
+    if (uploadError) toast.error(uploadError);
+  }, [uploadError]);
   const handleSubmit = async () => {
     const data: DataPost = {
       product_id,
@@ -76,9 +81,15 @@ function CreateTaskForm({
     };
     if (data.requirement_id == 0) delete data.requirement_id;
     if (data.acceptances?.length == 0) delete data.acceptances;
-    const result = await postData("/tasks", data);
-
-    if (result !== null) {
+    // const result = await postData("/tasks", data);
+    const result = await uploadMultiFiles({
+      files,
+      uploadUrl: "/tasks",
+      meta: {
+        ...data,
+      },
+    });
+    if (result?.value == "") {
       toast.success("Tạo công việc thành công");
       onSuccess(); // gọi lại TaskList để reload
       setTitle("");
@@ -230,15 +241,31 @@ function CreateTaskForm({
               ))}
           </select>
         </fieldset>
+        <fieldset className="fieldset">
+          <legend className="fieldset-legend">Tệp đính kèm</legend>
+          <input
+            type="file"
+            className="file-input file-input-primary mt-4"
+            name="fileSend"
+            multiple
+            placeholder="Chọn tệp đính kèm"
+            onChange={(e) => {
+              const selected = e.target.files;
+              if (selected) {
+                setFile(Array.from(selected));
+              }
+            }}
+          />
+        </fieldset>
       </div>
 
       <div className="flex justify-between md:col-span-2">
         <button
           className="btn btn-primary"
           onClick={handleSubmit}
-          disabled={isLoading}
+          disabled={isUploading}
         >
-          {isLoading ? "Đang tạo..." : "Tạo công việc"}
+          {isUploading ? "Đang tạo..." : "Tạo công việc"}
         </button>
         <button
           className="btn btn-outline btn-accent"

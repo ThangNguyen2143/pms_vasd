@@ -8,7 +8,7 @@ function CreateTestcaseClient() {
   const route = useRouter();
   const [selectProduct, setSelectProduct] = useState("");
   return (
-    <div className="container mt-4">
+    <div className="container mt-4 shadow">
       <SelectProject
         setProductSelect={setSelectProduct}
         productSelected={selectProduct}

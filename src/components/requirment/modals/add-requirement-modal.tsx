@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import DateTimePicker from "~/components/ui/date-time-picker";
 import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
+import { useUploadFile } from "~/hooks/use-upload-file";
 import { ProductDto, RequirementType } from "~/lib/types";
 
 interface AddRequirementProps {
@@ -44,12 +45,15 @@ export default function AddRequirementModal({
   const [dateReceive, setDateReceive] = useState("");
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState("");
+  const [files, setFile] = useState<File[]>([]);
+
+  const { isUploading, uploadError, uploadMultiFiles } = useUploadFile();
 
   const [locationId, setLocationId] = useState<number | "">("");
   const [requester, setRequester] = useState("");
   const [role, setRole] = useState("");
 
-  const { postData, isLoading, errorData } = useApi<"", DataCreate>();
+  // const { postData, isLoading, errorData } = useApi<"", DataCreate>();
   const {
     data: typeList,
     getData,
@@ -62,8 +66,9 @@ export default function AddRequirementModal({
     );
   }, []);
   useEffect(() => {
-    if (errorData) toast.error(errorData.message);
-  }, [errorData]);
+    // if (errorData) toast.error(errorData.message);
+    if (uploadError) toast.error(uploadError);
+  }, [uploadError]);
   if (!typeList) {
     if (errorListType) toast.error(errorListType.message);
     return (
@@ -114,8 +119,16 @@ export default function AddRequirementModal({
       },
     };
 
-    const re = await postData("/requirements", data);
-    if (re != "") return;
+    // const re = await postData("/requirements", data);
+    // if (re != "") return;
+    const re = await uploadMultiFiles({
+      files,
+      uploadUrl: "/requirements",
+      meta: {
+        ...data,
+      },
+    });
+    if (re?.value != "") return;
     else {
       toast.success("Tạo yêu cầu thành công");
       await onCreated();
@@ -272,6 +285,22 @@ export default function AddRequirementModal({
               onChange={(e) => setRole(e.target.value)}
             />
           </label>
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">Tệp đính kèm</legend>
+            <input
+              type="file"
+              className="file-input file-input-primary mt-4"
+              name="fileSend"
+              multiple
+              placeholder="Chọn tệp đính kèm"
+              onChange={(e) => {
+                const selected = e.target.files;
+                if (selected) {
+                  setFile(Array.from(selected));
+                }
+              }}
+            />
+          </fieldset>
         </div>
         <div className="modal-action">
           <button className="btn btn-ghost" onClick={onClose}>
@@ -280,9 +309,9 @@ export default function AddRequirementModal({
           <button
             className="btn btn-primary"
             onClick={handleSubmit}
-            disabled={isLoading}
+            disabled={isUploading}
           >
-            {isLoading ? (
+            {isUploading ? (
               <span className="loading loading-spinner loading-xs"></span>
             ) : (
               "Lưu"
