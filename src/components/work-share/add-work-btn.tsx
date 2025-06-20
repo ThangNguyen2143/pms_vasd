@@ -51,7 +51,7 @@ function AddWorkBtn({
       type: formData.type,
       request_at: formData.request_at as string,
       deadline: formData.deadline as string,
-      project_id,
+      project_id: Number(project_id),
       pic: formData.pic,
     });
     if (validatedFields.error) {
@@ -70,6 +70,7 @@ function AddWorkBtn({
     }
     // Đóng dialog nếu cần hoặc reset form
   };
+  console.log(errors, errorData, message);
   if (project_id === "0") {
     // If project_id is empty, return a button without opening the modal
     return (

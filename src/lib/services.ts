@@ -2,7 +2,6 @@ import { decode, encode } from "base-64";
 import { verifySession } from "./dal";
 import { DataResponse } from "./types";
 import { getSession } from "./session";
-import { logClient } from "./clientLog";
 
 const DOMAIN = process.env.DOMAIN || "https://pmapi.vasd.vn/api";
 export function encodeBase64(obj: object): string {
@@ -27,7 +26,6 @@ export async function getItem<T>({
       value: "",
       status: "failed",
     } as DataResponse<T>;
-  await logClient(`[REQUEST] GET ${DOMAIN + endpoint}`);
   const result = await fetch(DOMAIN + endpoint, {
     cache,
     headers: {
@@ -37,11 +35,6 @@ export async function getItem<T>({
 
   try {
     const response = (await result.json()) as DataResponse<T>;
-    await logClient(
-      `[RESPONSE] ${response.code || result.status} - message: ${
-        response.message || result.statusText
-      }`
-    );
     return response;
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (e) {
