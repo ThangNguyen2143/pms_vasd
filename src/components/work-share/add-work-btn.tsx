@@ -70,7 +70,6 @@ function AddWorkBtn({
     }
     // Đóng dialog nếu cần hoặc reset form
   };
-  console.log(errors, errorData, message);
   if (project_id === "0") {
     // If project_id is empty, return a button without opening the modal
     return (
