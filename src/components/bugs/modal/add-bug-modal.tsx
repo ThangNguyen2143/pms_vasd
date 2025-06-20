@@ -127,10 +127,10 @@ export default function AddBugModal({
 
   return (
     <div className="modal modal-open ">
-      <div className="modal-box max-w-xl w-full">
+      <div className="modal-box max-w-5xl w-full">
         <h3 className="font-bold text-lg pb-2">Báo bug mới</h3>
-        <div className="flex flex-col gap-2 px-4">
-          <label className="floating-label">
+        <div className="grid grid-cols-2 gap-2 px-4">
+          <label className="floating-label col-span-2">
             <span>Tiêu đề</span>
             <input
               type="text"
@@ -140,7 +140,7 @@ export default function AddBugModal({
               onChange={(e) => setTitle(e.target.value)}
             />
           </label>
-          <fieldset className="fieldset">
+          <fieldset className="fieldset col-span-2">
             <legend className="fieldset-legend">Mô tả</legend>
             <RichTextEditor
               placeholder="Mô tả"
@@ -148,11 +148,11 @@ export default function AddBugModal({
               onChange={setDescription}
             />
           </fieldset>
-          <fieldset className="fieldset">
+          <fieldset className="fieldset col-span-2">
             <legend className="fieldset-legend">Log</legend>
-            <input
-              type="text"
-              className="input w-full"
+            <textarea
+              className="textarea w-full"
+              rows={2}
               placeholder="Log gây bug"
               value={logBug}
               onChange={(e) => setLogBug(e.target.value)}

@@ -1,10 +1,12 @@
 "use client";
+import clsx from "clsx";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 import { encodeBase64 } from "~/lib/services";
 import { RequirementDto, UserDto } from "~/lib/types";
 import { format_date } from "~/utils/fomat-date";
+import { status_with_color } from "~/utils/status-with-color";
 
 function ContructionTable({ children }: { children: ReactNode }) {
   return (
@@ -67,7 +69,21 @@ function RequirementList({
             return (
               <tr key={required.id}>
                 <td>{required.id}</td>
-                <td>{required.title}</td>
+                <td>
+                  <div className="indicator">
+                    <span
+                      className={clsx(
+                        "indicator-item badge indicator-top indicator-end text-xs",
+                        `badge-${status_with_color(required.status)}`
+                      )}
+                    >
+                      {required.status}
+                    </span>
+                    <div className="grid place-items-center w-full m-2">
+                      {required.title}
+                    </div>
+                  </div>
+                </td>
                 <td>{required.priority}</td>
                 <td>{required.type}</td>
                 <td>{format_date(required.date_create)}</td>
