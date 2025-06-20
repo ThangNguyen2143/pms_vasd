@@ -1,0 +1,24 @@
+[2025-06-20T01:12:10.258Z] [IP ::1] [REQUEST] GET https://pmapi.vasd.vn/api/system/config/eyJ0eXBlIjoicHJvamVjdCJ9
+[2025-06-20T01:12:10.514Z] [IP ::1] [RESPONSE] 200 - message: Xử lý thành công
+[2025-06-20T01:12:10.872Z] [IP ::1] [REQUEST] GET https://pmapi.vasd.vn/api/user/eyJ0eXBlIjoiaW5mbyIsImlkIjoxMn0=
+[2025-06-20T01:12:11.006Z] [IP ::1] [RESPONSE] 200 - message: Xử lý thành công
+[2025-06-20T01:12:11.293Z] [IP ::1] [REQUEST] GET https://pmapi.vasd.vn/api/dashboard/eyJ0eXBlIjoib3ZlcnZpZXciLCJwcm9qZWN0X2lkIjo2fQ==
+[2025-06-20T01:12:11.541Z] [IP ::1] [RESPONSE] 200 - message: Xử lý thành công
+[2025-06-20T01:12:11.847Z] [IP ::1] [REQUEST] GET https://pmapi.vasd.vn/api/dashboard/eyJ0eXBlIjoiYXNzaWdubWVudF9zdW1tYXJ5IiwicHJvamVjdF9pZCI6Nn0=
+[2025-06-20T01:12:12.027Z] [IP ::1] [RESPONSE] 200 - message: Xử lý thành công
+[2025-06-20T01:12:12.225Z] [IP ::1] [REQUEST] GET https://pmapi.vasd.vn/api/dashboard/eyJ0eXBlIjoiZ2FudHRfZGF0YSIsInByb2plY3RfaWQiOjZ9
+[2025-06-20T01:12:12.449Z] [IP ::1] [RESPONSE] 200 - message: Xử lý thành công
+[2025-06-20T01:12:12.620Z] [IP ::1] [REQUEST] GET https://pmapi.vasd.vn/api/product/eyJ0eXBlIjoiYWxsIiwicHJvamVjdF9pZCI6MX0=
+[2025-06-20T01:12:12.919Z] [IP ::1] [RESPONSE] 404 - message: Không tìm thấy dữ liệu
+[2025-06-20T01:12:13.177Z] [IP ::1] [REQUEST] GET https://pmapi.vasd.vn/api/product/eyJ0eXBlIjoiYWxsIiwicHJvamVjdF9pZCI6Nn0=
+[2025-06-20T01:12:13.744Z] [IP ::1] [RESPONSE] 200 - message: Xử lý thành công
+[2025-06-20T01:12:14.320Z] [IP ::1] [REQUEST] GET https://pmapi.vasd.vn/api/product/eyJ0eXBlIjoiYWxsIiwicHJvamVjdF9pZCI6N30=
+[2025-06-20T01:12:14.584Z] [IP ::1] [RESPONSE] 200 - message: Xử lý thành công
+[2025-06-20T01:12:14.863Z] [IP ::1] [REQUEST] GET https://pmapi.vasd.vn/api/system/config/eyJ0eXBlIjoibWVudSJ9
+[2025-06-20T01:12:14.973Z] [IP ::1] [RESPONSE] 200 - message: Xử lý thành công
+[2025-06-20T01:12:15.255Z] [IP ::1] [REQUEST] GET https://pmapi.vasd.vn/api/system/config/eyJ0eXBlIjoibWVudSJ9
+[2025-06-20T01:12:15.342Z] [IP ::1] [RESPONSE] 200 - message: Xử lý thành công
+[2025-06-20T01:12:15.520Z] [IP ::1] [REQUEST] GET https://pmapi.vasd.vn/api/system/config/eyJ0eXBlIjoibWVudSJ9
+[2025-06-20T01:12:15.607Z] [IP ::1] [RESPONSE] 200 - message: Xử lý thành công
+[2025-06-20T01:12:15.845Z] [IP ::1] [REQUEST] GET https://pmapi.vasd.vn/api/system/config/eyJ0eXBlIjoibWVudSJ9
+[2025-06-20T01:12:15.966Z] [IP ::1] [RESPONSE] 200 - message: Xử lý thành công
