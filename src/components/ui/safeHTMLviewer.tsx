@@ -1,5 +1,6 @@
 "use client";
 
+import clsx from "clsx";
 import DOMPurify from "dompurify";
 
 interface SafeHtmlViewerProps {
@@ -10,7 +11,7 @@ interface SafeHtmlViewerProps {
 const SafeHtmlViewer: React.FC<SafeHtmlViewerProps> = ({ html, className }) => {
   return (
     <div
-      className={className}
+      className={clsx(className, "max-h-96 overflow-y-auto")}
       dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }}
     />
   );
