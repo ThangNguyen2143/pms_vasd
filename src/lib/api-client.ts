@@ -1,10 +1,10 @@
 "use server";
 import "server-only";
 import type { DataResponse } from "./types";
-
-// Import your existing methods
 import { deleteItem, getItem, postItem, putItem } from "./services"; // Replace with actual import path
 import { verifySession } from "./dal";
+import { logClient } from "./clientLog";
+const DOMAIN = process.env.DOMAIN || "https://pmapi.vasd.vn/api";
 
 // Add similar imports for your POST, PUT, DELETE methods
 // import { postItem, putItem, deleteItem } from "your-library-path"
@@ -47,11 +47,17 @@ export async function createData<T, D>({
     if (!session) {
       throw new Error("Session verification failed");
     }
+    await logClient(`[REQUEST] POST ${DOMAIN + endpoint} - Payload: ${data}`);
     // Replace with your actual postItem method
     const response = await postItem({
       endpoint,
       data: JSON.stringify({ data, token: session.token }),
     });
+    await logClient(
+      `[RESPONSE] POST ${DOMAIN + endpoint} - Data: ${
+        response.message || response.title
+      }`
+    );
     return response as DataResponse<T>;
   } catch (error) {
     console.error("API call failed:", error);
@@ -79,10 +85,16 @@ export async function updateData<T, D>({
     if (!session) {
       throw new Error("Session verification failed");
     }
+    await logClient(`[REQUEST] PUT ${DOMAIN + endpoint} - Payload: ${data}`);
     const response = await putItem({
       endpoint,
       data: JSON.stringify({ data, token: session.token }),
     });
+    await logClient(
+      `[RESPONSE] PUT ${DOMAIN + endpoint} - Data: ${
+        response.message || response.title
+      }`
+    );
     return response as DataResponse<T>;
   } catch (error) {
     console.error("API call failed:", error);
@@ -106,9 +118,15 @@ export async function deleteData<T>({
     if (!session) {
       throw new Error("Session verification failed");
     }
+    await logClient(`[REQUEST] DEL ${DOMAIN + endpoint}`);
     const response = await deleteItem({
       endpoint,
     });
+    await logClient(
+      `[RESPONSE] DEL ${DOMAIN + endpoint} - Data: ${
+        response.message || response.title
+      }`
+    );
     return response as DataResponse<T>;
   } catch (error) {
     console.error("API call failed:", error);
