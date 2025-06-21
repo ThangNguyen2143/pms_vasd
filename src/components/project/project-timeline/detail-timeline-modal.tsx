@@ -6,9 +6,9 @@ import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import {
   Contact,
+  ProjectMember,
   ProjectTimeLine,
   ProjectTimeLineDetail,
-  UserDto,
 } from "~/lib/types";
 import { sendEmail } from "~/utils/send-notify";
 import UpdateInfoForm from "./update-info-timeline";
@@ -49,9 +49,10 @@ export default function TimelineDetailModal({
   const {
     getData: getTimeLine,
     data: timeline,
+    errorData: errorGetData,
     isLoading,
   } = useApi<ProjectTimeLineDetail>();
-  const { getData: getUser, data: users } = useApi<UserDto[]>();
+  const { getData: getUser, data: users } = useApi<ProjectMember[]>();
   const {
     putData: assignUser,
     isLoading: loadingPut,
@@ -71,7 +72,10 @@ export default function TimelineDetailModal({
   const { removeData } = useApi<string>();
   useEffect(() => {
     getTimeLine("/project/timeline/detail/" + encodeBase64({ timeline_id }));
-    getUser("/user/" + encodeBase64({ type: "all" }));
+    getUser(
+      "/project/member/" +
+        encodeBase64({ project_id: timeLineList[0].project_id })
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeline_id]);
   const updateTimeLineData = async () => {
@@ -134,10 +138,6 @@ export default function TimelineDetailModal({
     });
     if (re != "") return;
     toast.success("Xử lý thành công");
-    await getTimeLine(
-      "/project/timeline/detail/" + encodeBase64({ timeline_id }),
-      "reload"
-    );
     await updateTimeLineData();
   };
   useEffect(() => {
@@ -156,8 +156,10 @@ export default function TimelineDetailModal({
         </button>
         {isLoading ? (
           <span className="loading loading-infinity"></span>
-        ) : !timeline ? (
-          <div className="card-body">Lỗi tải dữ liệu</div>
+        ) : !timeline || errorGetData ? (
+          <div className="card-body">
+            {errorGetData?.message || errorGetData?.title}
+          </div>
         ) : updateShow ? (
           <UpdateInfoForm
             onClose={() => setupdateShow(false)}
@@ -193,7 +195,9 @@ export default function TimelineDetailModal({
                     <button
                       className="btn btn-outline join-item btn-primary tooltip"
                       onClick={() => handlerUpdateStatus("START")}
-                      disabled={updateLoading}
+                      disabled={
+                        updateLoading || timeline.status == "IN_PROGRESS"
+                      }
                       data-tip="Bắt đầu"
                     >
                       <Play></Play>
@@ -220,8 +224,8 @@ export default function TimelineDetailModal({
                     </option>
                     {users ? (
                       users.map((us) => (
-                        <option value={us.userid} key={us.userid}>
-                          {us.userData.display_name}
+                        <option value={us.id} key={us.id}>
+                          {us.name}
                         </option>
                       ))
                     ) : (
