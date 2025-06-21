@@ -36,14 +36,6 @@ function PhaseTab({ project_id }: { project_id: number }) {
     }
   }, [errorStatusGet]);
 
-  if (!errorData)
-    return (
-      <div className="p-6">
-        Đang tải dữ liệu giai đoạn dự án
-        <span className="loading loading-dots loading-sm"></span>
-      </div>
-    );
-
   return (
     <div className="p-6 max-w-7xl mx-auto flex flex-col gap-6">
       <div className="flex justify-between">
@@ -67,7 +59,7 @@ function PhaseTab({ project_id }: { project_id: number }) {
       ) : (
         <div>
           <span className="alert alert-error">
-            {errorData.message || errorData.title}
+            {errorData?.message || errorData?.title}
           </span>
         </div>
       )}

@@ -44,9 +44,10 @@ function SelectProject({
   //   }
   //   return undefined;
   // };
-  const nameProduct = dataProduct?.find(
-    (product) => product.id == productSelected
-  )?.name;
+  const nameProduct =
+    dataProduct && dataProduct.length > 0
+      ? dataProduct.find((product) => product.id == productSelected)?.name
+      : undefined;
   // const nameProject = findProject(productSelected)?.product?.find(
   //   (p) => p.id === productSelected
   // )?.name;
