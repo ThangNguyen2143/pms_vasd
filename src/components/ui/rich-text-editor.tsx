@@ -1,10 +1,15 @@
+import clsx from "clsx";
 import StandaloneQuill from "./standaloneQuill";
 
-export default function RichTextEditor(
-  props: Parameters<typeof StandaloneQuill>[0]
-) {
+type RichTextEditorProps = Parameters<typeof StandaloneQuill>[0] & {
+  className?: string;
+};
+export default function RichTextEditor({
+  className = "",
+  ...props
+}: RichTextEditorProps) {
   return (
-    <div className="form-control w-full">
+    <div className={clsx("w-full", className)}>
       <div className="rounded-box border border-base-300 bg-white overflow-hidden">
         <StandaloneQuill {...props} />
       </div>

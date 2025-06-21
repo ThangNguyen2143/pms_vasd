@@ -20,9 +20,9 @@ function GroupProductToChart({ data, getProductName }: Props) {
       className={clsx(
         "grid",
         `grid-cols-${
-          [...groupedData.entries()].length < 4
+          [...groupedData.entries()].length <= 3
             ? [...groupedData.entries()].length
-            : 4
+            : 3
         }`
       )}
     >

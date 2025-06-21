@@ -24,6 +24,7 @@ type Project = {
 
 type ProjectContextType = {
   projects: Project[] | null;
+  isLoading: boolean;
   setProject: (projects: Project[] | null) => void;
   setProduct: (
     products: { id: string; name: string }[],
@@ -35,6 +36,7 @@ const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
 export function ProjectProvider({ children }: { children: ReactNode }) {
   const [projects, setProject] = useState<Project[] | null>(null);
+  const [isLoading, setLoading] = useState(false);
   const setProduct = useCallback(
     (products: { id: string; name: string }[], project_id: number) => {
       setProject((prevProjects) => {
@@ -72,17 +74,20 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
         fetchSoftware(project.id);
       });
     };
+    setLoading(true);
     fetchProjects();
+    setLoading(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const value = useMemo(
     () => ({
       projects,
+      isLoading,
       setProject,
       setProduct,
     }),
-    [projects, setProject, setProduct]
+    [projects, setProject, setProduct, isLoading]
   );
   return (
     <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>

@@ -23,6 +23,12 @@ function ListProject({
     const selectedValue = e.target.value;
     setProjectSelect(Number.parseInt(selectedValue));
   };
+  if (projectContext?.isLoading)
+    return (
+      <span>
+        Đang tải <span className="loading loading-spinner"></span>
+      </span>
+    );
   return (
     <select
       className="select select-ghost"
@@ -34,12 +40,6 @@ function ListProject({
       </option>
       {projectList ? (
         projectList.map((item, index) => {
-          if (projectList.length === 1)
-            return (
-              <option key={index} value={item.id} defaultChecked>
-                {item.name}
-              </option>
-            );
           return (
             <option key={index} value={item.id}>
               {item.name}
@@ -47,7 +47,9 @@ function ListProject({
           );
         })
       ) : (
-        <option>Đang tải...</option>
+        <option disabled value={0}>
+          Không có dữ liệu
+        </option>
       )}
     </select>
   );
