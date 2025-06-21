@@ -61,7 +61,7 @@ function MainProductTable({ project_id }: { project_id: number }) {
         <AddProductBtn
           project_id={project_id}
           onUpdate={async () => {
-            await getUser(endpointUser, "reload");
+            await onUpdate();
           }}
         />
       </div>

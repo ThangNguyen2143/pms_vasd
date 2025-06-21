@@ -35,16 +35,14 @@ function PhaseTab({ project_id }: { project_id: number }) {
       );
     }
   }, [errorStatusGet]);
-  if (!data) {
-    if (!errorData)
-      return (
-        <div className="p-6">
-          Đang tải dữ liệu giai đoạn dự án
-          <span className="loading loading-dots loading-sm"></span>
-        </div>
-      );
-    else return <div className="p-6 alert-error">{errorData.message}</div>;
-  }
+
+  if (!errorData)
+    return (
+      <div className="p-6">
+        Đang tải dữ liệu giai đoạn dự án
+        <span className="loading loading-dots loading-sm"></span>
+      </div>
+    );
 
   return (
     <div className="p-6 max-w-7xl mx-auto flex flex-col gap-6">
@@ -57,12 +55,22 @@ function PhaseTab({ project_id }: { project_id: number }) {
           + Thêm giai đoạn
         </button>
       </div>
-      <PhaseProjectTable
-        data={data}
-        onUpdate={re}
-        project_id={project_id}
-        statusData={statusData || undefined}
-      />
+      {data ? (
+        <PhaseProjectTable
+          data={data}
+          onUpdate={re}
+          project_id={project_id}
+          statusData={statusData || undefined}
+        />
+      ) : errorData && errorData.code != 404 ? (
+        <div>Chưa có dữ liệu</div>
+      ) : (
+        <div>
+          <span className="alert alert-error">
+            {errorData.message || errorData.title}
+          </span>
+        </div>
+      )}
       {showAddPhaseProject && (
         <AddPhaseProjectModal
           onClose={() => setShowAddPhaseProject(false)}
