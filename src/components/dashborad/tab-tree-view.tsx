@@ -13,7 +13,7 @@ export default function StaffTreeView({ data }: { data: WorkOverviewDTO[] }) {
       </h3>
 
       {/* Tree view container */}
-      <div className="overflow-x-auto">
+      <div className="overflow-auto max-h-[580px]">
         <div className="grid grid-cols-1 min-w-max">
           {data.map((user) => (
             <StaffColumn key={user.user_id} user={user} />

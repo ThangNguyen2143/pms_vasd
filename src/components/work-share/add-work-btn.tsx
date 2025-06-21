@@ -73,7 +73,7 @@ function AddWorkBtn({
   if (project_id === "0") {
     // If project_id is empty, return a button without opening the modal
     return (
-      <label htmlFor="AddWorkDialog" className="btn btn-primary">
+      <label htmlFor="AddWorkDialog" className="btn btn-info">
         Thêm công việc
       </label>
     );
@@ -83,7 +83,7 @@ function AddWorkBtn({
     <Dialog
       title="Thêm công việc mới"
       nameBtn={<>+ Thêm công việc</>}
-      typeBtn="primary"
+      typeBtn="info"
       sizeBox="sm"
       id="AddWorkBtn"
     >

@@ -61,22 +61,14 @@ function MainWork() {
       getWorkList(endpointWork, "reload");
     }
   }, [projectSelected]);
-  if (!statusList || !priorityList || !typeWorkList) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        Loading...
-      </div>
-    );
-  }
-
   return (
-    <div className="mt-4 flex flex-col gap-4 items-center">
+    <div className="mt-4 flex flex-col gap-4">
       <div className="container flex justify-between gap-2.5">
         <ListProject
           projectSelected={projectSelected}
           setProjectSelect={setProjectSelect}
         />
-        {isGuess ? (
+        {isGuess || !priorityList || !typeWorkList ? (
           ""
         ) : (
           <AddWorkBtn
@@ -94,7 +86,7 @@ function MainWork() {
           {errorWorkList.message}
         </div>
       ) : projectSelected != 0 ? (
-        <div className="relative shadow-md sm:rounded-lg">
+        <div className="shadow-md sm:rounded-lg flex flex-col">
           <div className="tabs tabs-lift">
             <input
               type="radio"
@@ -105,11 +97,13 @@ function MainWork() {
               aria-label="Tổng quan"
             />
             <div className="tab-content">
-              <OverviewWork
-                priorityList={priorityList}
-                statusList={statusList}
-                dataRaw={workList}
-              />
+              {priorityList && statusList && (
+                <OverviewWork
+                  priorityList={priorityList}
+                  statusList={statusList}
+                  dataRaw={workList}
+                />
+              )}
             </div>
             <input
               type="radio"
@@ -121,8 +115,8 @@ function MainWork() {
             <div className="tab-content">
               <TableWork
                 workList={workList || []}
-                priorityList={priorityList}
-                statusList={statusList}
+                priorityList={priorityList || undefined}
+                statusList={statusList || undefined}
                 isGuess={isGuess}
                 onUpdate={() => fetchData()}
               />

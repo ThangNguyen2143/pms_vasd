@@ -56,10 +56,10 @@ function ClientIncidentPage() {
           ""
         ) : (
           <button
-            className="btn btn-outline btn-primary"
+            className="btn btn-info"
             onClick={() => setShowAddModal(true)}
           >
-            Thêm sự kiện
+            + Thêm sự kiện
           </button>
         )}
       </div>

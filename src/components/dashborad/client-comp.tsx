@@ -154,6 +154,8 @@ function ClientDashboardPage() {
               ganttData || [],
               overview.progress_percent
             )}
+            project_start={overview.start_date}
+            project_end={overview.end_date}
           />
         </div>
       )}

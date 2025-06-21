@@ -14,7 +14,7 @@ function AddProjectBtn() {
 
   return (
     <>
-      <label htmlFor="AddProjectDialog" className="btn btn-primary">
+      <label htmlFor="AddProjectDialog" className="btn btn-info">
         Thêm dự án
       </label>
       <input type="checkbox" id="AddProjectDialog" className="modal-toggle" />

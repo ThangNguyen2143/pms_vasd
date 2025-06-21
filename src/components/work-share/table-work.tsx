@@ -18,8 +18,8 @@ function TableWork({
   onUpdate,
 }: {
   workList?: WorkShareDto[];
-  priorityList: Priority[];
-  statusList: WorkStatus[];
+  priorityList?: Priority[];
+  statusList?: WorkStatus[];
   isGuess?: boolean;
   onUpdate: () => Promise<void>;
 }) {
@@ -107,7 +107,7 @@ function TableWork({
                   }
                 </td>
                 <td>
-                  {!isGuess ? (
+                  {!isGuess && statusList ? (
                     <EditStatus
                       display={
                         statusList?.find(

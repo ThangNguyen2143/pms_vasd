@@ -8,7 +8,15 @@ export type GanttTask = {
   end: string;
   dependencies?: string;
 };
-export function GanttChart({ tasks }: { tasks: GanttTask[] }) {
+export function GanttChart({
+  tasks,
+  start,
+  end,
+}: {
+  tasks: GanttTask[];
+  start: string;
+  end: string;
+}) {
   const ref = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
@@ -17,21 +25,24 @@ export function GanttChart({ tasks }: { tasks: GanttTask[] }) {
     const svg = d3.select(ref.current);
     svg.selectAll("*").remove(); // Xoá nội dung cũ
 
-    const startDate = d3.min(tasks, (d) => new Date(d.start))!;
-    const endDate = d3.max(tasks, (d) => new Date(d.end))!;
-    const totalDays = d3.timeDay.count(startDate, endDate);
+    const projectStart = new Date(start);
+    const projectEnd = new Date(end);
+    const taskStart = d3.min(tasks, (d) => new Date(d.start))!;
+    const taskEnd = d3.max(tasks, (d) => new Date(d.end))!;
     const widthPerDay = 40;
-    const margin = { top: 20, right: 20, bottom: 30, left: 150 };
+    // Lấy ngày nhỏ nhất để bắt đầu
+    const startDate = projectStart < taskStart ? projectStart : taskStart;
+
+    // Lấy ngày lớn nhất để kết thúc
+    const endDate = projectEnd > taskEnd ? projectEnd : taskEnd;
+
+    // Số ngày hiển thị
+    const totalDays = d3.timeDay.count(startDate, endDate);
     const width = totalDays * widthPerDay;
     const height = tasks.length * 40;
 
-    const x = d3
-      .scaleTime()
-      .domain([
-        d3.min(tasks, (d) => new Date(d.start))!,
-        d3.max(tasks, (d) => new Date(d.end))!,
-      ])
-      .range([0, width]);
+    const margin = { top: 20, right: 20, bottom: 30, left: 150 };
+    const x = d3.scaleTime().domain([startDate, endDate]).range([0, width]);
 
     const y = d3
       .scaleBand()
@@ -139,7 +150,7 @@ export function GanttChart({ tasks }: { tasks: GanttTask[] }) {
         .attr("stroke-width", 2)
         .attr("marker-end", "url(#arrow)");
     });
-  }, [tasks]);
+  }, [tasks, start, end]);
 
   return (
     <div className="relative w-full">

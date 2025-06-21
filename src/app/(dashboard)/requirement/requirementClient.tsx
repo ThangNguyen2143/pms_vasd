@@ -248,7 +248,7 @@ function RequirementsClient() {
                 </div>
                 <div className="flex gap-2">
                   <button
-                    className="btn btn-primary"
+                    className="btn btn-info"
                     onClick={() => setShowAddRequirment(true)}
                   >
                     Thêm yêu cầu
