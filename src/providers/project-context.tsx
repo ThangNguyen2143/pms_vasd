@@ -6,7 +6,6 @@ import {
   useState,
   ReactNode,
   useMemo,
-  useCallback,
   useEffect,
 } from "react";
 import { fetchData } from "~/lib/api-client";
@@ -21,10 +20,14 @@ type Project = {
     name: string;
   }[];
 };
-
+type Product = {
+  id: string;
+  name: string;
+};
 type ProjectContextType = {
   projects: Project[] | null;
   isLoading: boolean;
+  products: Product[] | null;
   setProject: (projects: Project[] | null) => void;
   setProduct: (
     products: { id: string; name: string }[],
@@ -37,30 +40,21 @@ const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 export function ProjectProvider({ children }: { children: ReactNode }) {
   const [projects, setProject] = useState<Project[] | null>(null);
   const [isLoading, setLoading] = useState(false);
-  const setProduct = useCallback(
-    (products: { id: string; name: string }[], project_id: number) => {
-      setProject((prevProjects) => {
-        if (!prevProjects) return null;
-        return prevProjects.map((project) =>
-          project.id === project_id
-            ? { ...project, products: products }
-            : project
-        );
-      });
-    },
-    [setProject]
-  );
+  const [products, setProduct] = useState<Product[] | null>(null);
+  // const setProduct = useCallback(
+  //   (products: { id: string; name: string }[], project_id: number) => {
+  //     setProject((prevProjects) => {
+  //       if (!prevProjects) return null;
+  //       return prevProjects.map((project) =>
+  //         project.id === project_id
+  //           ? { ...project, products: products }
+  //           : project
+  //       );
+  //     });
+  //   },
+  //   [setProject]
+  // );
 
-  const fetchSoftware = async (project_id: number) => {
-    // Gọi API để lấy danh sách phần mềm
-    const endpointProduct =
-      "/product/" + encodeBase64({ type: "all", project_id: project_id });
-    const response = await fetchData<ProductDto[]>({
-      endpoint: endpointProduct,
-      cache: "default",
-    });
-    setProduct(response.value, project_id);
-  };
   useEffect(() => {
     const fetchProjects = async () => {
       //Hàm lấy danh sách dự án đang tham gia
@@ -70,14 +64,24 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
       });
       if (!response.value) return;
       setProject(response.value);
-      response.value.map((project) => {
-        fetchSoftware(project.id);
+      // response.value.map((project) => {
+      //   fetchSoftware(project.id);
+      // });
+    };
+    const fetchSoftware = async () => {
+      // Gọi API để lấy danh sách phần mềm
+      const endpointProduct =
+        "/system/config/" + encodeBase64({ type: "product" });
+      const response = await fetchData<ProductDto[]>({
+        endpoint: endpointProduct,
+        cache: "default",
       });
+      setProduct(response.value);
     };
     setLoading(true);
     fetchProjects();
+    fetchSoftware();
     setLoading(false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const value = useMemo(
@@ -85,9 +89,10 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
       projects,
       isLoading,
       setProject,
+      products,
       setProduct,
     }),
-    [projects, setProject, setProduct, isLoading]
+    [projects, setProject, products, setProduct, isLoading]
   );
   return (
     <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>

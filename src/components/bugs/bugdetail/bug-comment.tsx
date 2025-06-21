@@ -2,6 +2,8 @@
 import { Send } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import RichTextEditor from "~/components/ui/rich-text-editor";
+import SafeHtmlViewer from "~/components/ui/safeHTMLviewer";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { BugComment, Contact } from "~/lib/types";
@@ -107,7 +109,7 @@ export default function BugComments({
                </div> */}
                   <div className="chat-bubble wrap-anywhere">
                     <p className="font-bold text-sm">{comment.user_name}</p>
-                    <p className="text-lg mt-0.5 mx-2">{comment.comment}</p>
+                    <SafeHtmlViewer html={comment.comment} />
                   </div>
                   <div className="chat-footer">
                     <time className="text-xs opacity-50">
@@ -136,14 +138,19 @@ export default function BugComments({
             </div>
           </div>
           <div className="join-vertical mt-4 w-full border-dashed border rounded-2xl p-3">
-            <textarea
+            <RichTextEditor
+              value={newComment}
+              className="join-item resize-none not-last:focus-visible:outline-none focus-visible:border-none focus-visible:ring-0"
+              onChange={(e) => setNewComment(e)}
+            />
+            {/* <textarea
               ref={textareaRef}
               rows={1}
-              className="join-item resize-none break-words overflow-hidden w-full focus-visible:outline-none focus-visible:border-none focus-visible:ring-0"
+              className=" break-words overflow-hidden w-full "
               placeholder="Viết bình luận..."
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-            />
+            /> */}
             <div className="join-item flex justify-end">
               <button
                 className="btn btn-ghost btn-sm rounded-full"

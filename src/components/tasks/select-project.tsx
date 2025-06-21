@@ -16,7 +16,7 @@ function SelectProject({
   setProductSelect: (product_id: string) => void;
 }) {
   const projectContext = useProject();
-  const dataProject = projectContext?.projects;
+  const dataProduct = projectContext?.products;
   // Lấy lại lựa chọn từ localStorage
   useEffect(() => {
     const storedId = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -30,29 +30,31 @@ function SelectProject({
     localStorage.setItem(LOCAL_STORAGE_KEY, product_id);
   };
 
-  const findProject = (product_id: string) => {
-    const projectInList = dataProject?.find((project) => {
-      if (project.products)
-        return project.products.some((product) => product.id === product_id);
-      return undefined;
-    });
-    if (projectInList) {
-      return {
-        product: projectInList.products,
-        ...dataProject?.find((project) => projectInList.id === project.id),
-      };
-    }
-    return undefined;
-  };
-  const nameProduct = findProject(productSelected)?.name;
-  const nameProject = findProject(productSelected)?.product?.find(
-    (p) => p.id === productSelected
+  // const findProject = (product_id: string) => {
+  //   const projectInList = dataProject?.find((project) => {
+  //     if (project.products)
+  //       return project.products.some((product) => product.id === product_id);
+  //     return undefined;
+  //   });
+  //   if (projectInList) {
+  //     return {
+  //       product: projectInList.products,
+  //       ...dataProject?.find((project) => projectInList.id === project.id),
+  //     };
+  //   }
+  //   return undefined;
+  // };
+  const nameProduct = dataProduct?.find(
+    (product) => product.id == productSelected
   )?.name;
-  const displayLabel = !nameProject
+  // const nameProject = findProject(productSelected)?.product?.find(
+  //   (p) => p.id === productSelected
+  // )?.name;
+  const displayLabel = !nameProduct
     ? projectContext?.isLoading && (
         <span className="loading loading-spinner loading-sm"></span>
       )
-    : nameProject + " của " + nameProduct;
+    : nameProduct;
 
   if (projectContext?.isLoading) {
     return (
@@ -62,7 +64,7 @@ function SelectProject({
       </div>
     );
   }
-  if (dataProject)
+  if (dataProduct)
     return (
       <div className="dropdown">
         <div tabIndex={0} role="button" className="btn m-1">
@@ -72,26 +74,15 @@ function SelectProject({
           tabIndex={0}
           className="menu dropdown-content bg-base-100 rounded-box z-10 p-2 shadow-sm"
         >
-          {dataProject.map((project) => (
-            <li key={project.id}>
-              <h2 className="menu-title">{project.name}</h2>
-              {project.products ? (
-                <ul>
-                  {project.products.map((product) => (
-                    <li key={product.id}>
-                      <a
-                        id={product.id}
-                        className="hover:cursor-pointer"
-                        onClick={() => handleClickProduct(product.id)}
-                      >
-                        {product.name}
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <span>Chưa có phần mềm nào</span>
-              )}
+          {dataProduct.map((product) => (
+            <li key={product.id}>
+              <a
+                id={product.id}
+                className="hover:cursor-pointer"
+                onClick={() => handleClickProduct(product.id)}
+              >
+                {product.name}
+              </a>
             </li>
           ))}
         </ul>

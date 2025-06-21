@@ -19,7 +19,7 @@ export default function GanttWrapper({ tasks }: Props) {
     <div className="border rounded shadow">
       <div className="overflow-x-auto max-h-[500px]">
         <div className="min-w-[800px]">
-          <GanttChart tasks={tasks} />
+          {tasks.length > 0 && <GanttChart tasks={tasks} />}
         </div>
       </div>
     </div>
