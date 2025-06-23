@@ -21,6 +21,7 @@ type BugInfoProps = {
     reporter_name: string;
     tags: string[];
     status: string;
+    log: string;
   };
 };
 
@@ -158,14 +159,16 @@ export default function BugInfo({
 
       <div className="space-y-2">
         <p>
-          <strong>Tiêu đề:</strong> {bug.title}
+          <strong className="w-36">Tiêu đề:</strong> {bug.title}
         </p>
         <div>
-          <strong>Mô tả:</strong> <SafeHtmlViewer html={bug.description} />
+          <strong className="w-36">Mô tả:</strong>{" "}
+          <SafeHtmlViewer className="m-2" html={bug.description} />
         </div>
         <div className="flex gap-2">
           <p className="tooltip tooltip-bottom" data-tip={priority?.hints}>
-            <strong>Ưu tiên:</strong> {priority?.display || bug.priority}
+            <strong className="w-36">Ưu tiên:</strong>{" "}
+            {priority?.display || bug.priority}
           </p>
           {hiddenButton || errorPriority
             ? ""
@@ -180,7 +183,8 @@ export default function BugInfo({
         </div>
         <div className="flex gap-2">
           <p className="tooltip tooltip-bottom" data-tip={severity?.hints}>
-            <strong>Ảnh hưởng:</strong> {severity?.display || bug.severity}
+            <strong className="w-36">Ảnh hưởng:</strong>{" "}
+            {severity?.display || bug.severity}
           </p>
           {hiddenButton || errorSeverity
             ? ""
@@ -195,22 +199,28 @@ export default function BugInfo({
         </div>
 
         <p>
-          <strong>Đã cập nhật:</strong> {bug.is_update ? "Có" : "Chưa"}
+          <strong className="w-36">Đã cập nhật:</strong>{" "}
+          {bug.is_update ? "Có" : "Chưa"}
         </p>
         <p>
-          <strong>Người báo cáo:</strong> {bug.reporter_name}
+          <strong className="w-36">Người báo cáo:</strong> {bug.reporter_name}
         </p>
         <p>
-          <strong>Thời gian báo cáo:</strong> {format_date(bug.reported_at)}
+          <strong className="w-36">Thời gian báo cáo:</strong>{" "}
+          {format_date(bug.reported_at)}
         </p>
         <p>
-          <strong>Tag:</strong>{" "}
+          <strong className="w-36">Tag:</strong>{" "}
           {bug.tags.map((t) => (
             <span key={t} className="badge badge-outline mx-1 badge-primary">
               {t}
             </span>
           ))}
         </p>
+        <div>
+          <strong className="w-36">Log:</strong>
+          <SafeHtmlViewer className="m-2" html={bug.log} />
+        </div>
       </div>
     </div>
   );
