@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-// app/tasks/[id]/TaskDetailClient.tsx
 "use client";
 import clsx from "clsx";
 import { notFound } from "next/navigation";

@@ -12,9 +12,11 @@ import { toast } from "sonner";
 
 export default function Attachments({
   files,
+  requirement_id,
   onUpdate, // hàm để reload lại danh sách file sau khi thêm/xóa
   onAdd,
 }: {
+  requirement_id: number;
   files: { file_id: number; file_name: string; file_type: string }[];
   onUpdate: () => Promise<void>; // hàm để reload lại danh sách file sau khi thêm/xóa
   onAdd: () => void;
@@ -25,7 +27,7 @@ export default function Attachments({
   const handleRemoveFile = async (file_id: number) => {
     if (confirm("Bạn có chắc chắn muốn xóa tệp này?")) {
       const res = await removeFile(
-        "/requirements/file/" + encodeBase64({ file_id })
+        "/requirements/file/" + encodeBase64({ requirement_id, file_id })
       );
       if (res == "") {
         toast.success("Đã xóa tệp thành công.");

@@ -10,12 +10,13 @@ import {
   UserPlus,
 } from "lucide-react";
 import React from "react";
-import { Task } from "~/lib/types";
+import { ProductModule, Task } from "~/lib/types";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 import { format_date } from "~/utils/fomat-date";
 import SafeHtmlViewer from "~/components/ui/safeHTMLviewer";
+import { encodeBase64 } from "~/lib/services";
 export default function TaskInfo({
   task,
   onEdit,
@@ -35,7 +36,15 @@ export default function TaskInfo({
     "",
     { task_id: number; status: string }
   >();
-
+  const { data: moduleList, getData: getModules } = useApi<ProductModule[]>();
+  useEffect(() => {
+    getModules(
+      "/product/" +
+        encodeBase64({ type: "module", product_id: task.product_id }),
+      "default"
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [task.product_id]);
   useEffect(() => {
     if (errorData) toast.error(errorData.message);
   }, [errorData]);
@@ -127,6 +136,12 @@ export default function TaskInfo({
           <span className="font-bold w-32 inline-block">Mô tả:</span>{" "}
           <SafeHtmlViewer html={task.description} />
         </div>
+        <p>
+          <strong className="font-bold w-32 inline-block">Module:</strong>{" "}
+          {moduleList
+            ? moduleList.find((m) => m.id == task.module)?.display
+            : task.module}
+        </p>
         <p>
           <span className="font-bold w-32 inline-block">Ngày tạo:</span>{" "}
           {format_date(task.create_at)}

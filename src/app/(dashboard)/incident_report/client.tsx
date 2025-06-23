@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
+import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import IncidentList from "~/components/incident_report/incident-list";
@@ -16,6 +17,9 @@ function ClientIncidentPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showIncidentDetail, setShowIncidentDetail] = useState<number>();
   const [showUpdateDetail, setShowUpdateDetail] = useState(false);
+  const [findIncident, setFindIncident] = useState("");
+  const [incidentList, setIncidentList] = useState([] as Incident[]);
+
   const { data, getData, isLoading, errorData } = useApi<Incident[]>();
   const {
     data: detailIncident,
@@ -28,6 +32,22 @@ function ClientIncidentPage() {
   const endpointIncidentDetail = (id: number) => {
     return `/incident/detail/${encodeBase64({ incident_id: id })}`;
   };
+  useEffect(() => {
+    if (data) {
+      setIncidentList(data);
+    } else setIncidentList([]);
+  }, [data]);
+  useEffect(() => {
+    if (data) {
+      const filteredIncident = data.filter((incident) => {
+        return findIncident
+          ? incident.id === parseInt(findIncident) ||
+              incident.title.toLowerCase().includes(findIncident.toLowerCase())
+          : true;
+      });
+      setIncidentList(filteredIncident);
+    }
+  }, [findIncident, data]);
   useEffect(() => {
     if (selectProduct != "") getData(endpointIncidentList(selectProduct));
   }, [selectProduct]);
@@ -63,6 +83,19 @@ function ClientIncidentPage() {
           </button>
         )}
       </div>
+      <div className="flex justify-start">
+        <label className="input">
+          <input
+            placeholder="Nhập tên, id sự cố"
+            type="text"
+            value={findIncident}
+            onChange={(e) => setFindIncident(e.target.value)}
+          />
+          <span className="label">
+            <Search></Search>
+          </span>
+        </label>
+      </div>
       {isLoading ? (
         <div className="flex justify-center">
           <span className="loading loading-infinity loading-lg"></span>
@@ -75,7 +108,7 @@ function ClientIncidentPage() {
         <div>
           <IncidentList
             product_id={selectProduct}
-            incidentList={data || undefined}
+            incidentList={incidentList}
             showIncidentDetail={(id) => {
               setShowIncidentDetail(id);
             }}

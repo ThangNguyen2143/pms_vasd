@@ -125,6 +125,7 @@ export default function RequirementDetailClient({
           />
           <Attachments
             onUpdate={async () => await updateRequirement()}
+            requirement_id={requirement.id}
             files={requirement.requirementFiles || []}
             onAdd={() => setShowAddAttachmentModal(true)}
           />
