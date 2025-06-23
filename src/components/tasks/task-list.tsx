@@ -7,17 +7,18 @@ interface TaskListProps {
   modules: ProductModule[];
   taskList?: TaskDTO[];
   statusList: WorkStatus[];
-  externalTaskCreated?: TaskDTO;
+  onUpdateInProduct: (id: number[]) => void;
 }
 function TaskList({
   product_id,
   modules,
   taskList,
   statusList,
+  onUpdateInProduct,
 }: TaskListProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-
+  const [selectTask, setSelectTask] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const fullTaskList = taskList ? [...taskList] : [];
   const totalPages = Math.ceil(fullTaskList.length / 10);
@@ -74,13 +75,17 @@ function TaskList({
                 task={task}
                 statusList={statusList || []}
                 modules={modules}
+                select={() => setSelectTask((pre) => [...pre, task.id])}
+                unSelect={() =>
+                  setSelectTask((pre) => pre.filter((t) => t != task.id))
+                }
                 key={task.id}
                 product_id={product_id}
               />
             ))
           ) : (
             <tr>
-              <td colSpan={6} className="text-center py-4">
+              <td colSpan={9} className="text-center py-4">
                 {product_id == ""
                   ? "Chưa chọn phần mềm nào"
                   : "Chưa có công việc nào được tạo"}
@@ -88,6 +93,18 @@ function TaskList({
             </tr>
           )}
         </tbody>
+        <tfoot>
+          <tr>
+            <td colSpan={9} className="text-end">
+              <button
+                className="btn btn-accent"
+                onClick={() => onUpdateInProduct(selectTask)}
+              >
+                Cập nhật trong hệ thống
+              </button>
+            </td>
+          </tr>
+        </tfoot>
       </table>
       <div className="flex justify-center">
         {totalPages > 1 && (

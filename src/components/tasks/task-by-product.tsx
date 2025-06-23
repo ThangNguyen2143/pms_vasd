@@ -8,16 +8,18 @@ import { ProductModule, TaskDTO, WorkStatus } from "~/lib/types";
 import { useEffect, useState } from "react";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
+import UpdateInProductModalConfirm from "./modals/update-in-product-modal";
 function TaskByProduct() {
   const [selectProduct, setSelectProduct] = useState<string>("");
-  const { getData: getModule, data: modules } = useApi<ProductModule[]>();
+  const [showUpdateInProduct, setShowUpdateInProduct] = useState<number[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [findTask, setFindTask] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
+  const [taskList, setTaskList] = useState([] as TaskDTO[]);
+  const { getData: getModule, data: modules } = useApi<ProductModule[]>();
   const endpoint = (product_id: string) =>
     "/tasks/" + encodeBase64({ product_id });
   const endpointStatus = "/system/config/eyJ0eXBlIjoidGFza19zdGF0dXMifQ==";
-  const [taskList, setTaskList] = useState([] as TaskDTO[]);
   const {
     data: tasks,
     getData: getTaskList,
@@ -108,6 +110,7 @@ function TaskByProduct() {
         <TaskList
           product_id={selectProduct}
           modules={modules || []}
+          onUpdateInProduct={(list) => setShowUpdateInProduct(list)}
           statusList={statusList || []}
           taskList={taskList || undefined}
         />
@@ -137,6 +140,13 @@ function TaskByProduct() {
           />
         </div>
       </dialog>
+      {showUpdateInProduct.length > 0 && (
+        <UpdateInProductModalConfirm
+          list={showUpdateInProduct}
+          taskList={tasks}
+          onClose={() => setShowUpdateInProduct([])}
+        />
+      )}
     </div>
   );
 }
