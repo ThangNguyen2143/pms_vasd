@@ -12,8 +12,10 @@ interface DataUpLoad {
 
 export default function EvaluateRequirementModal({
   onClose,
+  onUpdate,
   requirement_id,
 }: {
+  onUpdate: () => Promise<void>;
   requirement_id: number;
   onClose: () => void;
 }) {
@@ -58,7 +60,7 @@ export default function EvaluateRequirementModal({
     if (re != "") return;
     else {
       toast.success("Đánh giá thành công");
-
+      await onUpdate();
       onClose();
     }
   };

@@ -1,9 +1,6 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-import React, { useEffect } from "react";
 import { Star } from "lucide-react";
-import { useApi } from "~/hooks/use-api";
-import { encodeBase64 } from "~/lib/services";
+import React from "react";
 import { format_date } from "~/utils/fomat-date";
 interface DataRating {
   code: string;
@@ -17,10 +14,10 @@ interface DataRating {
   }[];
 }
 export default function StatusTag({
-  requirement_id,
+  data,
   onEvaluate,
 }: {
-  requirement_id: number;
+  data?: DataRating[];
   onEvaluate: () => void;
 }) {
   const listRatingDisplay = [
@@ -30,13 +27,7 @@ export default function StatusTag({
     { value: 4, display: "Cao" },
     { value: 5, display: "Rất cao" },
   ];
-  const { data, getData } = useApi<DataRating[]>();
-  useEffect(() => {
-    getData(
-      "/requirements/assessment/" + encodeBase64({ requirement_id }),
-      "reload"
-    );
-  }, []);
+
   return (
     <div className="bg-base-200 p-4 rounded-lg flex flex-col gap-2 items-center">
       <div className="flex w-full justify-between">

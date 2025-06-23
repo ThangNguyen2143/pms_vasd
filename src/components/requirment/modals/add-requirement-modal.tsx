@@ -128,6 +128,7 @@ export default function AddRequirementModal({
         ...data,
       },
     });
+
     if (re?.value != "") return;
     else {
       toast.success("Tạo yêu cầu thành công");

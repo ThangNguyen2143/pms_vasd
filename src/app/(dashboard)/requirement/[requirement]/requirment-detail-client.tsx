@@ -22,7 +22,17 @@ import { notFound } from "next/navigation";
 import ErrorMessage from "~/components/ui/error-message";
 import NoteRequirment from "~/components/requirment/requirement-detail/note-requirement";
 import { toast } from "sonner";
-
+interface DataRating {
+  code: string;
+  name: string;
+  date: string;
+  items: {
+    criteria_code: string;
+    criteria_title: string;
+    selected_value: number;
+    weight: number;
+  }[];
+}
 export default function RequirementDetailClient({
   requirement_id,
   typeList,
@@ -38,6 +48,14 @@ export default function RequirementDetailClient({
   const [showEditRequesterModal, setShowEditRequesterModal] = useState(false);
   const [showAddAttachmentModal, setShowAddAttachmentModal] = useState(false);
   const [showEvaluateModal, setShowEvaluateModal] = useState(false);
+  const { data: RatingData, getData } = useApi<DataRating[]>();
+  const reloadAssessment = async () => {
+    await getData(
+      "/requirements/assessment/" + encodeBase64({ requirement_id }),
+      "reload"
+    );
+  };
+
   const {
     data: requirement,
     getData: getRequirement,
@@ -65,6 +83,7 @@ export default function RequirementDetailClient({
       "/requirements/note/" + encodeBase64({ requirement_id }),
       "default"
     );
+    reloadAssessment();
   }, []);
   if (errorNote)
     if (errorNote.code != 404)
@@ -105,7 +124,7 @@ export default function RequirementDetailClient({
           />
           <StatusTag
             onEvaluate={() => setShowEvaluateModal(true)}
-            requirement_id={requirement.id}
+            data={RatingData || undefined}
           />
           <NoteRequirment
             comments={note_requirment || []}
@@ -160,6 +179,7 @@ export default function RequirementDetailClient({
         {showEvaluateModal && (
           <EvaluateRequirementModal
             requirement_id={requirement.id}
+            onUpdate={reloadAssessment}
             onClose={() => setShowEvaluateModal(false)}
           />
         )}

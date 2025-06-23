@@ -132,7 +132,6 @@ export default function StatusPieChart({
       },
     },
   };
-  console.log(pieData, data);
   return (
     <div className="bg-base-200 p-4 rounded-lg shadow text-center w-full md:w-64">
       <h3 className="font-bold text-lg text-primary mb-4">{title}</h3>
