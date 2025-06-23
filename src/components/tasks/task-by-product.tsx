@@ -142,6 +142,9 @@ function TaskByProduct() {
       </dialog>
       {showUpdateInProduct.length > 0 && (
         <UpdateInProductModalConfirm
+          onUpdate={async () => {
+            await getTaskList(endpoint(selectProduct), "reload");
+          }}
           list={showUpdateInProduct}
           taskList={tasks}
           onClose={() => setShowUpdateInProduct([])}
