@@ -18,6 +18,7 @@ import CommentTestcase from "~/components/testcase/testcase-detail/comment-testc
 import UpdateStepTestModal from "~/components/testcase/modals/update-step-test";
 import TestDependComp from "~/components/testcase/testcase-detail/test-depend";
 import TestHistory from "~/components/testcase/testcase-detail/test-history";
+import CopyTestcaseModal from "~/components/testcase/modals/copy-testcase-modal";
 type InfoTestcaseDetail = {
   name: string;
   description: string;
@@ -57,6 +58,7 @@ export default function TestcaseDetailClient({
   const [showEditModal, setShowEditModal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showUpdateStep, setShowUpdateStep] = useState(false);
+  const [showCopyModal, setShowCopyModal] = useState(false);
   const [openAddTest, setOpenAddTest] = useState<string>();
   useEffect(() => {
     getEnv(
@@ -162,6 +164,9 @@ export default function TestcaseDetailClient({
     <div className="max-w-7xl mx-auto  p-6 rounded-lg shadow-sm">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">📋 Chi tiết Test Case</h1>
+        <button className="btn btn-dash" onClick={() => setShowCopyModal(true)}>
+          Copy testcase
+        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -218,6 +223,12 @@ export default function TestcaseDetailClient({
       </div>
 
       {/* Modals */}
+      {showCopyModal && (
+        <CopyTestcaseModal
+          test_id={testcase_id}
+          onClose={() => setShowCopyModal(false)}
+        />
+      )}
       <AssignTestcaseModal
         isOpen={showAssignModal}
         onClose={() => setShowAssignModal(false)}

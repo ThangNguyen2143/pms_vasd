@@ -18,6 +18,8 @@ import AssignBugModal from "~/components/bugs/modal/assign-bug-modal";
 import ReTestBugAssignModal from "~/components/bugs/modal/re-test-assign";
 import LinkTaskOrTestToBugModal from "~/components/bugs/modal/ref-update-modal";
 import UpdateBugModal from "~/components/bugs/modal/edit-info-bug";
+import { Copy } from "lucide-react";
+import CopyBugModal from "~/components/bugs/modal/copy-bug-modal";
 
 function BugDetailClient({
   bug_id,
@@ -30,6 +32,7 @@ function BugDetailClient({
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showLinkModal, setShowLinkModal] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState(false);
+  const [showCopyModal, setShowCopyModal] = useState(false);
   const [showAddFile, setShowAddFile] = useState(false);
   const { data: bugData, getData, isLoading, errorData } = useApi<BugDetail>();
   const { data: bugcomments, getData: getListComment } = useApi<BugComment[]>();
@@ -72,16 +75,13 @@ function BugDetailClient({
       <div className="max-w-6xl mx-auto bg-base-100 shadow-lg rounded-xl p-6 grid md:grid-cols-3 gap-6">
         <div className="md:col-span-3 flex justify-between items-center border-b pb-4">
           <h2 className="text-2xl font-bold text-primary">🐞 Chi tiết Bug</h2>
-          {/* <span
-            className={clsx(
-              "badge text-sm px-4 py-2 rounded-full",
-              `badge-${status_with_color(bugData.status)}`
-            )}
+          <button
+            className={"btn btn-dash"}
+            onClick={() => setShowCopyModal(true)}
           >
-            {bugStatus
-              ? bugStatus.find((st) => st.code == bugData.status)?.description
-              : bugData.status}
-          </span> */}
+            <Copy />
+            Sao chép bug
+          </button>
         </div>
         {/* Left side: Bug info + Attachments + Comments */}
         <div className="md:col-span-2 space-y-6">
@@ -130,6 +130,9 @@ function BugDetailClient({
         </div>
       </div>
       {/* Modal */}
+      {showCopyModal && (
+        <CopyBugModal bug_id={bug_id} onClose={() => setShowCopyModal(false)} />
+      )}
       {showAddFile && (
         <AddFileAttachmentModal
           bug_id={bug_id}

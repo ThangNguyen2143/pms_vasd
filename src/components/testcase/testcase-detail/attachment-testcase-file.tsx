@@ -74,7 +74,11 @@ function AttachmentTestcaseFile({
               key={f.file_id}
               className="file bg-base-100 p-2 rounded border-l-4 border-neutral"
             >
-              📎 {f.file_name.replace(".gz", "")}{" "}
+              <span className="truncate max-w-32">
+                {" "}
+                📎 {f.file_name.replace(".gz", "")}{" "}
+              </span>
+
               {loadingMap[f.file_id] ? (
                 <span className="loading loading-ball"></span>
               ) : (

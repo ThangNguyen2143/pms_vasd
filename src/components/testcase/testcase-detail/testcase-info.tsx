@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import SafeHtmlViewer from "~/components/ui/safeHTMLviewer";
 import { useApi } from "~/hooks/use-api";
 import { TestcaseDetail } from "~/lib/types";
+import { format_date } from "~/utils/fomat-date";
 import { status_with_color } from "~/utils/status-with-color";
 
 function TestcaseInfo({
@@ -51,6 +52,7 @@ function TestcaseInfo({
     toast.success("Cập nhật trạng thái thành công!");
     await onUpdate();
   };
+  console.log(testcase);
   return (
     <div className="bg-base-100 shadow p-4 rounded-lg">
       <div className="flex justify-between border-l-4 border-green-500 pl-3">
@@ -156,14 +158,11 @@ function TestcaseInfo({
           <strong>Môi trường:</strong> {testcase.environment}
         </p>
         <p>
-          <strong>Ngày tạo:</strong>{" "}
-          {new Date(testcase.create_date).toLocaleDateString()}
+          <strong>Ngày tạo:</strong> {format_date(testcase.create_date)}
         </p>
         <p>
           <strong>Deadline:</strong>{" "}
-          {testcase.time_end
-            ? new Date(testcase.time_end).toLocaleDateString()
-            : "N/A"}
+          {testcase.time_end ? format_date(testcase.time_end) : "N/A"}
         </p>
         <p>
           <strong>Đầu vào:</strong> {testcase.test_data || "-"}

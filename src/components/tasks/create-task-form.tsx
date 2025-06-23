@@ -19,7 +19,7 @@ interface DataPost {
   title: string;
   description: string;
   dead_line: string;
-  module: string;
+  module?: string;
   requirement_id?: number;
   acceptances?: { title: string; type: string }[];
 }
@@ -80,6 +80,7 @@ function CreateTaskForm({
       })),
     };
     if (data.requirement_id == 0) delete data.requirement_id;
+    if (data.module == "") delete data.module;
     if (data.acceptances?.length == 0) delete data.acceptances;
     // const result = await postData("/tasks", data);
     const result = await uploadMultiFiles({

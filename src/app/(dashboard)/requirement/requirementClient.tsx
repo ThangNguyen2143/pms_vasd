@@ -9,6 +9,7 @@ import {
   ProjectDto,
   ProjectLocation,
   RequirementDto,
+  RequirementStatus,
   UserDto,
 } from "~/lib/types";
 import OverviewRequirement from "~/components/requirment/overview-required-tab";
@@ -30,6 +31,8 @@ function RequirementsClient() {
   const [showAddLocation, setShowAddLocation] = useState(false);
   const [showAddRequirment, setShowAddRequirment] = useState(false);
   const [loading, setloading] = useState(false);
+  const [filterStatus, setFilterStatus] = useState<string>("");
+  const [requiredData, setRequiredData] = useState<RequirementDto[]>([]);
   const [fromDate, setFromDate] = useState<string>(
     toISOString(startOfDay(subDays(new Date(), 7))) //Mặc định 1 tuần trước
   );
@@ -39,6 +42,8 @@ function RequirementsClient() {
   const { data: requiredList, getData: getRequiredList } =
     useApi<RequirementDto[]>();
   const { data: userList, getData: getUserList } = useApi<UserDto[]>();
+  const { data: statusList, getData: getStatus } =
+    useApi<RequirementStatus[]>();
   const {
     data: projectList,
     getData: getProjectJoin,
@@ -57,6 +62,7 @@ function RequirementsClient() {
   } = useApi<ProjectLocation[]>();
   useEffect(() => {
     getUserList("/user/" + encodeBase64({ type: "all" }));
+    getStatus("/system/config/" + encodeBase64({ type: "requirement_status" }));
     getProjectJoin("/system/config/eyJ0eXBlIjoicHJvamVjdCJ9", "default");
     const saved = sessionStorage.getItem("projectSelected");
     if (saved) setprojectSelect(parseInt(saved));
@@ -125,6 +131,14 @@ function RequirementsClient() {
       }, 3000);
     }
   }, [projectSelect, productSelect, fromDate, toDate]);
+  useEffect(() => {
+    if (requiredList) {
+      const filteredTests = requiredList.filter((req) =>
+        filterStatus ? req.status === filterStatus : true
+      );
+      setRequiredData(filteredTests);
+    }
+  }, [filterStatus, requiredList]);
   const onLoadRequire = async () => {
     const from = fromDate;
     const to = toDate;
@@ -257,12 +271,30 @@ function RequirementsClient() {
               </div>
             )}
             {projectSelect != 0 ? (
-              <RequirementList
-                loading={loading}
-                project_id={projectSelect}
-                requiredList={requiredList}
-                userList={userList}
-              />
+              <div className="flex flex-col">
+                <div className="m-4">
+                  <label className="select">
+                    <span className="label">Trạng thái</span>
+                    <select
+                      value={filterStatus}
+                      onChange={(e) => setFilterStatus(e.target.value)}
+                    >
+                      <option value="">Tất cả</option>
+                      {statusList?.map((status) => (
+                        <option key={status.code} value={status.code}>
+                          {status.description}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+                <RequirementList
+                  loading={loading}
+                  project_id={projectSelect}
+                  requiredList={requiredData}
+                  userList={userList}
+                />
+              </div>
             ) : (
               <div className="alert alert-info mt-4">Chưa chọn dự án nào</div>
             )}
