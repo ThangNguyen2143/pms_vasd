@@ -124,7 +124,9 @@ function RequirementsClient() {
             to,
           });
       }
+
       setloading(true);
+      setRequiredData([]);
       setTimeout(() => {
         getRequiredList(endpoint, "reload");
         setloading(false);

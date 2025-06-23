@@ -7,9 +7,11 @@ import BugList from "./bug-list";
 import { encodeBase64 } from "~/lib/services";
 import { useApi } from "~/hooks/use-api";
 import { BugDto } from "~/lib/types";
+import UpdateBugInProductModalConfirm from "./modal/update-bug-in-product-modal";
 
 function BugsClient() {
   const [selectProduct, setSelectProduct] = useState<string>("");
+  const [showUpdateInProduct, setShowUpdateInProduct] = useState<number[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [findBug, setFindBug] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
@@ -130,7 +132,11 @@ function BugsClient() {
           {errorData.message}
         </div>
       ) : (
-        <BugList product_id={selectProduct} bugList={bugList} />
+        <BugList
+          product_id={selectProduct}
+          bugList={bugList}
+          onUpdateInProduct={(id) => setShowUpdateInProduct(id)}
+        />
       )}
 
       {showModal && (
@@ -140,6 +146,16 @@ function BugsClient() {
           onCreated={() => {
             getBugList(endpoint(selectProduct), "reload");
           }}
+        />
+      )}
+      {showUpdateInProduct.length > 0 && (
+        <UpdateBugInProductModalConfirm
+          onUpdate={async () => {
+            await getBugList(endpoint(selectProduct), "reload");
+          }}
+          list={showUpdateInProduct}
+          bugList={bugList}
+          onClose={() => setShowUpdateInProduct([])}
         />
       )}
     </div>

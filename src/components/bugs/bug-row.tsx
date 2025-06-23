@@ -8,9 +8,16 @@ import { status_with_color } from "~/utils/status-with-color";
 interface BugRowProps {
   bug: BugDto;
   product_id: string;
+  select: () => void;
+  unSelect: () => void;
 }
 
-export default function BugRow({ bug, product_id }: BugRowProps) {
+export default function BugRow({
+  bug,
+  product_id,
+  select,
+  unSelect,
+}: BugRowProps) {
   return (
     <tr className="hover:bg-gray-50 dark:hover:bg-gray-700">
       <td className="px-4 py-2">{bug.bug_id}</td>
@@ -35,6 +42,18 @@ export default function BugRow({ bug, product_id }: BugRowProps) {
         >
           Chi tiết
         </Link>
+      </td>
+      <td className="py-2 px-4">
+        <label>
+          <input
+            type="checkbox"
+            className="checkbox"
+            onChange={(e) => {
+              if (e.target.checked) select();
+              else unSelect();
+            }}
+          />
+        </label>
       </td>
     </tr>
   );

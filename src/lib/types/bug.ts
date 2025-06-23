@@ -15,6 +15,7 @@ export type BugDetail = {
   description: string;
   priority: string;
   severity: string;
+  log: string;
   test_case_ref?: string;
   test_case_ref_id?: number;
   related_task_name?: string;

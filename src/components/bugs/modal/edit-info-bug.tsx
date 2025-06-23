@@ -19,6 +19,7 @@ interface DataCreate {
   description: string;
   priority: string;
   severity: string;
+  log?: string;
   tags: string[];
 }
 
@@ -32,8 +33,8 @@ export default function UpdateBugModal({
   const [severitySelect, setSeveritySelected] = useState(bug.severity || "");
   const [prioritySelected, setPrioritySelected] = useState(bug.priority || "");
   const [tags, setTags] = useState<string[]>(bug.tags || []);
+  const [log, setLog] = useState<string>(bug.log || "");
   const [newTag, setNewTag] = useState("");
-
   const { putData, isLoading, errorData } = useApi<"", DataCreate>();
   const {
     data: severityList,
@@ -91,10 +92,12 @@ export default function UpdateBugModal({
       description,
       priority: prioritySelected,
       tags,
+      log,
       severity: severitySelect,
       // Nếu không có testcaseSelected thì sẽ là chuỗi rỗng
       // Nếu có thì sẽ là id của testcase
     };
+    if (data.log?.trim().length == 0) delete data.log;
     const re = await putData("/bugs", data);
 
     if (re != "") return;
@@ -128,6 +131,14 @@ export default function UpdateBugModal({
               onChange={setDescription}
             />
           </fieldset>
+          <label className="floating-label">
+            <textarea
+              rows={3}
+              value={log}
+              onChange={(e) => setLog(e.target.value)}
+              className="textarea"
+            ></textarea>
+          </label>
           <label className="floating-label">
             <span>Mức độ ưu tiên</span>
             <select

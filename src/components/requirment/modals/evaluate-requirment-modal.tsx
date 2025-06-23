@@ -25,7 +25,11 @@ export default function EvaluateRequirementModal({
     errorData: errorCriteria,
     isLoading,
   } = useApi<RequirementCritreia[]>();
-  const { postData, errorData, isLoading: postLoad } = useApi<"", DataUpLoad>();
+  const {
+    postData,
+    errorData,
+    isLoading: postLoad,
+  } = useApi<string, DataUpLoad>();
   const [missingCriteria, setMissingCriteria] = useState<string[]>([]);
 
   const [selectedValues, setSelectedValues] = useState<Record<string, string>>(
@@ -57,12 +61,11 @@ export default function EvaluateRequirementModal({
       ),
     };
     const re = await postData("/requirements/assessment", dataaa);
-    if (re != "") return;
-    else {
-      toast.success("Đánh giá thành công");
-      await onUpdate();
-      onClose();
-    }
+    if (re == null) return;
+
+    toast.success(re);
+    await onUpdate();
+    onClose();
   };
   const handleSubmit = async () => {
     const missing = criteriaList?.filter((c) => !selectedValues[c.code]);

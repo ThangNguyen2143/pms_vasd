@@ -5,21 +5,15 @@ import { useRouter, useSearchParams } from "next/navigation";
 interface BugListProps {
   product_id: string;
   bugList?: BugDto[];
-  externalBugCreated?: BugDto;
+  onUpdateInProduct: (id: number[]) => void;
 }
-function BugList({ product_id, bugList, externalBugCreated }: BugListProps) {
+function BugList({ product_id, bugList, onUpdateInProduct }: BugListProps) {
   const [currentPage, setCurrentPage] = useState(1);
   const fullBugList = bugList ? [...bugList] : [];
   const router = useRouter();
   const searchParams = useSearchParams();
-
+  const [selectBug, setSelectBug] = useState<number[]>([]);
   const totalPages = Math.ceil(fullBugList.length / 10);
-  if (
-    externalBugCreated &&
-    !fullBugList.find((t) => t.bug_id === externalBugCreated.bug_id)
-  ) {
-    fullBugList.push(externalBugCreated);
-  }
 
   // ⬅️ Khi load lại, đọc từ URL
   useEffect(() => {
@@ -46,6 +40,7 @@ function BugList({ product_id, bugList, externalBugCreated }: BugListProps) {
     { code: "dead_line", display: "Deadline" },
     { code: "status", display: "Trạng thái" },
     { code: "", display: "Thao tác" },
+    { code: "update", display: "" },
   ];
 
   return (
@@ -55,7 +50,13 @@ function BugList({ product_id, bugList, externalBugCreated }: BugListProps) {
           <tr>
             {fieldTable.map((field) => (
               <th key={field.code} className="px-4 py-3">
-                {field.display}
+                {field.display != "" ? (
+                  field.display
+                ) : (
+                  <label>
+                    <input type="checkbox" className="checkbox" />
+                  </label>
+                )}
               </th>
             ))}
           </tr>
@@ -65,6 +66,10 @@ function BugList({ product_id, bugList, externalBugCreated }: BugListProps) {
             currentBugs.map((bug) => (
               <BugRow
                 key={"bug" + bug.bug_id}
+                select={() => setSelectBug((pre) => [...pre, bug.bug_id])}
+                unSelect={() =>
+                  setSelectBug((pre) => pre.filter((t) => t != bug.bug_id))
+                }
                 bug={bug}
                 product_id={product_id}
               />
@@ -79,6 +84,18 @@ function BugList({ product_id, bugList, externalBugCreated }: BugListProps) {
             </tr>
           )}
         </tbody>
+        <tfoot>
+          <tr>
+            <td colSpan={9} className="text-end">
+              <button
+                className="btn btn-accent"
+                onClick={() => onUpdateInProduct(selectBug)}
+              >
+                Cập nhật trong hệ thống
+              </button>
+            </td>
+          </tr>
+        </tfoot>
       </table>
       <div className="flex justify-center">
         {totalPages > 1 && (
