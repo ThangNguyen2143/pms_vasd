@@ -14,10 +14,12 @@ import SafeHtmlViewer from "~/components/ui/safeHTMLviewer";
 function DetailPhase({
   project_id,
   phase_id,
+  onOpenFile,
   onUpdate,
 }: {
   project_id: number;
   phase_id: number;
+  onOpenFile: (file: File) => void;
   onUpdate: () => Promise<void>;
 }) {
   // This component is a placeholder for the detail phase.
@@ -36,7 +38,7 @@ function DetailPhase({
   const { removeData: deletePhase } = useApi<string>();
   const { removeData: removeFilePhase, errorData: errorRemoveFile } = useApi();
   useEffect(() => {
-    if (phase_id) {
+    if (phase_id > 0) {
       getData(`/project/phase/detail/${encodeBase64({ phase_id })}`, "default");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -60,7 +62,7 @@ function DetailPhase({
       "/project/phase/file/detail/" + encodeBase64({ file_id })
     );
     if (res) {
-      await openGzipBase64FileInNewTab(res);
+      onOpenFile(await openGzipBase64FileInNewTab(res));
     } else {
       toast.error("Tải file thất bại hoặc không tìm thấy file.");
     }

@@ -52,7 +52,7 @@ function ProjectTable() {
                 <tr key={index}>
                   <th>{index + 1}</th>
                   <td>{item.name}</td>
-                  <td>{item.description}</td>
+                  <td className="max-w-64 truncate">{item.description}</td>
                   <td>{format_date(item.start_date)}</td>
                   <td>{format_date(item.end_date)}</td>
                   <td>

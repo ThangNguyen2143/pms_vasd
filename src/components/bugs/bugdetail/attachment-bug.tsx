@@ -2,6 +2,7 @@
 import { Download, ExternalLink, Paperclip, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
+import PreviewFileModal from "~/components/ui/file-reviewer/preview-file-modal";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { FileDto, RequirementFile } from "~/lib/types";
@@ -23,6 +24,7 @@ export default function BugAttachments({
 }) {
   const { getData, errorData } = useApi<FileDto>(); // ⚠️ chỉ dùng getData, không dùng state dùng chung
   const [loadingMap, setLoadingMap] = useState<Record<number, boolean>>({}); // trạng thái tải theo file_id
+  const [reviewFile, setReviewFile] = useState<File>();
   const { removeData: removeFile, errorData: errorRemoveFile } = useApi();
   const handleRemoveFile = async (file_id: number) => {
     if (confirm("Bạn có chắc chắn muốn xóa tệp này?")) {
@@ -51,7 +53,9 @@ export default function BugAttachments({
     );
     if (res) {
       if (type == "down") await downloadGzipBase64File(res);
-      else await openGzipBase64FileInNewTab(res);
+      else {
+        setReviewFile(await openGzipBase64FileInNewTab(res));
+      }
     } else {
       toast.error("Tải file thất bại hoặc không tìm thấy file.");
     }
@@ -114,6 +118,12 @@ export default function BugAttachments({
         <p>
           <i>Không có tài liệu đính kèm.</i>
         </p>
+      )}
+      {reviewFile && (
+        <PreviewFileModal
+          file={reviewFile}
+          onClose={() => setReviewFile(undefined)}
+        />
       )}
     </div>
   );

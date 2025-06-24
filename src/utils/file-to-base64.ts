@@ -144,7 +144,7 @@ export async function openGzipBase64FileInNewTab({
   const actualContentType = contentType || getContentTypeFromFileName(fileName);
   const isGzipped =
     fileName.endsWith(".gz") || actualContentType === "application/gzip";
-
+  const finalFileName = fileName.replace(/\.gz$/, "");
   let rawBlob: Blob;
   let finalContentType = actualContentType;
 
@@ -169,8 +169,8 @@ export async function openGzipBase64FileInNewTab({
     rawBlob = await decompressedResponse.blob();
 
     // Đoán lại loại file nếu contentType chưa rõ
-    const cleanName = fileName.replace(/\.gz$/, "");
-    finalContentType = getContentTypeFromFileName(cleanName);
+    // const cleanName = fileName.replace(/\.gz$/, "");
+    finalContentType = getContentTypeFromFileName(finalFileName);
   } else {
     // Nếu không gzip, decode base64
     const byteCharacters = atob(fileData);
@@ -188,32 +188,37 @@ export async function openGzipBase64FileInNewTab({
       type: actualContentType || "application/octet-stream",
     });
   }
-
-  const url = URL.createObjectURL(rawBlob);
+  return new File([rawBlob], finalFileName, { type: finalContentType });
+  // const url = URL.createObjectURL(rawBlob);
 
   // Hiển thị dạng iframe với PDF và ảnh
-  const newWindow = window.open("", "_blank");
-  if (newWindow) {
-    newWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>${fileName.replace(/\.gz$/, "")}</title>
-          <style>
-            body { margin: 0; height: 100vh; display: flex; justify-content: center; align-items: center; background: #f3f4f6; }
-            iframe { border: none; width: 100%; height: 100%; }
-            img { max-width: 100%; max-height: 100%; }
-          </style>
-        </head>
-        <body>
-          ${
-            finalContentType.startsWith("image/")
-              ? `<img src="${url}" alt="${fileName}" />`
-              : `<iframe src="${url}" title="${fileName}"></iframe>`
-          }
-        </body>
-      </html>
-    `);
-    newWindow.document.close();
-  }
+  // const newWindow = window.open("", "_blank");
+  // if (newWindow) {
+  //   newWindow.document.write(`
+  //     <!DOCTYPE html>
+  //     <html>
+  //       <head>
+  //         <title>${fileName.replace(/\.gz$/, "")}</title>
+  //         <style>
+  //           body { margin: 0; height: 100vh; display: flex; justify-content: center; align-items: center; background: #f3f4f6; }
+  //           iframe { border: none; width: 100%; height: 100%; }
+  //           img { max-width: 100%; max-height: 100%; }
+  //         </style>
+  //       </head>
+  //       <body>
+  //         ${
+  //           finalContentType.startsWith("image/")
+  //             ? `<img src="${url}" alt="${fileName}" />`
+  //             : `<iframe src={"https://docs.google.com/gview?url=${encodeURIComponent(
+  //                 url
+  //               )}&embedded=true"}
+  //             width="100%"
+  //             height="100%"
+  //             frameBorder="0""></iframe>`
+  //         }
+  //       </body>
+  //     </html>
+  //   `);
+  //   newWindow.document.close();
+  // }
 }

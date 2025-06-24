@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import TimelineList from "../project-timeline/timeline-list";
 import { encodeBase64 } from "~/lib/services";
 import { useApi } from "~/hooks/use-api";
+import PreviewFileModal from "~/components/ui/file-reviewer/preview-file-modal";
 
 function PhaseProjectTable({
   data,
@@ -35,6 +36,7 @@ function PhaseProjectTable({
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
+  const [reviewFile, setReviewFile] = useState<File>();
   const updateTimeLineData = async (phase_id: number) => {
     const encoded = encodeBase64({ phase_id, project_id });
     const re = await getListTimeLine(`/project/timeline/${encoded}`);
@@ -130,7 +132,7 @@ function PhaseProjectTable({
                 {/* <Timeline phaseId={phase.id} projectId={project_id} /> */}
               </div>
             </div>
-            <div className="drawer drawer-end z-50 w-24">
+            <div className="drawer drawer-end w-24">
               <input
                 id={`detail-phase-drawer-${phase.id}`}
                 type="checkbox"
@@ -146,7 +148,7 @@ function PhaseProjectTable({
                   </label>
                 </div>
               </div>
-              <div className="drawer-side">
+              <div className="drawer-side z-50">
                 <label
                   htmlFor={`detail-phase-drawer-${phase.id}`}
                   className="drawer-overlay"
@@ -155,11 +157,18 @@ function PhaseProjectTable({
                   phase_id={phase.id}
                   onUpdate={onUpdate}
                   project_id={project_id}
+                  onOpenFile={(file: File) => setReviewFile(file)}
                 />
               </div>
             </div>
           </div>
         ))}
+      {reviewFile && (
+        <PreviewFileModal
+          file={reviewFile}
+          onClose={() => setReviewFile(undefined)}
+        />
+      )}
     </div>
   );
 }
