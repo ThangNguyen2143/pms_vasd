@@ -16,6 +16,7 @@ import { usePathname } from "next/navigation";
 type User = {
   userId: number;
   name: string;
+  userName: string;
   role: string;
   expires: string;
 };
@@ -57,6 +58,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
           setUser({
             userId: userAuth.id,
             name: userAuth.name,
+            userName: userAuth.username,
             role: userAuth.role,
             expires: userAuth.expires,
           });

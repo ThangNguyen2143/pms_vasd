@@ -3,6 +3,8 @@ import Link from "next/link";
 import { encodeBase64 } from "~/lib/services";
 // import { BrushCleaning } from "lucide-react";
 import ChangePassForm from "../profile/change-pass";
+import { toast } from "sonner";
+import { useState } from "react";
 
 function UserIcon({
   id,
@@ -15,8 +17,15 @@ function UserIcon({
   username: string;
   onLogout: () => void;
 }) {
+  const [showModalChangePass, setShowModalChangePass] = useState(false);
   if (!id) return <div className="btn btn-ghost">Đang tải...</div>;
+
   const userParse = encodeBase64({ id });
+  const handlerClearCache = async () => {
+    localStorage.clear();
+    sessionStorage.clear();
+    toast.success("Xóa cache thành công");
+  };
   return (
     <>
       <div className="dropdown dropdown-end">
@@ -33,20 +42,10 @@ function UserIcon({
             </Link>
           </li>
           <li>
-            <a
-              onClick={() =>
-                (
-                  document.getElementById(
-                    "dialog_form_change_pass"
-                  ) as HTMLDialogElement
-                )?.showModal()
-              }
-            >
-              Đổi mật khẩu
-            </a>
+            <a onClick={() => setShowModalChangePass(true)}>Đổi mật khẩu</a>
           </li>
           <li>
-            <a>
+            <a onClick={() => handlerClearCache()}>
               Clear cache
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -72,18 +71,12 @@ function UserIcon({
           </li>
         </ul>
       </div>
-      <dialog id="dialog_form_change_pass" className="modal">
-        <div className="modal-box">
-          <form method="dialog">
-            {/* if there is a button in form, it will close the modal */}
-            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
-              ✕
-            </button>
-          </form>
-          <h3 className="font-bold text-lg m-2">Thay đổi mật khẩu</h3>
-          <ChangePassForm userName={username} />
-        </div>
-      </dialog>
+      {showModalChangePass && (
+        <ChangePassForm
+          userName={username}
+          onClose={() => setShowModalChangePass(false)}
+        />
+      )}
     </>
   );
 }

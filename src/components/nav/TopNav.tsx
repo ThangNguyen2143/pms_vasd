@@ -71,7 +71,7 @@ export default function TopNav() {
         <UserIcon
           name={user.name}
           id={user.userId}
-          username={user.name} // Hoặc thêm username vào User type nếu cần
+          username={user.userName} // Hoặc thêm username vào User type nếu cần
           onLogout={handleLogout}
           // Thêm prop onLogout nếu cần
         />

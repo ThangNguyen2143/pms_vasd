@@ -7,7 +7,7 @@ import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
 import { useUploadFile } from "~/hooks/use-upload-file";
 import { encodeBase64 } from "~/lib/services";
-import { BugSeverity, Priority, TestcaseDto } from "~/lib/types";
+import { BugSeverity, Priority, TaskDTO, TestcaseDto } from "~/lib/types";
 
 interface AddBugProps {
   product_id: string;
@@ -24,6 +24,7 @@ interface DataCreate {
   severity: string;
   log?: string;
   test_case_ref_id?: number;
+  task_id?: number;
   tags: string[];
 }
 
@@ -40,6 +41,7 @@ export default function AddBugModal({
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState("");
   const [testcaseSelected, setTestcaseSelected] = useState("");
+  const [taskSelected, setTaskSelected] = useState("");
   const [files, setFile] = useState<File[]>([]);
   const { isUploading, uploadError, uploadMultiFiles } = useUploadFile();
 
@@ -55,6 +57,7 @@ export default function AddBugModal({
     errorData: errorType,
   } = useApi<Priority[]>();
   const { data: testcaseList, getData: getTestCase } = useApi<TestcaseDto[]>();
+  const { data: taskList, getData: getTask } = useApi<TaskDTO[]>();
   useEffect(() => {
     getPriority("/system/config/eyJ0eXBlIjoicHJpb3JpdHkifQ==", "force-cache");
     getSeverity(
@@ -64,6 +67,7 @@ export default function AddBugModal({
   }, []);
   useEffect(() => {
     getTestCase("/testcase/" + encodeBase64({ product_id }), "reload");
+    getTask("/tasks/" + encodeBase64({ product_id }), "default");
   }, [product_id]);
   useEffect(() => {
     // if (errorData) toast.error(errorData.message || errorData.title);
@@ -106,8 +110,10 @@ export default function AddBugModal({
       log: logBug,
       severity: severitySelect,
       test_case_ref_id: Number(testcaseSelected),
+      task_id: Number(taskSelected),
     };
     if (!data.test_case_ref_id) delete data.test_case_ref_id;
+    if (!data.task_id) delete data.task_id;
     if (data.log?.trim().length == 0) delete data.log;
     // const re = await postData("/bugs", data);
     const re = await uploadMultiFiles({
@@ -117,6 +123,7 @@ export default function AddBugModal({
         ...data,
       },
     });
+    console.log(re);
     if (re?.value != "") return;
     else {
       toast.success("Báo bug thành công");
@@ -192,40 +199,6 @@ export default function AddBugModal({
               ))}
             </select>
           </label>
-
-          <div className="join w-full">
-            <input
-              type="text"
-              className="input join-item input-neutral w-full"
-              value={newTag}
-              onChange={(e) => setNewTag(e.target.value)}
-              onKeyUp={(e) => {
-                if (e.key == "Enter") handleAddTag();
-              }}
-              placeholder="Nhập thẻ và nhấn Thêm"
-            />
-            <button
-              type="button"
-              className="btn join-item btn-outline btn-neutral"
-              onClick={handleAddTag}
-            >
-              Thêm
-            </button>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {tags.map((tag, idx) => (
-              <div key={idx} className="badge badge-info gap-2">
-                {tag}
-                <button
-                  type="button"
-                  className="text-xs ml-1"
-                  onClick={() => handleRemoveTag(tag)}
-                >
-                  ✕
-                </button>
-              </div>
-            ))}
-          </div>
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Test case liên quan</legend>
             <select
@@ -242,21 +215,74 @@ export default function AddBugModal({
             </select>
           </fieldset>
           <fieldset className="fieldset">
-            <legend className="fieldset-legend">Tệp đính kèm</legend>
-            <input
-              type="file"
-              className="file-input file-input-primary mt-4"
-              name="fileSend"
-              multiple
-              placeholder="Chọn tệp đính kèm"
-              onChange={(e) => {
-                const selected = e.target.files;
-                if (selected) {
-                  setFile(Array.from(selected));
-                }
-              }}
-            />
+            <legend className="fieldset-legend">Task liên quan</legend>
+            <select
+              className="select select-neutral"
+              value={taskSelected}
+              onChange={(e) => setTaskSelected(e.target.value)}
+            >
+              <option value="">Chọn Task liên kết</option>
+              {taskList?.map((task) => (
+                <option key={task.id} value={task.id}>
+                  {task.title}
+                </option>
+              ))}
+            </select>
           </fieldset>
+          <div>
+            <div className="join w-full">
+              <input
+                type="text"
+                className="input join-item input-neutral w-full"
+                value={newTag}
+                onChange={(e) => setNewTag(e.target.value)}
+                onKeyUp={(e) => {
+                  if (e.key == "Enter") handleAddTag();
+                }}
+                placeholder="Nhập thẻ và nhấn Thêm"
+              />
+              <button
+                type="button"
+                className="btn join-item btn-outline btn-neutral"
+                onClick={handleAddTag}
+              >
+                Thêm
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {tags.map((tag, idx) => (
+                <div key={idx} className="badge badge-info gap-2">
+                  {tag}
+                  <button
+                    type="button"
+                    className="text-xs ml-1"
+                    onClick={() => handleRemoveTag(tag)}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <fieldset className="fieldset">
+              <legend className="fieldset-legend">Tệp đính kèm</legend>
+              <input
+                type="file"
+                className="file-input file-input-primary mt-4"
+                name="fileSend"
+                multiple
+                placeholder="Chọn tệp đính kèm"
+                onChange={(e) => {
+                  const selected = e.target.files;
+                  if (selected) {
+                    setFile(Array.from(selected));
+                  }
+                }}
+              />
+            </fieldset>
+          </div>
         </div>
         <div className="modal-action">
           <button className="btn btn-ghost" onClick={onClose}>

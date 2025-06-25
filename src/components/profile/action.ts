@@ -114,6 +114,14 @@ export async function HandlerChangePwUser(
         code: data.code,
       },
     };
+  } else {
+    return {
+      message: {
+        message: "Thay đổi mật khẩu thành công!",
+        hint: "",
+        code: data.code,
+      },
+    };
   }
-  redirect("/");
+  // redirect("/");
 }

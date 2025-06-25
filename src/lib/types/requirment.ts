@@ -12,6 +12,7 @@ export type RequirementDto = {
   type: string;
 };
 export type RequirementDetail = Exclude<RequirementDto, "id"> & {
+  description: string;
   product_id: string;
   tags: string[];
   requesters: RequestersInfo;

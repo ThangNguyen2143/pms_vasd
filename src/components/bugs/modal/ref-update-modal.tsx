@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
-import { TaskDTO } from "~/lib/types";
+import { TaskDTO, TestcaseDto } from "~/lib/types";
 
 function LinkTaskOrTestToBugModal({
   bug_id,
@@ -17,7 +17,8 @@ function LinkTaskOrTestToBugModal({
   onClose: () => void;
 }) {
   const [selectType, setSelectType] = useState<string>("");
-  const { data: taskList, getData: getTask, errorData } = useApi<TaskDTO[]>();
+  const { data: taskList, getData: getTask } = useApi<TaskDTO[]>();
+  const { data: testcaseList, getData: getTestCase } = useApi<TestcaseDto[]>();
   const [selectData, setSelectData] = useState<number>(0);
   const {
     putData,
@@ -26,12 +27,10 @@ function LinkTaskOrTestToBugModal({
   } = useApi<string, { type: string; bug_id: number; ref_id: number }>();
   // const {data:testcaseList, getData:getTestcase, isLoading:isLoadTestcase} = useApi<TaskDTO>()
   useEffect(() => {
-    getTask("/tasks/" + encodeBase64({ product_id }), "no-cache");
+    getTask("/tasks/" + encodeBase64({ product_id }), "default");
+    getTestCase("/testcase/" + encodeBase64({ product_id }), "reload");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product_id]);
-  useEffect(() => {
-    if (errorData) toast.error(errorData.message || errorData.title);
-  }, [errorData]);
   useEffect(() => {
     if (errorPut) toast.error(errorPut.message || errorPut.title);
   }, [errorPut]);
@@ -83,6 +82,15 @@ function LinkTaskOrTestToBugModal({
                 return (
                   <option value={task.id} key={task.id + "task"}>
                     {task.title}
+                  </option>
+                );
+              })}
+            {testcaseList &&
+              selectType == "test" &&
+              testcaseList.map((test) => {
+                return (
+                  <option value={test.id} key={test.id + "test"}>
+                    {test.name}
                   </option>
                 );
               })}
