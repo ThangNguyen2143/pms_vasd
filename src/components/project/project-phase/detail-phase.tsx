@@ -108,29 +108,33 @@ function DetailPhase({
         )}
         {phaseData && (
           <div>
-            <h1 className="text-2xl font-bold mb-4">{phaseData.name}</h1>
-            <SafeHtmlViewer html={phaseData.description} />
+            <h1 className="text-2xl font-bold mb-4">
+              {phaseData.phaseInfo.name}
+            </h1>
+            <SafeHtmlViewer html={phaseData.phaseInfo.description} />
             <p>
-              <strong>Bắt đầu:</strong> {phaseData.start_date}
+              <strong>Bắt đầu:</strong> {phaseData.phaseInfo.start_date}
             </p>
             <p>
-              <strong>Kết thúc:</strong> {phaseData.end_date}
+              <strong>Kết thúc:</strong> {phaseData.phaseInfo.end_date}
             </p>
-            {phaseData.actual_end && (
+            {phaseData.phaseInfo.actual_end && (
               <p>
-                <strong>Kết thúc thực tế:</strong> {phaseData.actual_end}
+                <strong>Kết thúc thực tế:</strong>{" "}
+                {phaseData.phaseInfo.actual_end}
               </p>
             )}
             <p>
-              <strong>Ngày tạo:</strong> {phaseData.create_date}
+              <strong>Ngày tạo:</strong> {phaseData.phaseInfo.date_create}
             </p>
             <p>
               <span className="font-bold">Từ khóa:</span>{" "}
-              {phaseData.tags.map((tag) => (
-                <span key={tag + "tags"} className="badge badge-info mr-1">
-                  {tag}
-                </span>
-              ))}
+              {phaseData.phaseInfo.tags &&
+                phaseData.phaseInfo.tags.map((tag) => (
+                  <span key={tag + "tags"} className="badge badge-info mr-1">
+                    {tag}
+                  </span>
+                ))}
             </p>
             {/* Action as update status, add file attachment, update info*/}
             <div className="mt-4 mr-3 flex justify-end gap-2 flex-col sm:flex-row">
@@ -168,7 +172,7 @@ function DetailPhase({
                 </button>
               </div>
             </div>
-            {phaseData.filePhases ? (
+            {phaseData.filePhases && phaseData.filePhases.length > 0 ? (
               <ul className="space-y-1">
                 {phaseData.filePhases.map((f) => (
                   <li

@@ -66,23 +66,26 @@ export type ProjectLocation = {
 export type ProjectPhase = {
   id: number;
   name: string;
+  description: string;
   start_date: string;
   end_date: string;
-  description: string;
-  project_id: number;
-  create_by: number;
-  create_at: string;
   status: string;
 };
-export type ProjectPhaseDetail = Omit<ProjectPhase, "id"> & {
-  id: number;
+export type ProjectPhaseDetail = Omit<ProjectPhase, ""> & {
   project_id: number;
-  create_by: number;
-  create_date: string;
-  actual_end: string;
-  tags: string[];
+  phaseInfo: PhaseInfo;
   phaseLogs: ProjectPhaseLog[];
   filePhases?: RequirementFile[];
+};
+export type PhaseInfo = {
+  name: string;
+  description: string;
+  start_date: string;
+  end_date: string;
+  actual_end?: string;
+  tags: string[];
+  date_create: string;
+  num_notify: number;
 };
 export type ProjectPhaseStatus = {
   code: string;

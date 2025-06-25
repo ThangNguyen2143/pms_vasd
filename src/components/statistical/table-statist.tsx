@@ -206,9 +206,12 @@ function TableStatist({
               {data.length > 0 ? (
                 data.map((row, idx) => (
                   <tr key={idx}>
-                    {config.statisticColumns.map((col) => (
-                      <td key={col.code}>{row[col.code] ?? "-"}</td>
-                    ))}
+                    {config.statisticColumns.map((col) => {
+                      let display = row[col.code];
+                      if (!isNaN(Number(display)) && !/^-?\d+$/.test(display))
+                        display = Number(display).toFixed(2);
+                      return <td key={col.code}>{display ?? "-"}</td>;
+                    })}
                   </tr>
                 ))
               ) : (
