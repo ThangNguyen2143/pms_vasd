@@ -110,20 +110,20 @@ export default function UpdateBugModal({
 
   return (
     <div className="modal modal-open ">
-      <div className="modal-box w-96">
+      <div className="modal-box max-w-5xl w-full">
         <h3 className="font-bold text-lg pb-2">Cập nhật thông tin bug</h3>
-        <div className="flex flex-col gap-2 px-4">
-          <label className="floating-label">
+        <div className="grid lg:grid-cols-2 gap-2 px-4">
+          <label className="floating-label lg:col-span-2">
             <span>Tiêu đề</span>
             <input
               type="text"
-              className="input input-neutral"
+              className="input input-neutral w-full"
               placeholder="Tiêu đề"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
             />
           </label>
-          <fieldset className="fieldset">
+          <fieldset className="fieldset lg:col-span-2">
             <legend className="fieldset-legend">Mô tả</legend>
             <RichTextEditor
               placeholder="Mô tả"
@@ -131,12 +131,13 @@ export default function UpdateBugModal({
               onChange={setDescription}
             />
           </fieldset>
-          <label className="floating-label">
+          <label className="floating-label lg:col-span-2">
+            <span>Log gây bug</span>
             <textarea
               rows={3}
               value={log}
               onChange={(e) => setLog(e.target.value)}
-              className="textarea"
+              className="textarea w-full"
             ></textarea>
           </label>
           <label className="floating-label">

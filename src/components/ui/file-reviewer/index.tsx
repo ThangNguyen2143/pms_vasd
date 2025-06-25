@@ -1,4 +1,3 @@
-import Image from "next/image";
 import DocxViewer from "./docx-viewer";
 import ExcelViewer from "./excel-viewer";
 import { Download } from "lucide-react";
@@ -23,11 +22,10 @@ export function FilePreview({ file }: FilePreviewProps) {
     );
   if (ext?.startsWith("png") || ext?.startsWith("jpg"))
     return (
-      <Image
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
         src={URL.createObjectURL(file)}
         alt={file.name}
-        width={1000}
-        height={1000}
         className="max-w-full max-h-[80vh]"
       />
     );
