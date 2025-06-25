@@ -1,11 +1,12 @@
 export type RequirementDto = {
   id: number;
   title: string;
-  description: string;
   priority?: string;
   date_receive: string;
   date_create: string;
   date_end?: string;
+  creator?: string;
+  location?: string;
   created_by: number;
   status: string;
   type: string;

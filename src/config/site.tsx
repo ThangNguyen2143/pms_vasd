@@ -8,8 +8,8 @@ import {
   type LucideIcon,
   MessageSquareWarning,
   NotebookPen,
-  Projector,
   Settings,
+  Tags,
   Users,
 } from "lucide-react";
 import { MenuNav } from "~/lib/types";
@@ -31,7 +31,7 @@ export const setNavigation = (menu: MenuNav[]) => {
       let icon: LucideIcon;
       switch (item.code) {
         case "project":
-          icon = Projector;
+          icon = Tags;
           break;
         case "task":
           icon = ListCheck;

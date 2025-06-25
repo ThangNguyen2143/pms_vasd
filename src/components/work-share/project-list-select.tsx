@@ -30,11 +30,7 @@ function ListProject({
       </span>
     );
   return (
-    <select
-      className="select select-ghost"
-      onChange={handleChange}
-      value={projectSelected}
-    >
+    <select className="select" onChange={handleChange} value={projectSelected}>
       <option disabled={true} value={0}>
         Chọn dự án
       </option>

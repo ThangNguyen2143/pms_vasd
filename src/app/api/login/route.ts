@@ -15,11 +15,11 @@ type SignInRespone = {
 export async function POST(request: Request) {
   try {
     const data: { username: string; password: string } = await request.json();
-
+    const DOMAIN = process.env.DOMAIN || "https://pmapi.vasd.vn/api";
     // 1. Tìm user trong database
     const response: AxiosResponse<DataResponse<SignInRespone>> = await axios({
       method: "post",
-      url: "https://pmapi.vasd.vn/api/user/login",
+      url: `${DOMAIN}/user/login`,
       data: JSON.stringify({ data }),
       headers: { "Content-Type": "application/json" },
       responseType: "json",

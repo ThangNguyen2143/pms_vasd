@@ -65,15 +65,22 @@ export default function Navigation() {
   return [
     ...visibleNav.map((item) => renderNavItem(item, pathname)),
     <li key="extendNav">
-      <details>
-        <summary className="flex items-center cursor-pointer gap-2">
+      <div className="dropdown">
+        <div
+          tabIndex={0}
+          role="button"
+          className="flex items-center cursor-pointer gap-2"
+        >
           <AlignJustify size={16} />
           Thêm
-        </summary>
-        <ul className="z-50">
+        </div>
+        <ul
+          tabIndex={0}
+          className="dropdown-content menu z-50 bg-base-100 rounded-box w-40 p-2 shadow-sm"
+        >
           {hiddenNav.map((item) => renderNavItem(item, pathname))}
         </ul>
-      </details>
+      </div>
     </li>,
   ];
 }

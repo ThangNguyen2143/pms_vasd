@@ -3,43 +3,60 @@
 import { useEffect, useState } from "react";
 import ListProject from "./project-list-select";
 import TableWork from "./table-work";
-import AddWorkBtn from "./add-work-btn";
+// import AddWorkBtn from "./add-work-btn";
 import { encodeBase64 } from "~/lib/services";
 import { useApi } from "~/hooks/use-api";
-import { Priority, WorkShareDto, WorkStatus, WorkType } from "~/lib/types";
-import { useUser } from "~/providers/user-context";
+import {
+  Priority,
+  RequirementDto,
+  RequirementStatus,
+  RequirementType,
+} from "~/lib/types";
+// import { useUser } from "~/providers/user-context";
 import OverviewWork from "./orverview-work";
+import { toISOString } from "~/utils/fomat-date";
+import { endOfDay, startOfDay, subDays } from "date-fns";
+import DateTimePicker from "../ui/date-time-picker";
 
 function MainWork() {
-  const { user } = useUser();
-  const role = user?.role;
+  // const { user } = useUser();
+  // const role = user?.role;
   const [projectSelected, setProjectSelect] = useState<number>(0);
-  const { data: statusList, getData: getStatusList } = useApi<WorkStatus[]>();
+  const { data: statusList, getData: getStatusList } =
+    useApi<RequirementStatus[]>();
   const { data: priorityList, getData: getPriority } = useApi<Priority[]>();
-  const { data: typeWorkList, getData: getTypeWork } = useApi<WorkType[]>();
+  const { data: typeWorkList, getData: getTypeWork } =
+    useApi<RequirementType[]>();
+  const [fromDate, setFromDate] = useState<string>(
+    toISOString(startOfDay(subDays(new Date(), 7))) //Mặc định 1 tuần trước
+  );
+  const [toDate, settoDate] = useState<string>(
+    toISOString(endOfDay(new Date()))
+  );
   const {
     data: workList,
     getData: getWorkList,
     errorData: errorWorkList,
     isLoading: loadingWork,
-  } = useApi<WorkShareDto[]>();
-  const fetchData = async () => {
+  } = useApi<RequirementDto[]>();
+  const fetchData = async (from: string, to: string) => {
     const endpointWork =
-      "/work/" + encodeBase64({ project_id: projectSelected });
+      "/requirements/" +
+      encodeBase64({ type: "project", project_id: projectSelected, from, to });
     await getWorkList(endpointWork, "no-cache");
   };
-  const isGuess = !role || role == "Guess";
+  // const isGuess = !role || role == "Guess";
   useEffect(() => {
     // Lấy projectSelected từ localStorage khi component mount
     const saved = sessionStorage.getItem("projectSelected");
     if (saved) setProjectSelect(parseInt(saved));
     const fetchData = async () => {
       const endpointStatus =
-        "/system/config/" + encodeBase64({ type: "work_status" });
+        "/system/config/" + encodeBase64({ type: "requirement_status" });
       const endpointPriority =
         "/system/config/" + encodeBase64({ type: "priority" });
       const endpointTypeWork =
-        "/system/config/" + encodeBase64({ type: "work_type" });
+        "/system/config/" + encodeBase64({ type: "requirement_type" });
 
       await getStatusList(endpointStatus);
       await getPriority(endpointPriority);
@@ -53,22 +70,36 @@ function MainWork() {
       sessionStorage.setItem("projectSelected", projectSelected.toString());
     }
   }, [projectSelected]);
-
+  console.log(workList);
   useEffect(() => {
     if (projectSelected != 0) {
-      const endpointWork =
-        "/work/" + encodeBase64({ project_id: projectSelected });
-      getWorkList(endpointWork, "reload");
+      fetchData(fromDate, toDate);
     }
-  }, [projectSelected]);
+  }, [projectSelected, fromDate, toDate]);
   return (
     <div className="mt-4 flex flex-col gap-4">
-      <div className="container flex justify-between gap-2.5">
+      <div className="container flex flex-1 gap-2.5">
         <ListProject
           projectSelected={projectSelected}
           setProjectSelect={setProjectSelect}
         />
-        {isGuess || !priorityList || !typeWorkList ? (
+        <div className="flex">
+          <span className="label">Từ</span>
+          <DateTimePicker
+            value={fromDate}
+            onChange={setFromDate}
+            className="w-full"
+          />
+        </div>
+        <div className="flex">
+          <span className="label">Đến</span>
+          <DateTimePicker
+            value={toDate}
+            onChange={settoDate}
+            className="w-full"
+          />
+        </div>
+        {/* {isGuess || !priorityList || !typeWorkList ? (
           ""
         ) : (
           <AddWorkBtn
@@ -77,7 +108,7 @@ function MainWork() {
             typeWork={typeWorkList}
             onSuccess={fetchData}
           />
-        )}
+        )} */}
       </div>
       {loadingWork ? (
         <span className="loading loading-infinity loading-lg"></span>
@@ -117,8 +148,9 @@ function MainWork() {
                 workList={workList || []}
                 priorityList={priorityList || undefined}
                 statusList={statusList || undefined}
-                isGuess={isGuess}
-                onUpdate={() => fetchData()}
+                typeList={typeWorkList || undefined}
+                // isGuess={isGuess}
+                // onUpdate={() => fetchData()}
               />
             </div>
           </div>

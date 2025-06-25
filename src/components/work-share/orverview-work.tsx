@@ -16,7 +16,7 @@ import {
 } from "chart.js";
 import { Bar, Pie, Radar } from "react-chartjs-2";
 import React from "react";
-import { Priority, WorkShareDto, WorkStatus } from "~/lib/types";
+import { Priority, RequirementDto, RequirementStatus } from "~/lib/types";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 
 ChartJS.register(
@@ -40,13 +40,13 @@ export default function OverviewWork({
   dataRaw,
 }: {
   priorityList: Priority[];
-  statusList: WorkStatus[];
-  dataRaw: WorkShareDto[] | null;
+  statusList: RequirementStatus[];
+  dataRaw: RequirementDto[] | null;
 }) {
   if (!dataRaw) return <p>Không có dữ liệu</p>;
 
   // === DATA ===
-  const statusLabels = statusList.map((s) => s.display);
+  const statusLabels = statusList.map((s) => s.code);
   const priorityLabels = priorityList.map((p) => p.display);
 
   // Đếm số lượng công việc theo trạng thái

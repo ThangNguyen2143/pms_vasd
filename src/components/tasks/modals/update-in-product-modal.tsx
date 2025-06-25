@@ -17,13 +17,13 @@ function UpdateInProductModalConfirm({
   onUpdate,
   taskList,
 }: UpdateModalProps) {
-  const { postData, isLoading, errorData } = useApi();
+  const { postData, isLoading, errorData } = useApi<string>();
   useEffect(() => {
     if (errorData) toast.error(errorData.message || errorData.title);
   }, [errorData]);
   const handleUpdate = async () => {
     const re = await postData("/tasks/update", { task_id: list });
-    if (re != "") return;
+    if (re == null) return;
     toast.success("Xử lý thành công");
     await onUpdate();
     onClose();

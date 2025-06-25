@@ -47,7 +47,7 @@ export default function ProjectMemberList({
       </div>
 
       {project_member?.length ? (
-        <div className="space-y-3">
+        <div className="space-y-3 max-h-[480px] overflow-y-auto">
           {project_member.map((member) => (
             <div key={member.id} className="bg-base-100 p-3 rounded border">
               <p>

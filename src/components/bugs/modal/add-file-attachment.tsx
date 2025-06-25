@@ -22,6 +22,7 @@ export default function AddFileAttachmentModal({
       uploadUrl: "/bugs/file",
       meta: { bug_id },
     });
+    // const re = await uploadChunkedFile(file, "/bugs/file", { bug_id });
     if (re?.value != "") return;
     await onUpdate();
     toast.success("Tệp đính kèm đã được thêm thành công");

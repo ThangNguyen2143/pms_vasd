@@ -122,20 +122,28 @@ function ClientStatisticalPage() {
           Mở
         </label>
       </div>
-      <div className="drawer-side shadow border-r-1">
+      <div
+        className="drawer-side shadow border-r-1"
+        style={{ overflow: "visible" }}
+      >
         <label
           htmlFor="my-drawer-2"
           aria-label="close sidebar"
           className="drawer-overlay"
         ></label>
-        <ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4">
+        <ul className="menu bg-base-200 text-base-content min-h-full w-30 p-4">
           {/* Sidebar content here */}
           {configGeneral ? (
             configGeneral
               .sort((a, b) => a.id - b.id)
               .map((config) => {
                 return (
-                  <li key={config.id} onClick={() => setStatistTable(config)}>
+                  <li
+                    key={config.id}
+                    onClick={() => setStatistTable(config)}
+                    className="tooltip tooltip-right"
+                    data-tip={config.name}
+                  >
                     <a
                       className={clsx(
                         "flex",
@@ -143,8 +151,7 @@ function ClientStatisticalPage() {
                         statistTable?.code === config.code ? "menu-active" : ""
                       )}
                     >
-                      <div className="shrink">{config.code}</div>
-                      <div className="truncate grow">{config.name}</div>
+                      {config.code}
                     </a>
                   </li>
                 );
