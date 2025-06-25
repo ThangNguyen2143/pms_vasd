@@ -3,7 +3,7 @@
 "use client";
 import clsx from "clsx";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import TableStatist from "~/components/statistical/table-statist";
 import { useApi } from "~/hooks/use-api";
 import { decodeBase64, encodeBase64 } from "~/lib/services";
@@ -45,17 +45,48 @@ function ClientStatisticalPage() {
       return;
     }
   }, [configGeneral, searchParams]);
-  useEffect(() => {
-    const base64Str = encodeBase64({
-      code: statistTable?.code,
-      ...filterParas,
-    });
-    const params = new URLSearchParams();
+  const encodebase = useMemo(() => {
     if (statistTable) {
-      params.set("q", base64Str);
-      router.replace(`?${params.toString()}`);
+      const fullParams = {
+        code: statistTable.code,
+        ...filterParas,
+      };
+      return encodeBase64(fullParams);
     }
-  }, [filterParas, statistTable]);
+    return "";
+  }, [statistTable?.code, JSON.stringify(filterParas)]);
+
+  useEffect(() => {
+    if (statistTable) {
+      const newQ = encodebase;
+      const currentQ = searchParams.get("q");
+      if (newQ && currentQ !== newQ) {
+        const params = new URLSearchParams();
+        params.set("q", newQ);
+        router.push(`?${params.toString()}`);
+      }
+    }
+  }, [encodebase]);
+  useEffect(() => {
+    if (statistTable) {
+      // Optional: Reset filterParas khi table thay đổi
+      setFilterParas((prev) => ({
+        ...prev,
+        code: statistTable.code,
+      }));
+    }
+  }, [statistTable]);
+
+  // useEffect(() => {
+  //   const base64Str = encodebase;
+  //   if (statistTable) {
+  //     const params = new URLSearchParams();
+  //     params.set("q", base64Str);
+  //     console.log("code=", statistTable.code);
+  //     console.log(params.toString());
+  //     router.push(`?${params.toString()}`);
+  //   }
+  // }, [filterParas, statistTable]);
 
   useEffect(() => {
     getData("/statistic");

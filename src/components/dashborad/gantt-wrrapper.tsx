@@ -22,7 +22,7 @@ export default function GanttWrapper({
   project_start,
 }: Props) {
   return (
-    <div className="border rounded shadow">
+    <div className="rounded shadow">
       <div className="overflow-x-auto max-h-[500px]">
         <div className="min-w-[800px]">
           {tasks.length > 0 && (

@@ -67,6 +67,7 @@ export default function LoginForm() {
       setUser({
         userId: user.userid,
         name: user.display,
+        userName: user.username,
         role: user.account_type,
         expires: user.expired,
       });

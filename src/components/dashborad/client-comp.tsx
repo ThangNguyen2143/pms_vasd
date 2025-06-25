@@ -147,8 +147,8 @@ function ClientDashboardPage() {
       </div>
 
       {/* Gantt Chart */}
-      {overview && (
-        <div className="border rounded shadow max-h-[500px]">
+      {overview && ganttData && (
+        <div className="rounded shadow max-h-[500px]">
           <GanttWrapper
             tasks={sortAndMapGanttData(
               ganttData || [],
@@ -159,9 +159,6 @@ function ClientDashboardPage() {
           />
         </div>
       )}
-      {/* Overview Table */}
-      {/* {overview && <TotalOverviewTable data={overview} />} */}
-
       {/* Pie Charts */}
       {overview && <StatusPieChartGroup overview={overview} />}
 

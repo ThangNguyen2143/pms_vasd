@@ -16,7 +16,7 @@ export default function DateTimePicker({
   className?: string;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
-
+  const tempValueRef = useRef<string>("");
   useEffect(() => {
     if (!inputRef.current) return;
 
@@ -27,7 +27,13 @@ export default function DateTimePicker({
       locale: Vietnamese, // Vietnamese language
       defaultDate: value || undefined,
       onChange: (selectedDates, dateStr) => {
-        onChange(dateStr);
+        tempValueRef.current = dateStr; // chỉ lưu tạm, chưa gọi onChange
+      },
+      onClose: () => {
+        // Khi picker đóng, mới gọi onChange chính thức
+        if (tempValueRef.current && tempValueRef.current !== value) {
+          onChange(tempValueRef.current);
+        }
       },
     });
 
