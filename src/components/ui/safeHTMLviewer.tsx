@@ -3,6 +3,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import DOMPurify from "dompurify";
+import clsx from "clsx";
 
 interface Props {
   html: string;
@@ -47,8 +48,10 @@ export default function SafeHtmlViewer({ html, className }: Props) {
     <>
       <div
         ref={ref}
-        className={className}
-        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }}
+        className={clsx("ql-editor", className)}
+        dangerouslySetInnerHTML={{
+          __html: DOMPurify.sanitize(html),
+        }}
       />
       {previewImg && (
         <div
@@ -71,4 +74,58 @@ export default function SafeHtmlViewer({ html, className }: Props) {
       )}
     </>
   );
+}
+export function normalizeHtmlStructure(rawHtml: string): string {
+  const blockTags = ["ol", "ul", "div", "table", "pre", "blockquote"];
+
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(rawHtml, "text/html");
+
+  const paragraphs = doc.querySelectorAll("p");
+
+  paragraphs.forEach((p) => {
+    blockTags.forEach((tag) => {
+      const blocks = p.querySelectorAll(tag);
+
+      blocks.forEach((block) => {
+        // Clone block để chuyển ra ngoài
+        const clone = block.cloneNode(true);
+        const parent = p.parentNode;
+        if (!parent) return;
+
+        // Tách phần trước block
+        const rangeBefore = document.createRange();
+        rangeBefore.setStart(p, 0);
+        rangeBefore.setEndBefore(block);
+        const before = rangeBefore.cloneContents();
+
+        if (before.textContent?.trim()) {
+          const pBefore = document.createElement("p");
+          pBefore.appendChild(before);
+          parent.insertBefore(pBefore, p);
+        }
+
+        // Thêm block ra ngoài
+        parent.insertBefore(clone, p);
+
+        // Tách phần sau block
+        const rangeAfter = document.createRange();
+        rangeAfter.setStartAfter(block);
+        rangeAfter.setEndAfter(p);
+        const after = rangeAfter.cloneContents();
+
+        if (after.textContent?.trim()) {
+          const pAfter = document.createElement("p");
+          pAfter.appendChild(after);
+          parent.insertBefore(pAfter, p.nextSibling);
+        }
+
+        // Xoá block và thẻ <p> cũ
+        block.remove();
+        p.remove();
+      });
+    });
+  });
+
+  return doc.body.innerHTML;
 }

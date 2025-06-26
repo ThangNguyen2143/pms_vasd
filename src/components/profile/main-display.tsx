@@ -69,11 +69,11 @@ function MainProfile({ user_id }: { user_id: number }) {
     if (re == "") toast.success("Cập nhật thông tin thành công");
   };
   return (
-    <div className="font-sans antialiased text-gray-900 leading-normal tracking-wider bg-cover">
+    <div className="font-sans antialiased leading-normal tracking-wider bg-cover">
       <div className="max-w-4xl flex items-center justify-center h-auto lg:h-screen flex-wrap mx-auto my-32 lg:my-0">
         <div
           id="profile"
-          className="w-full lg:w-3/5 rounded-lg lg:rounded-l-lg lg:rounded-r-none shadow-2xl bg-white opacity-75 mx-6 lg:mx-0"
+          className="w-full lg:w-3/5 rounded-lg lg:rounded-l-lg lg:rounded-r-none shadow-2xl opacity-75 mx-6 lg:mx-0"
         >
           <div className="p-4 md:p-12 text-center lg:text-left flex flex-col gap-2">
             <div className="block lg:hidden rounded-full shadow-xl mx-auto -mt-16 h-48 w-48 bg-cover bg-center"></div>
@@ -122,7 +122,7 @@ function MainProfile({ user_id }: { user_id: number }) {
                 </option>
               </select>
             </label>
-            <div className="pt-2 text-gray-600 text-xs lg:text-sm flex flex-col gap-1">
+            <div className="pt-2  lg:text-sm flex flex-col gap-1">
               <div className="flex">
                 <Link size={36} className="h-4 text-green-700 pr-4" />
                 Liên hệ

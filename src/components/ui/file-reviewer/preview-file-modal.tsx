@@ -13,7 +13,7 @@ function PreviewFileModal({
       <div className="modal-backdrop ">
         <button onClick={onClose}>close</button>
       </div>
-      <div className="modal-box max-w-full w-fit items-center flex justify-center">
+      <div className="modal-box max-w-full w-fit items-center flex justify-center min-w-4xl">
         <FilePreview file={file}></FilePreview>
       </div>
     </div>

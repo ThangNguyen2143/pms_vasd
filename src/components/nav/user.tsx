@@ -69,6 +69,9 @@ function UserIcon({
           <li>
             <a onClick={onLogout}>Đăng xuất</a>
           </li>
+          <li className="menu-disabled text-xs flex justify-end">
+            <a>V1.0.1</a>
+          </li>
         </ul>
       </div>
       {showModalChangePass && (

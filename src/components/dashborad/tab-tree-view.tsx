@@ -1,4 +1,5 @@
 "use client";
+import { Bug, ClipboardList, LucideIcon, Repeat, Route } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { encodeBase64 } from "~/lib/services";
@@ -33,17 +34,25 @@ function StaffColumn({ user }: { user: WorkOverviewDTO }) {
       </h4>
 
       <div className="collapse-content space-y-3">
-        <WorkBox title="📋 Task" items={user.tasks} />
-        <WorkBox title="🐛 Bug" items={user.bugs} />
-        <WorkBox title="🧪 Testcase" items={user.testcases} />
-        <WorkBox title="🔁 Re-test" items={user.bug_retests} />
+        <WorkBox title="Task" Icon={ClipboardList} items={user.tasks} />
+        <WorkBox title="Bug" Icon={Bug} items={user.bugs} />
+        <WorkBox title="Testcase" Icon={Route} items={user.testcases} />
+        <WorkBox title="Re-test" Icon={Repeat} items={user.bug_retests} />
       </div>
     </div>
   );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function WorkBox({ title, items }: { title: string; items: any[] }) {
+function WorkBox({
+  title,
+  Icon,
+  items,
+}: {
+  Icon: LucideIcon;
+  title: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  items: any[];
+}) {
   let urls: string[] = [];
   if (title.includes("Task"))
     urls = items.map(
@@ -78,7 +87,9 @@ function WorkBox({ title, items }: { title: string; items: any[] }) {
   return (
     <div className="bg-base-200 p-2 rounded collapse">
       <input type="checkbox" id={title + "col"} defaultChecked />
-      <h5 className="collapse-title font-semibold text-sm mb-1">{title}</h5>
+      <h5 className="collapse-title font-semibold text-sm mb-1 flex gap-2">
+        <Icon></Icon> <span>{title}</span>
+      </h5>
       {items?.length > 0 ? (
         <ul className="collapse-content space-y-1 text-xs">
           {items.map((item, idx) => (

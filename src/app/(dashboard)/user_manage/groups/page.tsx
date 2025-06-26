@@ -16,23 +16,7 @@ async function GroupPage() {
             <p className="text-2xl font-bold">Danh sách nhóm</p>
             <AddGroupBtn />
           </div>
-          <div className="flex flex-row justify-between items-center gap-4">
-            <div>
-              <label className="input">
-                <span className="label">Tìm kiếm nhóm</span>
-                <input type="text" placeholder="Nhập tên nhóm" />
-              </label>
-            </div>
-            <div>
-              <label className="select">
-                <span className="label">Trạng thái</span>
-                <select>
-                  <option>Đang hoạt động</option>
-                  <option>Đang khóa</option>
-                </select>
-              </label>
-            </div>
-          </div>
+
           <GroupTab />
         </div>
       </div>

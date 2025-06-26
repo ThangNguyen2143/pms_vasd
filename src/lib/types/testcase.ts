@@ -26,7 +26,8 @@ export type TestcaseDetail = {
     id: number;
     name: string;
     relation_type: string;
-  }[]; //Khum biết nốt
+  }[];
+  module: string;
   create_date: string;
   created_by: number;
   time_start?: string;

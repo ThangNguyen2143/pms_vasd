@@ -1,6 +1,5 @@
 "use client";
 
-import clsx from "clsx";
 import { useEffect, useState } from "react";
 import ChartOverviewRequirement from "./charts";
 type EnumTab = "reqByLocation" | "reqByStatus" | "reqByDate" | "reqByType";
@@ -56,78 +55,38 @@ function OverviewRequirement() {
   }, [tabOverview]);
   return (
     <div className="bg-base-200 p-4 rounded-lg shadow">
-      <div className="drawer lg:drawer-open">
+      <div className="tabs tabs-box">
         <input
-          id="requirment-overview-draw"
-          type="checkbox"
-          className="drawer-toggle"
+          type="radio"
+          name="my_tabs_1"
+          className="tab"
+          aria-label="Số lượng yêu cầu theo khoa"
+          defaultChecked
+          onClick={() => setTabOverview("reqByLocation")}
         />
-        <div className="drawer-content flex flex-col">
-          {/* Page content here */}
-          <label
-            htmlFor="requirment-overview-draw"
-            className="btn btn-primary drawer-button lg:hidden"
-          >
-            Mở
-          </label>
-          {/* Chart here */}
-          <ChartOverviewRequirement tab={tabOverview} paraTab={paraTab} />
-        </div>
-        <div className="drawer-side">
-          <label
-            htmlFor="requirment-overview-draw"
-            aria-label="close sidebar"
-            className="drawer-overlay"
-          ></label>
-          <ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4">
-            {/* Sidebar content here */}
-            <li onClick={() => setTabOverview("reqByLocation")}>
-              <a
-                className={clsx(
-                  "flex",
-                  "truncate max-w-[300px]",
-                  tabOverview == "reqByLocation" ? "menu-active" : ""
-                )}
-              >
-                Số lượng yêu cầu theo khoa
-              </a>
-            </li>
-            <li onClick={() => setTabOverview("reqByStatus")}>
-              <a
-                className={clsx(
-                  "flex",
-                  "truncate max-w-[300px]",
-                  tabOverview == "reqByStatus" ? "menu-active" : ""
-                )}
-              >
-                Số lượng yêu cầu theo trạng thái
-              </a>
-            </li>
-            <li onClick={() => setTabOverview("reqByDate")}>
-              <a
-                className={clsx(
-                  "flex",
-                  "truncate max-w-[300px]",
-                  tabOverview == "reqByDate" ? "menu-active" : ""
-                )}
-              >
-                Tỉ lệ xử lý yêu cầu theo ngày
-              </a>
-            </li>
-            <li onClick={() => setTabOverview("reqByType")}>
-              <a
-                className={clsx(
-                  "flex",
-                  "truncate max-w-[300px]",
-                  tabOverview == "reqByType" ? "menu-active" : ""
-                )}
-              >
-                Số lượng yêu cầu theo loại
-              </a>
-            </li>
-          </ul>
-        </div>
+        <input
+          type="radio"
+          name="my_tabs_1"
+          className="tab"
+          aria-label="Số lượng yêu cầu theo trạng thái"
+          onClick={() => setTabOverview("reqByStatus")}
+        />
+        <input
+          type="radio"
+          name="my_tabs_1"
+          className="tab"
+          aria-label="Tỉ lệ xử lý yêu cầu theo ngày"
+          onClick={() => setTabOverview("reqByDate")}
+        />
+        <input
+          type="radio"
+          name="my_tabs_1"
+          className="tab"
+          aria-label="Số lượng yêu cầu theo loại"
+          onClick={() => setTabOverview("reqByType")}
+        />
       </div>
+      <ChartOverviewRequirement tab={tabOverview} paraTab={paraTab} />
     </div>
   );
 }

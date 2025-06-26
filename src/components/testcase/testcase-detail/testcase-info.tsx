@@ -10,16 +10,18 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 import SafeHtmlViewer from "~/components/ui/safeHTMLviewer";
 import { useApi } from "~/hooks/use-api";
-import { TestcaseDetail } from "~/lib/types";
+import { ProductModule, TestcaseDetail } from "~/lib/types";
 import { format_date } from "~/utils/fomat-date";
 import { status_with_color } from "~/utils/status-with-color";
 
 function TestcaseInfo({
   testcase,
+  modules,
   openUpdate,
   onUpdate,
 }: {
   testcase: TestcaseDetail;
+  modules?: ProductModule[];
   openUpdate: () => void;
   onUpdate: () => Promise<void>;
 }) {
@@ -52,7 +54,6 @@ function TestcaseInfo({
     toast.success("Cập nhật trạng thái thành công!");
     await onUpdate();
   };
-  console.log(testcase);
   return (
     <div className="bg-base-100 shadow p-4 rounded-lg">
       <div className="flex justify-between border-l-4 border-green-500 pl-3">
@@ -146,6 +147,12 @@ function TestcaseInfo({
         <div>
           <strong>Mô tả:</strong> <SafeHtmlViewer html={testcase.description} />
         </div>
+        <p>
+          <strong>Module:</strong>
+          {modules
+            ? modules.find((m) => m.id == testcase.module)?.display
+            : testcase.module}
+        </p>
         <p>
           <strong>Tags:</strong>
           {testcase.tags.map((tag) => (

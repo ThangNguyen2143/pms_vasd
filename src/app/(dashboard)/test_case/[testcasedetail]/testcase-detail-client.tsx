@@ -2,7 +2,12 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useApi } from "~/hooks/use-api";
-import { TestcaseDetail, EnviromentTest, TestComment } from "~/lib/types";
+import {
+  TestcaseDetail,
+  EnviromentTest,
+  TestComment,
+  ProductModule,
+} from "~/lib/types";
 import { toast } from "sonner";
 import AssignTestcaseModal from "~/components/testcase/modals/assign-testcase-modal";
 import UploadFileModal from "~/components/testcase/modals/upload-file-modal";
@@ -23,6 +28,7 @@ type InfoTestcaseDetail = {
   name: string;
   description: string;
   task_id?: number;
+  module: string;
   tags: string[];
   test_data: string;
   environment: string;
@@ -60,6 +66,15 @@ export default function TestcaseDetailClient({
   const [showUpdateStep, setShowUpdateStep] = useState(false);
   const [showCopyModal, setShowCopyModal] = useState(false);
   const [openAddTest, setOpenAddTest] = useState<string>();
+  const { data: moduleList, getData: getModules } = useApi<ProductModule[]>();
+  useEffect(() => {
+    if (testcase)
+      getModules(
+        "/product/" +
+          encodeBase64({ type: "module", product_id: testcase.product_id }),
+        "default"
+      );
+  }, [testcase]);
   useEffect(() => {
     getEnv(
       "/system/config/eyJ0eXBlIjoidGVzdF9lbnZpcm9ubWVudCJ9",
@@ -69,6 +84,7 @@ export default function TestcaseDetailClient({
   useEffect(() => {
     if (errorLoadEnv) toast.error(errorLoadEnv.message || errorLoadEnv.title);
     if (errorPost) toast.error(errorPost.message || errorPost.title);
+    console.log(errorPost);
   }, [errorLoadEnv, errorPost]);
   useEffect(() => {
     fetchTestcase();
@@ -107,6 +123,7 @@ export default function TestcaseDetailClient({
     try {
       const body: {
         steps: StepTest[];
+        module: string;
         testcase_id: number;
         name: string;
         description: string;
@@ -117,6 +134,7 @@ export default function TestcaseDetailClient({
         environment: string;
       } = {
         testcase_id,
+        module: info?.module || testcase?.module || "",
         name: info?.name || testcase?.name || "",
         description: info?.description || testcase?.description || "",
         task_id: info?.task_id || testcase?.task?.id,
@@ -138,9 +156,9 @@ export default function TestcaseDetailClient({
       };
       if (!body.task_id) delete body.task_id; // Remove task_id if not provided
       if (!body.test_data) delete body.test_data; // Remove test_data if not provided
+      console.log(body);
       const re = await putData(`/testcase`, body);
       if (re != "") {
-        toast.error("Cập nhật thất bại");
         return;
       }
       await fetchTestcase(); // Refetch to get updated data
@@ -159,7 +177,7 @@ export default function TestcaseDetailClient({
 
   if (loading) return <div>Loading...</div>;
   if (!testcase) return <div>Testcase not found</div>;
-
+  console.log(testcase);
   return (
     <div className="max-w-7xl mx-auto  p-6 rounded-lg shadow-sm">
       <div className="flex justify-between items-center mb-6">
@@ -173,6 +191,7 @@ export default function TestcaseDetailClient({
         {/* Testcase Info  Section */}
         <TestcaseInfo
           testcase={testcase}
+          modules={moduleList || undefined}
           openUpdate={() => setShowEditModal(true)}
           onUpdate={fetchTestcase}
         />
@@ -254,6 +273,7 @@ export default function TestcaseDetailClient({
       <EditTestcaseModal
         isOpen={showEditModal}
         onClose={() => setShowEditModal(false)}
+        modules={moduleList || []}
         product_id={testcase.product_id}
         testcase={testcase}
         environmentTests={environmentTest || []}

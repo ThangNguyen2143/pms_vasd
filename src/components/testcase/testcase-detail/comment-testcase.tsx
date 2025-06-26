@@ -31,16 +31,16 @@ function CommentTestcase({
   const [newComment, setNewComment] = useState("");
   const { postData, errorData } = useApi<
     ResponseNotify,
-    { testcase_id: number; comment: string }
+    { testcase_id: number; message: string }
   >();
   useEffect(() => {
-    if (errorData) toast.error(errorData.message);
+    if (errorData) toast.error(errorData.message || errorData.title);
   }, [errorData]);
   const handleAddComment = async () => {
     // API post comment here
     const data = {
       testcase_id,
-      comment: newComment,
+      message: newComment,
     };
     const re = await postData("/testcase/comments", data);
     if (!re) return;

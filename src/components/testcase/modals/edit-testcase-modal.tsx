@@ -3,11 +3,17 @@ import { useEffect, useState } from "react";
 import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
-import { EnviromentTest, TaskDTO, TestcaseDetail } from "~/lib/types";
+import {
+  EnviromentTest,
+  ProductModule,
+  TaskDTO,
+  TestcaseDetail,
+} from "~/lib/types";
 type InfoTestcaseDetail = {
   name: string;
   description: string;
   task_id?: number;
+  module: string;
   tags: string[];
   test_data: string;
   environment: string;
@@ -16,12 +22,14 @@ type InfoTestcaseDetail = {
 export default function EditTestcaseModal({
   isOpen,
   product_id,
+  modules,
   onClose,
   testcase,
   environmentTests,
   onSubmit,
 }: {
   isOpen: boolean;
+  modules: ProductModule[];
   product_id: string;
   onClose: () => void;
   testcase: TestcaseDetail;
@@ -32,6 +40,7 @@ export default function EditTestcaseModal({
     name: testcase.name,
     description: testcase.description,
     environment: testcase.environment,
+    module: testcase.module,
     tags: testcase.tags.join(", "),
     task_id: testcase.task?.id || 0,
     test_data: testcase.test_data || "",
@@ -56,7 +65,7 @@ export default function EditTestcaseModal({
 
   return (
     <div className="modal modal-open">
-      <div className="modal-box">
+      <div className="modal-box max-w-5xl w-full">
         <h2 className="text-xl font-bold mb-4">Chỉnh sửa testcase</h2>
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -127,6 +136,27 @@ export default function EditTestcaseModal({
                   setFormData({ ...formData, tags: e.target.value })
                 }
               />
+            </div>
+            <div>
+              <label className="label">Module</label>
+              <select
+                className="select select-bordered w-full"
+                value={formData.module}
+                onChange={(e) =>
+                  setFormData({ ...formData, module: e.target.value })
+                }
+              >
+                <option value={""}>Chọn module</option>
+                {modules ? (
+                  modules.map((module) => (
+                    <option key={module.id + "-ref"} value={module.id}>
+                      {module.display}
+                    </option>
+                  ))
+                ) : (
+                  <option>Không có module nào</option>
+                )}
+              </select>
             </div>
             <div className="md:col-span-2">
               <label className="bloc mb-1">Dữ liệu đầu vào</label>

@@ -78,13 +78,15 @@ export default function Attachments({
           {files.map((f) => (
             <li
               key={f.file_id}
-              className="file bg-base-100 p-2 rounded border-l-4 border-neutral"
+              className="flex items-center bg-base-100 p-2 rounded border-l-4 border-neutral "
             >
-              📎 {f.file_name.replace(".gz", "")}{" "}
+              <div className="max-w-48 truncate">
+                📎{f.file_name.replace(".gz", "")}
+              </div>
               {loadingMap[f.file_id] ? (
                 <span className="loading loading-ball"></span>
               ) : (
-                <>
+                <div>
                   <span
                     className="btn btn-circle text-blue-500 tooltip"
                     data-tip="Tải xuống"
@@ -106,7 +108,7 @@ export default function Attachments({
                   >
                     <X />
                   </span>
-                </>
+                </div>
               )}
             </li>
           ))}

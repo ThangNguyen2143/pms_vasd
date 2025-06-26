@@ -70,35 +70,37 @@ export default function Attachments({
           {attachments.map((f) => (
             <li
               key={f.file_id}
-              className="file bg-base-100 p-2 rounded border-l-4 border-neutral"
+              className="flex items-center bg-base-100 p-2 rounded border-l-4 border-neutral"
             >
-              📎 {f.file_name.replace(".gz", "")}{" "}
+              <div className="max-w-48 truncate">
+                📎{f.file_name.replace(".gz", "")}
+              </div>
               {loadingMap[f.file_id] ? (
                 <span className="loading loading-ball"></span>
               ) : (
-                <>
+                <div>
                   <span
-                    className="link text-blue-500 btn btn-ghost tooltip"
+                    className="btn btn-circle text-blue-500 tooltip"
+                    data-tip="Tải xuống"
                     onClick={() => handleDownfile(f.file_id, "down")}
-                    data-tip={"Tải xuống"}
                   >
                     <Download></Download>
                   </span>
                   <span
-                    className="link text-blue-500 btn btn-ghost tooltip"
-                    data-tip={"Mở file"}
+                    className="btn btn-circle text-blue-500 tooltip"
+                    data-tip="Mở trong tab mới"
                     onClick={() => handleDownfile(f.file_id, "open")}
                   >
                     <ExternalLink />
                   </span>
                   <span
-                    className="btn btn-ghost text-error tooltip"
-                    data-tip="Xóa tệp"
+                    className="btn btn-circle text-red-500 tooltip"
+                    data-tip="Xóa tài liệu"
                     onClick={() => handleRemoveFile(f.file_id)}
                   >
                     <X />
                   </span>
-                </>
+                </div>
               )}
             </li>
           ))}

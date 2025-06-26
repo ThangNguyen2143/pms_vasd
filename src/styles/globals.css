@@ -3,7 +3,7 @@
 @import "react-datetime-picker/dist/DateTimePicker.css";
 @import "react-calendar/dist/Calendar.css";
 @import "react-clock/dist/Clock.css";
-@import "react-quill-new/dist/quill.snow.css";
+
 @plugin "daisyui";
 
 @plugin "daisyui/theme" {
@@ -97,7 +97,6 @@ body {
 .react-datetime-picker__wrapper {
   border: none !important;
 }
-
 .rich-text-editor .ql-toolbar {
   @apply bg-base-200 border-b border-base-300 p-2 rounded-t-box;
 }

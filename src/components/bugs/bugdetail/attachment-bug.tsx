@@ -83,33 +83,37 @@ export default function BugAttachments({
           {files.map((f) => (
             <li
               key={f.file_id}
-              className="bg-base-100 p-2 rounded border-l-4 border-neutral flex items-center"
+              className="flex items-center bg-base-100 p-2 rounded border-l-4 border-neutral"
             >
-              📎 {f.file_name.replace(".gz", "")}{" "}
+              <div className="max-w-48 truncate">
+                📎{f.file_name.replace(".gz", "")}
+              </div>
               {loadingMap[f.file_id] ? (
                 <span className="loading loading-ball"></span>
               ) : (
-                <>
+                <div>
                   <span
-                    className="link text-blue-500 hover:underline cursor-pointer btn btn-circle"
+                    className="btn btn-circle text-blue-500 tooltip"
+                    data-tip="Tải xuống"
+                    onClick={() => handleDownfile(f.file_id, "down")}
+                  >
+                    <Download></Download>
+                  </span>
+                  <span
+                    className="btn btn-circle text-blue-500 tooltip"
+                    data-tip="Mở trong tab mới"
                     onClick={() => handleDownfile(f.file_id, "open")}
                   >
                     <ExternalLink />
                   </span>
                   <span
-                    className="link text-blue-500 hover:underline cursor-pointer btn btn-circle "
-                    onClick={() => handleDownfile(f.file_id, "down")}
-                  >
-                    <Download />
-                  </span>
-                  <span
-                    className="btn btn-circle text-red-500 hover:text-red-700 ml-2 tooltip"
-                    data-tip="Xóa tệp"
+                    className="btn btn-circle text-red-500 tooltip"
+                    data-tip="Xóa tài liệu"
                     onClick={() => handleRemoveFile(f.file_id)}
                   >
                     <X />
                   </span>
-                </>
+                </div>
               )}
             </li>
           ))}
