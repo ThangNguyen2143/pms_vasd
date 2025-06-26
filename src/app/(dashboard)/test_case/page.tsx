@@ -36,7 +36,9 @@ async function TestcasePage(props: TestcasePageProps) {
 
       {tab === "list" && (
         <>
-          <h1 className="text-3xl font-bold">Danh sách trường hợp kiểm thử</h1>
+          <h1 className="text-3xl text-center font-bold">
+            Danh sách trường hợp kiểm thử
+          </h1>
           <ClientTestCasesPage />
         </>
       )}

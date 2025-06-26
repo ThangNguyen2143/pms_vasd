@@ -39,7 +39,7 @@ async function BugsPage(props: BugsPageProps) {
 
       {tab === "list" && (
         <>
-          <h1 className="text-3xl font-bold">Danh sách bugs</h1>
+          <h1 className="text-3xl font-bold text-center">Danh sách bugs</h1>
           <Suspense fallback={<div>Đang tải dữ liệu...</div>}>
             <BugsClient />
           </Suspense>

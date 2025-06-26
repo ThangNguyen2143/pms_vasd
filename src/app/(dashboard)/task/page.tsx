@@ -20,7 +20,7 @@ async function TasksPage(props: TasksPageProps) {
     redirect("/task?tab=list");
   }
   return (
-    <main className="flex flex-col container">
+    <main className="flex flex-col container p-4">
       <div role="tablist" className="tabs tabs-box mb-4">
         <a
           href="?tab=overview"
@@ -40,7 +40,7 @@ async function TasksPage(props: TasksPageProps) {
 
       {tab === "list" && (
         <>
-          <h1 className="text-2xl text-center font-bold">
+          <h1 className="text-3xl text-center font-bold">
             Danh sách công việc
           </h1>
           <MainDisplayTask />

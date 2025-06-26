@@ -129,7 +129,7 @@ function TableWork({
               <th scope="col" className="px-6 py-3">
                 Ưu tiên
               </th>
-              <th scope="col" className="flex items-center px-6 py-3">
+              <th scope="col" className="flex items-center  py-3">
                 Trạng thái
                 <div className="dropdown">
                   <div tabIndex={0} role="button" className="btn m-1">
@@ -220,7 +220,7 @@ function TableWork({
                   ) : ( */}
                     <span
                       className={clsx(
-                        "px-6 badge",
+                        "badge",
                         `badge-${status_with_color(item.status)}`
                       )}
                     >

@@ -194,7 +194,6 @@ function RequirementsClient() {
   };
   return (
     <main className="flex flex-col gap-4 p-4 items-center">
-      <h1 className="text-2xl font-bold">Ghi nhận yêu cầu</h1>
       <div className="flex justify-between w-full">
         <div className="tabs tabs-box" role="tablist">
           <a
@@ -223,11 +222,14 @@ function RequirementsClient() {
           </div>
         )}
         {tabContent == "List" && (
-          <>
+          <div>
+            <h1 className="text-3xl font-bold text-center">
+              Danh sách yêu cầu
+            </h1>
             {!projectList && !errorProjectGet ? (
               <span className="loading loading-dots loading-xl"></span>
             ) : (
-              <div className="flex justify-between shadow w-full gap-2">
+              <div className="flex justify-between shadow w-full gap-2 mt-4">
                 <div className="flex flex-1 gap-2">
                   <select
                     name="project"
@@ -373,7 +375,7 @@ function RequirementsClient() {
             ) : (
               <div className="alert alert-info mt-4">Chưa chọn dự án nào</div>
             )}
-          </>
+          </div>
         )}
       </div>
       {showAddRequirment && (

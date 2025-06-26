@@ -2,6 +2,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import clsx from "clsx";
+import {
+  Bug,
+  ChartNoAxesCombined,
+  ClipboardPen,
+  File,
+  Globe,
+  Hourglass,
+  TestTube,
+} from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import TableStatist from "~/components/statistical/table-statist";
@@ -124,6 +133,33 @@ function ClientStatisticalPage() {
     }
     return null;
   };
+  const selectIcon = (name: string) => {
+    let icon;
+    switch (name) {
+      case "sta_0001":
+        icon = <File />;
+        break;
+      case "sta_0002":
+        icon = <Bug />;
+        break;
+      case "sta_0003":
+        icon = <TestTube />;
+        break;
+      case "sta_0004":
+        icon = <ClipboardPen />;
+        break;
+      case "sta_0005":
+        icon = <Hourglass />;
+        break;
+      case "sta_0006":
+        icon = <ChartNoAxesCombined />;
+        break;
+
+      default:
+        icon = <Globe />; // Default icon if no match
+    }
+    return icon;
+  };
   return (
     <div className="drawer lg:drawer-open">
       <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
@@ -162,7 +198,7 @@ function ClientStatisticalPage() {
           aria-label="close sidebar"
           className="drawer-overlay"
         ></label>
-        <ul className="menu bg-base-200 text-base-content min-h-full w-30 p-4">
+        <ul className="menu bg-base-200 text-base-content min-h-full w-24 p-4">
           {/* Sidebar content here */}
           {configGeneral ? (
             configGeneral
@@ -178,11 +214,11 @@ function ClientStatisticalPage() {
                     <a
                       className={clsx(
                         "flex",
-                        "truncate max-w-[300px]",
+                        "truncate max-w-[300px] justify-center",
                         statistTable?.code === config.code ? "menu-active" : ""
                       )}
                     >
-                      {config.code}
+                      {selectIcon(config.code)}
                     </a>
                   </li>
                 );

@@ -6,8 +6,8 @@ export const metadata = {
 };
 async function WorkSharePage() {
   return (
-    <div className="container p-2 mx-auto">
-      <h1 className="text-4xl font-bold">Theo dõi tiến độ</h1>
+    <div className="container p-4 mx-auto">
+      <h1 className="text-3xl text-center font-bold">Theo dõi tiến độ</h1>
       <MainWork />
     </div>
   );
