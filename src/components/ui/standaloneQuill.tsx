@@ -1,33 +1,37 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type ReactQuill from "react-quill-new";
+import { Quill } from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
-// import ReactQuillProps from "react-quill-new";
+import QuillWrapper from "./QuillWrapper";
 
-const QuillNoSSRWrapper = dynamic(
-  () => import("react-quill-new").then((mod) => mod.default),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="text-sm text-gray-400">Đang tải editor...</div>
-    ),
-  }
-);
+// const QuillNoSSRWrapper = lazy(() => import("./QuillWrapper"));
 
 interface Props {
   value: string;
   onChange: (val: string) => void;
   placeholder?: string;
+  suggestList?: string[];
 }
 
 export default function StandaloneQuill({
   value,
   onChange,
   placeholder,
+  suggestList,
 }: Props) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [editor, setEditor] = useState<any>(null);
+  const quillRef = useRef<ReactQuill | null>(null);
+  const [editor, setEditor] = useState<Quill | null>(null);
+  // const [savedSelection, setSavedSelection] = useState<RangeStatic | null>(
+  //   null
+  // );
+  const [mentionStartIndex, setMentionStartIndex] = useState<number | null>(
+    null
+  );
+  const [showSuggest, setShowSuggest] = useState(false);
+  const [keyword, setKeyword] = useState("");
+  const [pos, setPos] = useState({ top: 0, left: 0 });
 
   const modules = useMemo(
     () => ({
@@ -37,7 +41,7 @@ export default function StandaloneQuill({
         [{ indent: "-1" }, { indent: "+1" }],
         [{ align: [] }],
         [{ color: [] }, { background: [] }],
-        ["image"],
+        ["image", "link"],
       ],
     }),
     []
@@ -57,21 +61,27 @@ export default function StandaloneQuill({
   ];
 
   useEffect(() => {
-    if (!editor || !editor.root) return;
+    if (quillRef.current) {
+      const instance = quillRef.current.getEditor();
+      setEditor(instance);
+    }
+  }, [quillRef]);
+
+  useEffect(() => {
+    if (!editor?.root) return;
 
     const handlePaste = (e: ClipboardEvent) => {
-      const clipboardItems = e.clipboardData?.items;
-      if (!clipboardItems) return;
-
-      for (const item of clipboardItems) {
-        if (item.type.indexOf("image") === 0) {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (const item of items) {
+        if (item.type.startsWith("image")) {
           const file = item.getAsFile();
           if (file) {
             const reader = new FileReader();
             reader.onload = (evt) => {
-              const base64Image = evt.target?.result;
+              const base64 = evt.target?.result;
               const range = editor.getSelection(true);
-              editor.insertEmbed(range.index, "image", base64Image);
+              editor.insertEmbed(range.index, "image", base64);
             };
             reader.readAsDataURL(file);
           }
@@ -79,22 +89,109 @@ export default function StandaloneQuill({
       }
     };
 
+    const handleKeydown = (e: KeyboardEvent) => {
+      if (e.key === "@") {
+        const sel = editor.getSelection();
+        if (!sel) return;
+        const bounds = editor.getBounds(sel.index);
+        setKeyword("");
+        setMentionStartIndex(sel.index + 1); // Track where @ started
+        setPos({
+          top: bounds?.top ? bounds.top + 30 : 30,
+          left: bounds?.left ?? 30,
+        });
+        setShowSuggest(true);
+      }
+    };
+
+    const handleTextChange = () => {
+      if (!editor) return;
+      if (!editor.hasFocus()) editor.focus();
+      const sel = editor.getSelection();
+      if (
+        !sel ||
+        mentionStartIndex === null ||
+        sel.index < mentionStartIndex - 1
+      ) {
+        setShowSuggest(false);
+        return;
+      }
+
+      const text = editor.getText(
+        mentionStartIndex,
+        sel.index - mentionStartIndex
+      );
+      if (/\\s/.test(text)) {
+        setShowSuggest(false);
+        setMentionStartIndex(null);
+      } else {
+        setKeyword(text);
+      }
+    };
+
     const el = editor.root;
     el.addEventListener("paste", handlePaste);
-    return () => el.removeEventListener("paste", handlePaste);
-  }, [editor]);
+    el.addEventListener("keydown", handleKeydown);
+    editor.on("text-change", handleTextChange);
+
+    return () => {
+      el.removeEventListener("paste", handlePaste);
+      el.removeEventListener("keydown", handleKeydown);
+      editor.off("text-change", handleTextChange);
+    };
+  }, [editor, mentionStartIndex]);
+
+  const handleSelect = (name: string) => {
+    if (!editor || mentionStartIndex == null) return;
+    const sel = editor.getSelection();
+    if (!sel) return;
+    const length = sel.index - mentionStartIndex;
+    editor.deleteText(mentionStartIndex, length);
+    editor.insertText(mentionStartIndex, `${name}`, {
+      bold: true,
+      background: "#ffffdd",
+    });
+    editor.insertText(mentionStartIndex + name.length + 1, " ");
+    editor.setSelection(mentionStartIndex + name.length + 1);
+    setShowSuggest(false);
+    setMentionStartIndex(null);
+  };
+
+  const suggestions = suggestList?.filter((u) =>
+    u.toLowerCase().includes(keyword.toLowerCase())
+  );
 
   return (
-    <QuillNoSSRWrapper
-      theme="snow"
-      value={value}
-      onChange={onChange}
-      modules={modules}
-      formats={formats}
-      placeholder={placeholder}
-      onChangeSelection={(_selection, _source, editorInstance) => {
-        if (!editor) setEditor(editorInstance);
-      }}
-    />
+    <div className="relative">
+      <QuillWrapper
+        ref={quillRef}
+        value={value}
+        onChange={onChange}
+        modules={modules}
+        formats={formats}
+        placeholder={placeholder}
+        theme="snow"
+      />
+
+      {showSuggest && suggestions && suggestions.length > 0 && (
+        <ul
+          className="absolute bg-white border rounded shadow z-60 w-fit"
+          style={{ top: pos.top, left: pos.left }}
+        >
+          {suggestions.map((u) => (
+            <li
+              key={u}
+              className="px-2 py-1 hover:bg-gray-100 cursor-pointer"
+              onMouseDown={(e) => {
+                e.preventDefault();
+                handleSelect(u);
+              }}
+            >
+              @{u}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }

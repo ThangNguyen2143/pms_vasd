@@ -156,7 +156,6 @@ export default function TestcaseDetailClient({
       };
       if (!body.task_id) delete body.task_id; // Remove task_id if not provided
       if (!body.test_data) delete body.test_data; // Remove test_data if not provided
-      console.log(body);
       const re = await putData(`/testcase`, body);
       if (re != "") {
         return;
@@ -177,7 +176,6 @@ export default function TestcaseDetailClient({
 
   if (loading) return <div>Loading...</div>;
   if (!testcase) return <div>Testcase not found</div>;
-  console.log(testcase);
   return (
     <div className="max-w-7xl mx-auto  p-6 rounded-lg shadow-sm">
       <div className="flex justify-between items-center mb-6">
@@ -224,6 +222,7 @@ export default function TestcaseDetailClient({
         {/* Comment testcase */}
         <CommentTestcase
           testcase_id={testcase_id}
+          product_id={testcase.product_id}
           comments={commentsList || []}
           updateComment={fetchComment}
         />

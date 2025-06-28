@@ -123,7 +123,6 @@ export default function AddBugModal({
         ...data,
       },
     });
-    console.log(re);
     if (re?.value != "") return;
     else {
       toast.success("Báo bug thành công");

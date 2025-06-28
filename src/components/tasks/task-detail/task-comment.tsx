@@ -2,9 +2,18 @@
 import { Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import DOMPurify from "dompurify";
+import RichTextEditor from "~/components/ui/rich-text-editor";
+import SafeHtmlViewer from "~/components/ui/safeHTMLviewer";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
-import { Comment, ResopnseInfor, Task } from "~/lib/types";
+import {
+  Comment,
+  Contact,
+  ProjectMember,
+  ResopnseInfor,
+  Task,
+} from "~/lib/types";
 import { useUser } from "~/providers/user-context";
 import { formatCommentDate } from "~/utils/format-comment-date";
 import { sendEmail } from "~/utils/send-notify";
@@ -25,6 +34,16 @@ function TaskComments({
     { task_id: number; content: string }
   >();
 
+  const { data: memberProject, getData: getUsers } = useApi<ProjectMember[]>();
+  const { getData: getContact } =
+    useApi<{ userid: number; display_name: string; contacts: Contact[] }[]>();
+  useEffect(() => {
+    getUsers(
+      "/system/config/" +
+        encodeBase64({ type: "project_member", product_id: task.product_id })
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   useEffect(() => {
     if (errorData) toast.error(errorData.message);
   }, [errorData]);
@@ -39,6 +58,36 @@ function TaskComments({
       task_id: task.task_id,
       content: newComment.trim(),
     };
+    const list = memberProject?.filter((mem) => {
+      return newComment.includes(mem.name);
+    });
+    const listContact = await getContact(
+      "/user/contacts/" +
+        encodeBase64({ user_id: list?.map((l) => ({ id: l.id })) })
+    );
+    if (listContact && listContact.length > 0) {
+      const email = listContact.map((us) => {
+        const mail = us.contacts.filter((ct) => ct.code == "email");
+        return mail[0].value;
+      });
+      const content = {
+        id: task.id,
+        name: "Bạn đã được nhắc đến trong task",
+        massage: `Nội dung comment: ${DOMPurify.sanitize(newComment)}`,
+      };
+      const link =
+        window.location.origin +
+          "/task/" +
+          encodeBase64({ task_id: task.id }) || "https://pm.vasd.vn/";
+      if (email.length > 0)
+        email.forEach((e) =>
+          sendEmail(content, e, "Thông báo comment", link, "task")
+            .then((mes) => {
+              if (mes.message != "OK") toast(mes.message);
+            })
+            .catch((e) => toast.error(e))
+        );
+    }
     const re = await postData("/tasks/comments", data);
     if (!re) return;
     else {
@@ -88,7 +137,7 @@ function TaskComments({
                 <div className="chat chat-start" key={comment.id}>
                   <div className="chat-bubble wrap-anywhere">
                     <p className="font-bold text-sm">{comment.name}</p>
-                    <p className="text-lg mt-0.5 mx-2 ">{comment.content}</p>
+                    <SafeHtmlViewer html={comment.content} />
                   </div>
                   <div className="chat-footer">
                     <time className="text-xs opacity-50">
@@ -117,13 +166,12 @@ function TaskComments({
             </div>
           </div>
           <div className="join-vertical mt-4 w-full border-dashed border rounded-2xl p-3">
-            <textarea
-              ref={textareaRef}
-              rows={1}
-              className="join-item resize-none break-words overflow-hidden w-full focus-visible:outline-none focus-visible:border-none focus-visible:ring-0"
-              placeholder="Viết bình luận..."
+            <RichTextEditor
               value={newComment}
-              onChange={(e) => setNewComment(e.target.value)}
+              className="join-item resize-none not-last:focus-visible:outline-none focus-visible:border-none focus-visible:ring-0"
+              onChange={(e) => setNewComment(e)}
+              placeholder="Nhập bình luận..."
+              suggestList={memberProject?.map((mem) => mem.name)}
             />
             <div className="join-item flex justify-end">
               <button

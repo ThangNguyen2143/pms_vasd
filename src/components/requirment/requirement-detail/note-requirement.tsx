@@ -3,6 +3,8 @@
 import { Send } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import RichTextEditor from "~/components/ui/rich-text-editor";
+import SafeHtmlViewer from "~/components/ui/safeHTMLviewer";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { RequirementNote, UserDto } from "~/lib/types";
@@ -80,7 +82,7 @@ export default function NoteRequirment({
                       ? userList.find((us) => us.id == comment.user_id)?.name
                       : comment.user_id}
                   </p>
-                  <p className="text-lg mt-0.5 mx-2">{comment.note}</p>
+                  <SafeHtmlViewer html={comment.note} />
                 </div>
                 <div className="chat-footer">
                   <time className="text-xs opacity-50">
@@ -103,13 +105,11 @@ export default function NoteRequirment({
           </div>
         </div>
         <div className="join-vertical mt-4 w-full border-dashed border rounded-2xl p-3">
-          <textarea
-            ref={textareaRef}
-            rows={1}
-            className="join-item resize-none break-words overflow-hidden w-full focus-visible:outline-none focus-visible:border-none focus-visible:ring-0"
-            placeholder="Viết bình luận..."
+          <RichTextEditor
             value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
+            className="join-item resize-none not-last:focus-visible:outline-none focus-visible:border-none focus-visible:ring-0"
+            onChange={(e) => setNewComment(e)}
+            placeholder="Nhập bình luận..."
           />
           <div className="join-item flex justify-end">
             <button

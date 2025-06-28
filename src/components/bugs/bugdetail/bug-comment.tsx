@@ -1,12 +1,13 @@
 "use client";
 import { Send } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
+import DOMPurify from "dompurify";
 import { toast } from "sonner";
 import RichTextEditor from "~/components/ui/rich-text-editor";
 import SafeHtmlViewer from "~/components/ui/safeHTMLviewer";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
-import { BugComment, Contact } from "~/lib/types";
+import { BugComment, Contact, ProjectMember } from "~/lib/types";
 import { useUser } from "~/providers/user-context";
 import { formatCommentDate } from "~/utils/format-comment-date";
 import { sendEmail } from "~/utils/send-notify";
@@ -33,11 +34,20 @@ export default function BugComments({
   updateComment: () => Promise<void>;
 }) {
   const { user } = useUser();
-  const [newComment, setNewComment] = useState("");
+  const [newComment, setNewComment] = useState("\u200B");
+  const { data: memberProject, getData: getUsers } = useApi<ProjectMember[]>();
   const { postData, errorData } = useApi<
     ResponseNotify,
     { bug_id: number; comment: string }
   >();
+  const { getData: getContact } =
+    useApi<{ userid: number; display_name: string; contacts: Contact[] }[]>();
+  useEffect(() => {
+    getUsers(
+      "/system/config/" + encodeBase64({ type: "project_member", product_id })
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   useEffect(() => {
     if (errorData) toast.error(errorData.message || errorData.title);
   }, [errorData]);
@@ -47,6 +57,36 @@ export default function BugComments({
       bug_id,
       comment: newComment,
     };
+    const list = memberProject?.filter((mem) => {
+      return newComment.includes(mem.name);
+    });
+    const listContact = await getContact(
+      "/user/contacts/" +
+        encodeBase64({ user_id: list?.map((l) => ({ id: l.id })) })
+    );
+    if (listContact && listContact.length > 0) {
+      const email = listContact.map((us) => {
+        const mail = us.contacts.filter((ct) => ct.code == "email");
+        return mail[0].value;
+      });
+      const content = {
+        id: bug_id,
+        name: "Bạn đã được nhắc đến trong bug",
+        massage: `Nội dung comment: ${DOMPurify.sanitize(newComment)}`,
+      };
+      const link =
+        window.location.origin +
+          "/bug/" +
+          encodeBase64({ bug_id, product_id }) || "https://pm.vasd.vn/";
+      if (email.length > 0)
+        email.forEach((e) =>
+          sendEmail(content, e, "Thông báo comment", link, "bug")
+            .then((mes) => {
+              if (mes.message != "OK") toast(mes.message);
+            })
+            .catch((e) => toast.error(e))
+        );
+    }
     const re = await postData("/bugs/comments", data);
     if (!re) return;
     else {
@@ -142,6 +182,8 @@ export default function BugComments({
               value={newComment}
               className="join-item resize-none not-last:focus-visible:outline-none focus-visible:border-none focus-visible:ring-0"
               onChange={(e) => setNewComment(e)}
+              placeholder="Nhập bình luận..."
+              suggestList={memberProject?.map((mem) => mem.name)}
             />
             {/* <textarea
               ref={textareaRef}
@@ -154,7 +196,10 @@ export default function BugComments({
             <div className="join-item flex justify-end">
               <button
                 className="btn btn-ghost btn-sm rounded-full"
-                onClick={handleAddComment}
+                onClick={() => {
+                  // console.log(newComment);
+                  handleAddComment();
+                }}
                 disabled={newComment.trim().length == 0}
                 aria-label="Gửi"
               >

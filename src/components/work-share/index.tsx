@@ -70,7 +70,6 @@ function MainWork() {
       sessionStorage.setItem("projectSelected", projectSelected.toString());
     }
   }, [projectSelected]);
-  console.log(workList);
   useEffect(() => {
     if (projectSelected != 0) {
       fetchData(fromDate, toDate);
