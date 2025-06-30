@@ -15,6 +15,7 @@ function TaskByProduct() {
   const [showModal, setShowModal] = useState(false);
   const [findTask, setFindTask] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
+  const [moduleFilter, setModuleFilter] = useState("");
   const [taskList, setTaskList] = useState([] as TaskDTO[]);
   const { getData: getModule, data: modules } = useApi<ProductModule[]>();
   const endpoint = (product_id: string) =>
@@ -48,6 +49,7 @@ function TaskByProduct() {
     if (tasks) {
       const filteredTasks = tasks
         .filter((task) => (filterStatus ? task.status === filterStatus : true))
+        .filter((task) => (moduleFilter ? task.module == moduleFilter : true))
         .filter((task) =>
           findTask
             ? task.title.toLowerCase().includes(findTask.toLowerCase())
@@ -55,7 +57,7 @@ function TaskByProduct() {
         );
       setTaskList(filteredTasks);
     }
-  }, [filterStatus, findTask]);
+  }, [filterStatus, findTask, moduleFilter]);
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-row justify-between items-center">
@@ -79,10 +81,30 @@ function TaskByProduct() {
             />
           </label>
         </div>
-        <div>
-          <label className="select">
+        <div className="flex gap-2">
+          <label className="select w-full">
+            <span className="label">Module</span>
+            <select
+              name="moduleSort"
+              value={moduleFilter}
+              onChange={(e) => setModuleFilter(e.target.value)}
+            >
+              <option value="">Tất cả</option>
+              {modules ? (
+                modules.map((m) => (
+                  <option value={m.id} key={m.id + m.code}>
+                    {m.display}
+                  </option>
+                ))
+              ) : (
+                <option disabled>Không có module nào</option>
+              )}
+            </select>
+          </label>
+          <label className="select w-full">
             <span className="label">Trạng thái</span>
             <select
+              name="StatusSort"
               value={filterStatus}
               onChange={(e) => {
                 setFilterStatus(e.target.value);

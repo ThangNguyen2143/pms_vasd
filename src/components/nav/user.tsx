@@ -70,7 +70,7 @@ function UserIcon({
             <a onClick={onLogout}>Đăng xuất</a>
           </li>
           <li className="menu-disabled text-xs flex justify-end">
-            <a>V1.0.2</a>
+            <a>V1.0.3</a>
           </li>
         </ul>
       </div>
