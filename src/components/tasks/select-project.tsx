@@ -67,8 +67,8 @@ function SelectProject({
   }
   if (dataProduct)
     return (
-      <div className="dropdown">
-        <div tabIndex={0} role="button" className="btn m-1">
+      <div className="dropdown min-w-80">
+        <div tabIndex={0} role="button" className="btn m-1 ">
           {productSelected === "" ? "Chọn phần mềm" : displayLabel}
         </div>
         <ul
@@ -76,10 +76,10 @@ function SelectProject({
           className="menu dropdown-content bg-base-100 rounded-box z-10 p-2 shadow-sm"
         >
           {dataProduct.map((product) => (
-            <li key={product.id}>
+            <li key={product.id} className="truncate max-w-96 max-h-14">
               <a
                 id={product.id}
-                className="hover:cursor-pointer"
+                className="hover:cursor-pointer "
                 onClick={() => handleClickProduct(product.id)}
               >
                 {product.name}

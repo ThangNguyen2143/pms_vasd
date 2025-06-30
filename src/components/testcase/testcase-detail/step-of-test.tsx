@@ -28,7 +28,7 @@ function StepTest({
           <Wrench />
         </button>
       </div>
-      <div className="overflow-x-auto">
+      <div className="overflow-auto max-h-[400px]">
         <table className="table w-full">
           <thead>
             <tr>
@@ -58,7 +58,10 @@ function StepTest({
           </tbody>
           <tfoot>
             <tr>
-              <td colSpan={7}>Kết quả mong đợi: {result_expect}</td>
+              <td colSpan={7}>
+                Kết quả mong đợi:
+                <SafeHtmlViewer html={result_expect} />
+              </td>
             </tr>
           </tfoot>
         </table>

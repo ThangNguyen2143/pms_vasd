@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
 import { RequirementDetail, RequirementType } from "~/lib/types";
 
@@ -70,7 +71,7 @@ export default function EditRequirementModal({
   };
   return (
     <div className="modal modal-open">
-      <div className="modal-box">
+      <div className="modal-box w-full max-w-2xl">
         <h3 className="font-bold text-lg">Sửa thông tin yêu cầu</h3>
         <div className="flex flex-col gap-1 px-4">
           <label className="input w-full">
@@ -82,15 +83,14 @@ export default function EditRequirementModal({
               onChange={(e) => settitle(e.target.value)}
             />
           </label>
-          <label className="input w-full">
-            <span className="label">Mô tả</span>
-            <input
-              type="text"
-              placeholder="Nhập mô tả yêu cầu"
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">Mô tả</legend>
+            <RichTextEditor
               value={description}
-              onChange={(e) => setdescription(e.target.value)}
+              onChange={(e) => setdescription(e)}
+              placeholder="Nhập mô tả"
             />
-          </label>
+          </fieldset>
           <label className="select w-full">
             <span className="label">Loại yêu cầu</span>
             <select

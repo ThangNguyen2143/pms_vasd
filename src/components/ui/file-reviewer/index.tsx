@@ -18,7 +18,7 @@ export function FilePreview({ file }: FilePreviewProps) {
   if (ext === "xlsx" || ext === "xls") return <ExcelViewer file={file} />;
   if (ext === "pdf")
     return (
-      <iframe src={URL.createObjectURL(file)} className="w-full h-[80vh]" />
+      <iframe src={URL.createObjectURL(file)} className="w-full h-[90vh]" />
     );
   if (ext?.startsWith("png") || ext?.startsWith("jpg"))
     return (

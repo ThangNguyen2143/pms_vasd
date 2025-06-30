@@ -2,6 +2,7 @@
 "use client";
 import * as XLSX from "xlsx";
 import { useEffect, useState } from "react";
+import clsx from "clsx";
 
 export default function ExcelViewer({ file }: { file: File }) {
   const [rows, setRows] = useState<any[][]>([]);
@@ -20,16 +21,23 @@ export default function ExcelViewer({ file }: { file: File }) {
   }, []);
 
   return (
-    <table className="table table-zebra w-full">
-      <tbody>
-        {rows.map((row, i) => (
-          <tr key={i}>
-            {row.map((cell, j) => (
-              <td key={j}>{cell}</td>
-            ))}
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <div className="overflow-auto rounded-box border border-base-content/5 bg-base-100">
+      <table
+        className={clsx(
+          "table table-zebra w-full",
+          rows.length > 200 ? "table-xs" : ""
+        )}
+      >
+        <tbody>
+          {rows.map((row, i) => (
+            <tr key={i}>
+              {row.map((cell, j) => (
+                <td key={j}>{cell}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }

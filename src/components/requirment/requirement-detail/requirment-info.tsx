@@ -70,7 +70,7 @@ export default function RequirementInfo({
         <h3 className="text-lg font-semibold text-primary">
           📌 Thông tin yêu cầu
         </h3>
-        <div className="items-center">
+        <div className="items-center flex">
           <button
             className="btn btn-sm btn-ghost tooltip"
             data-tip="Chỉnh sửa"
