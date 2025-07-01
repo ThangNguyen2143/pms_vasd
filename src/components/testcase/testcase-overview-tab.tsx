@@ -139,7 +139,6 @@ function TestcaseOverView() {
         <div className="grid grid-cols-2">
           <div>
             <h3 className="text-xl font-bold">Thống kê tình trạng testcase</h3>
-            {/* Điều chỉnh lại dữ liệu */}
             <div className="h-[500px] w-full flex justify-center items-center">
               {productSelect != "" ? (
                 <StackedBarChartByModule

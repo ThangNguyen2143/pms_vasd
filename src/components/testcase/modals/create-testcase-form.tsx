@@ -2,6 +2,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import AddModuleProductModal from "~/components/tasks/modals/add-module-product-modal";
 import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
 import { useUploadFile } from "~/hooks/use-upload-file";
@@ -83,14 +84,9 @@ function CreateTestcaseForm({
 
   const [currentTag, setCurrentTag] = useState("");
   const [files, setFile] = useState<File[]>([]);
-
+  const [openAddModule, setopenAddModule] = useState(false);
   const { isUploading, uploadError, uploadMultiFiles } = useUploadFile();
 
-  // const {
-  //   postData,
-  //   isUploading,
-  //   errorData: errorPost,
-  // } = useApi<"", CreateTestcaseData>();
   const {
     getData: getEnv,
     data: environmentTest,
@@ -103,10 +99,7 @@ function CreateTestcaseForm({
   } = useApi<TaskDTO[]>();
   const { getData: getModule, data: modules } = useApi<ProductModule[]>();
   useEffect(() => {
-    getEnv(
-      "/system/config/eyJ0eXBlIjoidGVzdF9lbnZpcm9ubWVudCJ9",
-      "force-cache"
-    );
+    getEnv("/system/config/eyJ0eXBlIjoidGVzdF9lbnZpcm9ubWVudCJ9");
   }, []);
   useEffect(() => {
     getlistTasks("/tasks/" + encodeBase64({ product_id }));
@@ -118,10 +111,6 @@ function CreateTestcaseForm({
     }
     // if (errorGetTask && errorGetTask.code != 404)
     //   toast.error("Danh sách task:" + errorGetTask.message);
-    // if (errorPost) {
-    //   console.error(errorPost);
-    //   toast.error(errorPost.message || errorPost.title);
-    // }
     if (uploadError) toast.error(uploadError);
   }, [errorLoadEnv, uploadError]);
   const handleSubmit = async () => {
@@ -287,7 +276,12 @@ function CreateTestcaseForm({
           </label>
           <div>
             <label className="label">Kết quả mong đợi</label>
-            <input
+            <RichTextEditor
+              placeholder="Kết quả mong đợi"
+              value={formData.info.result_expect}
+              onChange={(e) => handleInfoChange("result_expect", e)}
+            ></RichTextEditor>
+            {/* <input
               type="text"
               className="input w-full"
               placeholder="Kết quả mong đợi"
@@ -295,7 +289,7 @@ function CreateTestcaseForm({
               onChange={(e) =>
                 handleInfoChange("result_expect", e.target.value)
               }
-            />
+            /> */}
           </div>
           <div className="md:col-span-2">
             <label className="label">Mô tả</label>
@@ -358,27 +352,36 @@ function CreateTestcaseForm({
               )}
             </select>
           </div>
-          <div>
-            <label className="label">Module</label>
-            <select
-              className="select select-bordered w-full"
-              value={formData.module}
-              onChange={(e) =>
-                setFormData((pre) => ({ ...pre, module: e.target.value }))
-              }
-            >
-              <option value={""}>Chọn moudle</option>
-              {modules ? (
-                modules.map((module) => (
-                  <option key={module.id + "-ref-module"} value={module.id}>
-                    {module.display}
-                  </option>
-                ))
-              ) : (
-                <option>Không có module nào</option>
-              )}
-            </select>
-          </div>
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">Module</legend>
+            <div className="join">
+              <select
+                className="select join-item w-full"
+                value={formData.module}
+                onChange={(e) =>
+                  setFormData((pre) => ({ ...pre, module: e.target.value }))
+                }
+              >
+                <option value={""}>Chọn moudle</option>
+                {modules ? (
+                  modules.map((module) => (
+                    <option key={module.id + "-ref-module"} value={module.id}>
+                      {module.display}
+                    </option>
+                  ))
+                ) : (
+                  <option>Không có module nào</option>
+                )}
+              </select>
+
+              <button
+                className="btn join-item"
+                onClick={() => setopenAddModule(true)}
+              >
+                Thêm
+              </button>
+            </div>
+          </fieldset>
           <div>
             <label className="label">Tags</label>
             <div className="flex gap-2">
@@ -473,14 +476,19 @@ function CreateTestcaseForm({
 
                 <div className="col-span-2 row-span-2 flex flex-col">
                   <label className="label">Mô tả</label>
-                  <textarea
+                  <RichTextEditor
+                    value={step.description}
+                    onChange={(e) => handleStepChange(index, "description", e)}
+                    placeholder="Mô tả bước"
+                  />
+                  {/* <textarea
                     className="textarea w-full"
                     placeholder="Mô tả bước"
                     value={step.description}
                     onChange={(e) =>
                       handleStepChange(index, "description", e.target.value)
                     }
-                  />
+                  /> */}
                 </div>
 
                 <div>
@@ -541,6 +549,18 @@ function CreateTestcaseForm({
           Làm mới
         </button>
       </div>
+      {openAddModule && (
+        <AddModuleProductModal
+          onClose={() => setopenAddModule(false)}
+          product_id={product_id}
+          reloadData={async () => {
+            await getModule(
+              "/product/" + encodeBase64({ type: "module", product_id }),
+              "reload"
+            );
+          }}
+        />
+      )}
     </div>
   );
 }

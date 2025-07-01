@@ -42,10 +42,7 @@ export default function RequirementInfo({
     { id: number; status: string }
   >();
   useEffect(() => {
-    getStatus(
-      "/system/config/eyJ0eXBlIjoicmVxdWlyZW1lbnRfc3RhdHVzIn0=",
-      "force-cache"
-    );
+    getStatus("/system/config/eyJ0eXBlIjoicmVxdWlyZW1lbnRfc3RhdHVzIn0=");
   }, []);
   useEffect(() => {
     if (errorData) toast.error(errorData.message);

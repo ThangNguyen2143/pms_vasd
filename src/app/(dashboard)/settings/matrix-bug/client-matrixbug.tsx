@@ -7,11 +7,8 @@ function ClientMatrixBug() {
   const { data: severity, getData: getSeverity } = useApi<BugSeverity[]>();
   const { data: priority, getData: getPriority } = useApi<Priority[]>();
   useEffect(() => {
-    getPriority("/system/config/eyJ0eXBlIjoicHJpb3JpdHkifQ==", "force-cache");
-    getSeverity(
-      "/system/config/eyJ0eXBlIjoiYnVnX3NldmVyaXR5In0=",
-      "force-cache"
-    );
+    getPriority("/system/config/eyJ0eXBlIjoicHJpb3JpdHkifQ==");
+    getSeverity("/system/config/eyJ0eXBlIjoiYnVnX3NldmVyaXR5In0=");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return (

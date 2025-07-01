@@ -46,7 +46,9 @@ function StepTest({
               <tr key={step.step}>
                 <td>{step.step}</td>
                 <td>{step.name}</td>
-                <td>{step.description}</td>
+                <td>
+                  <SafeHtmlViewer html={step.description} />
+                </td>
                 <td>{step.input_data || "-"}</td>
                 <td>{step.output_data || "-"}</td>
                 <td>{step.expected_result}</td>

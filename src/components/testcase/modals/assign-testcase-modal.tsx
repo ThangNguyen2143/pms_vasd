@@ -91,7 +91,8 @@ export default function AssignTestcaseModal({
     }
   };
   useEffect(() => {
-    if (errorData) toast.error(errorData.message);
+    if (errorData) toast.error(errorData.message || errorData.title);
+    console.log(errorData);
   }, [errorData]);
   if (!isOpen) return null;
 

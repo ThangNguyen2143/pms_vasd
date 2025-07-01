@@ -56,10 +56,7 @@ export default function TaskDetailClient({ task_id }: { task_id: number }) {
     );
   };
   useEffect(() => {
-    getCriterial(
-      "/system/config/eyJ0eXBlIjoiY3JpdGVyaWFfdHlwZSJ9",
-      "force-cache"
-    );
+    getCriterial("/system/config/eyJ0eXBlIjoiY3JpdGVyaWFfdHlwZSJ9");
     getTaskStatus("/system/config/eyJ0eXBlIjoidGFza19zdGF0dXMifQ==", "default");
   }, []);
   useEffect(() => {

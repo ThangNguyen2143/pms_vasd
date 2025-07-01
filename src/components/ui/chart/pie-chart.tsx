@@ -36,15 +36,17 @@ function getRandomColorList(length: number): string[] {
 
 export default function PieChartComp({ data, valueKey }: Props) {
   const { labels, dataset } = useMemo(() => {
-    const labels = data.map((d) => d.label);
-    const values = data.map((d) => Number(d[valueKey]) || 0);
-    const backgroundColor = getRandomColorList(values.length);
+    const labelList = data.map((d) => d.label);
+    const valueList = data.map((d) => {
+      const val = Number(d[valueKey]);
+      return isNaN(val) ? 0 : val;
+    });
 
     return {
-      labels,
+      labels: labelList,
       dataset: {
-        data: values,
-        backgroundColor,
+        data: valueList,
+        backgroundColor: getRandomColorList(valueList.length),
         borderWidth: 1,
       },
     };

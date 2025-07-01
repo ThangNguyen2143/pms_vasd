@@ -30,10 +30,7 @@ function AddCriterialModal({
     useApi<{ code: string; display: string }[]>();
   const { postData, errorData, isLoading } = useApi();
   useEffect(() => {
-    getCriterial(
-      "/system/config/eyJ0eXBlIjoiY3JpdGVyaWFfdHlwZSJ9",
-      "force-cache"
-    );
+    getCriterial("/system/config/eyJ0eXBlIjoiY3JpdGVyaWFfdHlwZSJ9");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {

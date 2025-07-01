@@ -9,11 +9,13 @@ import { useEffect, useState } from "react";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import UpdateInProductModalConfirm from "./modals/update-in-product-modal";
+import AddModuleProductModal from "./modals/add-module-product-modal";
 function TaskByProduct() {
   const [selectProduct, setSelectProduct] = useState<string>("");
   const [showUpdateInProduct, setShowUpdateInProduct] = useState<number[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [findTask, setFindTask] = useState("");
+  const [openAddModule, setopenAddModule] = useState(false);
   const [filterStatus, setFilterStatus] = useState("");
   const [moduleFilter, setModuleFilter] = useState("");
   const [taskList, setTaskList] = useState([] as TaskDTO[]);
@@ -155,6 +157,7 @@ function TaskByProduct() {
           <CreateTaskForm
             product_id={selectProduct}
             modules={modules || []}
+            onAddModule={() => setopenAddModule(true)}
             onSuccess={() => {
               getTaskList(endpoint(selectProduct), "reload");
               setShowModal(false);
@@ -162,6 +165,18 @@ function TaskByProduct() {
           />
         </div>
       </dialog>
+      {openAddModule && (
+        <AddModuleProductModal
+          onClose={() => setopenAddModule(false)}
+          product_id={selectProduct}
+          reloadData={async () => {
+            getModule(
+              "/product/" +
+                encodeBase64({ type: "module", product_id: selectProduct })
+            );
+          }}
+        />
+      )}
       {showUpdateInProduct.length > 0 && (
         <UpdateInProductModalConfirm
           onUpdate={async () => {

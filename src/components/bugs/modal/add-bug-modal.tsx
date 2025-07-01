@@ -59,11 +59,8 @@ export default function AddBugModal({
   const { data: testcaseList, getData: getTestCase } = useApi<TestcaseDto[]>();
   const { data: taskList, getData: getTask } = useApi<TaskDTO[]>();
   useEffect(() => {
-    getPriority("/system/config/eyJ0eXBlIjoicHJpb3JpdHkifQ==", "force-cache");
-    getSeverity(
-      "/system/config/eyJ0eXBlIjoiYnVnX3NldmVyaXR5In0=",
-      "force-cache"
-    );
+    getPriority("/system/config/eyJ0eXBlIjoicHJpb3JpdHkifQ==");
+    getSeverity("/system/config/eyJ0eXBlIjoiYnVnX3NldmVyaXR5In0=");
   }, []);
   useEffect(() => {
     getTestCase("/testcase/" + encodeBase64({ product_id }), "reload");

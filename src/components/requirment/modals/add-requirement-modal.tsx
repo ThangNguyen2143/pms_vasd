@@ -60,10 +60,7 @@ export default function AddRequirementModal({
     errorData: errorListType,
   } = useApi<RequirementType[]>();
   useEffect(() => {
-    getData(
-      "/system/config/eyJ0eXBlIjoicmVxdWlyZW1lbnRfdHlwZSJ9",
-      "force-cache"
-    );
+    getData("/system/config/eyJ0eXBlIjoicmVxdWlyZW1lbnRfdHlwZSJ9");
   }, []);
   useEffect(() => {
     // if (errorData) toast.error(errorData.message);

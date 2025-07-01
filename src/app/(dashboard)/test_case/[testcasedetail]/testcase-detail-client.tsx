@@ -76,10 +76,7 @@ export default function TestcaseDetailClient({
       );
   }, [testcase]);
   useEffect(() => {
-    getEnv(
-      "/system/config/eyJ0eXBlIjoidGVzdF9lbnZpcm9ubWVudCJ9",
-      "force-cache"
-    );
+    getEnv("/system/config/eyJ0eXBlIjoidGVzdF9lbnZpcm9ubWVudCJ9");
   }, []);
   useEffect(() => {
     if (errorLoadEnv) toast.error(errorLoadEnv.message || errorLoadEnv.title);

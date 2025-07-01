@@ -48,11 +48,8 @@ export default function UpdateBugModal({
   } = useApi<Priority[]>();
 
   useEffect(() => {
-    getPriority("/system/config/eyJ0eXBlIjoicHJpb3JpdHkifQ==", "force-cache");
-    getSeverity(
-      "/system/config/eyJ0eXBlIjoiYnVnX3NldmVyaXR5In0=",
-      "force-cache"
-    );
+    getPriority("/system/config/eyJ0eXBlIjoicHJpb3JpdHkifQ==");
+    getSeverity("/system/config/eyJ0eXBlIjoiYnVnX3NldmVyaXR5In0=");
   }, []);
 
   useEffect(() => {

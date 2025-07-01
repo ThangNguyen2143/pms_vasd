@@ -36,10 +36,7 @@ export default function EvaluateRequirementModal({
     {}
   );
   useEffect(() => {
-    getCriteria(
-      "/system/config/eyJ0eXBlIjoicmVxdWlyZW1lbnRfY3JpdGVyaWEifQ==",
-      "force-cache"
-    );
+    getCriteria("/system/config/eyJ0eXBlIjoicmVxdWlyZW1lbnRfY3JpdGVyaWEifQ==");
   }, []);
   useEffect(() => {
     if (errorData) toast.error(errorData.message);

@@ -27,9 +27,11 @@ function CreateTaskForm({
   product_id,
   modules,
   onSuccess,
+  onAddModule,
 }: {
   product_id: string;
   modules: ProductModule[];
+  onAddModule: () => void;
   onSuccess: () => void;
 }) {
   const [title, setTitle] = useState("");
@@ -54,10 +56,7 @@ function CreateTaskForm({
   const { data: criteriaType, getData: getCriterial } =
     useApi<{ code: string; display: string }[]>();
   useEffect(() => {
-    getCriterial(
-      "/system/config/eyJ0eXBlIjoiY3JpdGVyaWFfdHlwZSJ9",
-      "force-cache"
-    );
+    getCriterial("/system/config/eyJ0eXBlIjoiY3JpdGVyaWFfdHlwZSJ9");
   }, []);
   useEffect(() => {
     getRequiredList("/requirements/list/" + encodeBase64({ product_id }));
@@ -209,22 +208,27 @@ function CreateTaskForm({
       <div className="row-span-2">
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Module</legend>
-          <select
-            className="select select-bordered w-full"
-            value={selectModule}
-            onChange={(e) => setSelectModule(e.target.value)}
-          >
-            <option value={""}>Chọn moudle</option>
-            {modules ? (
-              modules.map((module) => (
-                <option key={module.id + "-ref-module"} value={module.id}>
-                  {module.display}
-                </option>
-              ))
-            ) : (
-              <option>Không có module nào</option>
-            )}
-          </select>
+          <div className="join w-full">
+            <select
+              className="select join-item "
+              value={selectModule}
+              onChange={(e) => setSelectModule(e.target.value)}
+            >
+              <option value={""}>Chọn moudle</option>
+              {modules ? (
+                modules.map((module) => (
+                  <option key={module.id + "-ref-module"} value={module.id}>
+                    {module.display}
+                  </option>
+                ))
+              ) : (
+                <option>Không có module nào</option>
+              )}
+            </select>
+            <button className="btn join-item" onClick={onAddModule}>
+              Thêm
+            </button>
+          </div>
         </fieldset>
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Liên kết yêu cầu</legend>

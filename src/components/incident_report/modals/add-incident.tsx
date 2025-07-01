@@ -52,11 +52,8 @@ export default function AddIncidentModal({
     errorData: errorSeverity,
   } = useApi<BugSeverity[]>();
   useEffect(() => {
-    getType("/system/config/eyJ0eXBlIjoiaW5jaWRlbnRfdHlwZSJ9", "force-cache");
-    getSeverity(
-      "/system/config/eyJ0eXBlIjoiYnVnX3NldmVyaXR5In0=",
-      "force-cache"
-    );
+    getType("/system/config/eyJ0eXBlIjoiaW5jaWRlbnRfdHlwZSJ9");
+    getSeverity("/system/config/eyJ0eXBlIjoiYnVnX3NldmVyaXR5In0=");
   }, []);
   useEffect(() => {
     if (errorData) toast.error(errorData.message);
