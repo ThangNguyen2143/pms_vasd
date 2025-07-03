@@ -1,5 +1,6 @@
 import { ProjectLogDto } from "~/lib/types";
 import { format_date } from "~/utils/fomat-date";
+import { formatContent } from "~/utils/format-content";
 
 function ProjectLogs({ project_log }: { project_log?: ProjectLogDto[] }) {
   return (
@@ -17,7 +18,7 @@ function ProjectLogs({ project_log }: { project_log?: ProjectLogDto[] }) {
                   <strong>{format_date(log.date)}</strong> - <em>{log.name}</em>
                   :
                   <br />
-                  {log.description}
+                  {formatContent(log.description)}
                 </div>
               </li>
             ))}

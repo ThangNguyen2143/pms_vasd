@@ -175,8 +175,8 @@ export default function StandaloneQuill({
 
       {showSuggest && suggestions && suggestions.length > 0 && (
         <ul
-          className="absolute  border rounded shadow z-60 w-fit"
-          style={{ top: pos.top, left: pos.left }}
+          className="absolute  border rounded z-60 w-fit bg-base-200"
+          style={{ left: pos.left }}
         >
           {suggestions.map((u) => (
             <li

@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { format_date } from "~/utils/fomat-date";
+import { formatContent } from "~/utils/format-content";
 
 export default function RequirmentLogs({
   logs,
@@ -25,7 +26,7 @@ export default function RequirmentLogs({
               <p>
                 <i>{format_date(log.date)}</i>
               </p>
-              <p>{log.content}</p>
+              <p>{formatContent(log.content)}</p>
             </div>
           ))
         ) : (

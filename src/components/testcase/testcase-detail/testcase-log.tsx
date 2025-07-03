@@ -1,5 +1,6 @@
 import { TestLog } from "~/lib/types";
 import { format_date } from "~/utils/fomat-date";
+import { formatContent } from "~/utils/format-content";
 
 function TestcaseLog({ testLogs }: { testLogs: TestLog[] }) {
   return (
@@ -17,7 +18,7 @@ function TestcaseLog({ testLogs }: { testLogs: TestLog[] }) {
                   <strong>{format_date(log.date)}</strong> - <em>{log.name}</em>
                   :
                   <br />
-                  {log.content}
+                  {formatContent(log.content)}
                 </div>
               </li>
             ))}

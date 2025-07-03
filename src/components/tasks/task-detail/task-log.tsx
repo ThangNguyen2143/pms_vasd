@@ -2,6 +2,7 @@
 import React from "react";
 import { TaskLog } from "~/lib/types";
 import { format_date } from "~/utils/fomat-date";
+import { formatContent } from "~/utils/format-content";
 
 export default function Logs({ logs }: { logs: TaskLog[] }) {
   if (!logs.length) return null;
@@ -23,7 +24,7 @@ export default function Logs({ logs }: { logs: TaskLog[] }) {
             <p>
               <i>{format_date(log.date)}</i>
             </p>
-            <p>{log.content}</p>
+            <p>{formatContent(log.content)}</p>
           </div>
         ))}
       </div>

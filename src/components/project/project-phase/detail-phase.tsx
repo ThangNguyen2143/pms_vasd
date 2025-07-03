@@ -10,6 +10,8 @@ import { openGzipBase64FileInNewTab } from "~/utils/file-to-base64";
 import { toast } from "sonner";
 import UpdatePhaseInfo from "./update-phase-info";
 import SafeHtmlViewer from "~/components/ui/safeHTMLviewer";
+import { format_date } from "~/utils/fomat-date";
+import { formatContent } from "~/utils/format-content";
 
 function DetailPhase({
   project_id,
@@ -113,19 +115,22 @@ function DetailPhase({
             </h1>
             <SafeHtmlViewer html={phaseData.phaseInfo.description} />
             <p>
-              <strong>Bắt đầu:</strong> {phaseData.phaseInfo.start_date}
+              <strong>Bắt đầu:</strong>{" "}
+              {format_date(phaseData.phaseInfo.start_date)}
             </p>
             <p>
-              <strong>Kết thúc:</strong> {phaseData.phaseInfo.end_date}
+              <strong>Kết thúc:</strong>{" "}
+              {format_date(phaseData.phaseInfo.end_date)}
             </p>
             {phaseData.phaseInfo.actual_end && (
               <p>
                 <strong>Kết thúc thực tế:</strong>{" "}
-                {phaseData.phaseInfo.actual_end}
+                {format_date(phaseData.phaseInfo.actual_end)}
               </p>
             )}
             <p>
-              <strong>Ngày tạo:</strong> {phaseData.phaseInfo.date_create}
+              <strong>Ngày tạo:</strong>{" "}
+              {format_date(phaseData.phaseInfo.date_create)}
             </p>
             <p>
               <span className="font-bold">Từ khóa:</span>{" "}
@@ -219,9 +224,11 @@ function DetailPhase({
                         <CircleChevronUp />
                       </div>
                       <div className="timeline-end md:mb-10">
-                        <time className="font-mono italic">{log.date}</time>
+                        <time className="font-mono italic">
+                          {format_date(log.date)}
+                        </time>
                         <div className="text-sm font-black">{log.name}</div>
-                        {log.content}
+                        {formatContent(log.content)}
                       </div>
                       <hr />
                     </li>
@@ -232,9 +239,11 @@ function DetailPhase({
                       <CircleChevronUp />
                     </div>
                     <div className="timeline-start mb-10 md:text-end">
-                      <time className="font-mono italic">{log.date}</time>
+                      <time className="font-mono italic">
+                        {format_date(log.date)}
+                      </time>
                       <div className="text-lg font-black">{log.name}</div>
-                      {log.content}
+                      {formatContent(log.content)}
                     </div>
                     <hr />
                   </li>

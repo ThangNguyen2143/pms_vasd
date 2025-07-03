@@ -87,7 +87,10 @@ export default function AssignBugModal({
     }
   };
   useEffect(() => {
-    if (errorData) toast.error(errorData.message || errorData.title);
+    if (errorData) {
+      toast.error(errorData.message || errorData.title);
+      console.log(errorData);
+    }
   }, [errorData]);
   if (errorUser) {
     return (

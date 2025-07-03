@@ -245,7 +245,7 @@ export default function AddBugModal({
                 Thêm
               </button>
             </div>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 mt-2">
               {tags.map((tag, idx) => (
                 <div key={idx} className="badge badge-info gap-2">
                   {tag}

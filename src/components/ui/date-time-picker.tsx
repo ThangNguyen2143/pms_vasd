@@ -29,6 +29,9 @@ export default function DateTimePicker({
       onChange: (selectedDates, dateStr) => {
         tempValueRef.current = dateStr; // chỉ lưu tạm, chưa gọi onChange
       },
+      onValueUpdate: (selectedDates, dateStr) => {
+        tempValueRef.current = dateStr;
+      },
       onClose: () => {
         // Khi picker đóng, mới gọi onChange chính thức
         if (tempValueRef.current && tempValueRef.current !== value) {
