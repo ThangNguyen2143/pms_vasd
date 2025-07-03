@@ -9,6 +9,7 @@ import {
   Title,
   Legend,
 } from "chart.js";
+import { useMemo } from "react";
 
 ChartJS.register(
   CategoryScale,
@@ -29,27 +30,22 @@ export function ChartByLocation({
   name: string;
   data: DataChart[];
 }) {
-  const chartData = {
-    labels: data.map((d) => d.label),
-    datasets: [
+  const { labels, datasets } = useMemo(() => {
+    const colorMap = getStatusColorMap();
+
+    const datasets = [
       {
         label: "Số lượng",
         data: data.map((d) => d.value),
-        backgroundColor: [
-          "#0505fa",
-          "#70eb13",
-          "#13ebd9",
-          "#ed0505",
-          "#f1f507",
-          "#4e00c2",
-          "#fa1b96",
-          "#09e68d",
-          "#5604d1",
-          "#f58b00",
-        ],
+        backgroundColor: data.map((d) => colorMap[d.label]),
       },
-    ],
-  };
+    ];
+
+    return {
+      labels: data.map((mod) => mod.label),
+      datasets,
+    };
+  }, [data]);
 
   const options = {
     indexAxis: "y" as const,
@@ -65,5 +61,29 @@ export function ChartByLocation({
     },
   };
 
-  return <Bar data={chartData} options={options} />;
+  return <Bar data={{ labels, datasets }} options={options} />;
+}
+
+function getStatusColorMap(): Record<string, string> {
+  return {
+    CLARIFY: "#0505fa",
+
+    NEW: "#70eb13",
+
+    ACCEPTED: "#13ebd9",
+
+    CLOSED: "#ed0505",
+
+    REJECTED: "#f1f507",
+
+    CANCELED: "#4e00c2",
+
+    FAILED: "#fa1b96",
+
+    INPROGRESS: "#09e68d",
+
+    PROCESSED: "#5604d1",
+
+    UNABLE_TO_PROCESS: "#f58b00",
+  };
 }

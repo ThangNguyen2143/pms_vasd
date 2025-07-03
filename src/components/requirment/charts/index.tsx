@@ -10,6 +10,7 @@ import { ChartByLocation } from "./horizonal-chart";
 import { ChartByDate } from "./bar-line-chart";
 import { ChartByStatus } from "./vertical-chart";
 import { ChartByType } from "./stack-chart";
+import clsx from "clsx";
 
 type EnumTab = "reqByLocation" | "reqByStatus" | "reqByDate" | "reqByType";
 interface ChartOverviewProps {
@@ -178,7 +179,14 @@ function ChartOverviewRequirement({ tab, paraTab }: ChartOverviewProps) {
         )}
       </div>
       {tab == "reqByLocation" && (
-        <div className="grid grid-cols-2 gap-2">
+        <div
+          className={clsx(
+            "grid gap-2",
+            dataOverView && dataOverView.length > 0
+              ? `grid-cols-${dataOverView.length > 4 ? 4 : dataOverView.length}`
+              : "grid-cols-1"
+          )}
+        >
           {dataOverView &&
             dataOverView.length >= 1 &&
             projectSelect != 0 &&

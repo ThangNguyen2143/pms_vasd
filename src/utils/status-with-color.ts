@@ -16,10 +16,12 @@ export const status_with_color = (status: string) => {
     case "INPROGRESS":
     case "IN_PROGRESS":
     case "PASSED":
+    case "ACCEPTED":
       return "info";
     case "WAITING_REVIEW":
     case "ASSIGNED":
     case "CONFIRMED":
+    case "CLARIFY":
       return "accent";
     case "ON_HOLD":
       return "warning";

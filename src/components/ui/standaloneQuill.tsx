@@ -175,13 +175,13 @@ export default function StandaloneQuill({
 
       {showSuggest && suggestions && suggestions.length > 0 && (
         <ul
-          className="absolute bg-white border rounded shadow z-60 w-fit"
+          className="absolute  border rounded shadow z-60 w-fit"
           style={{ top: pos.top, left: pos.left }}
         >
           {suggestions.map((u) => (
             <li
               key={u}
-              className="px-2 py-1 hover:bg-gray-100 cursor-pointer"
+              className="px-2 py-1  cursor-pointer"
               onMouseDown={(e) => {
                 e.preventDefault();
                 handleSelect(u);

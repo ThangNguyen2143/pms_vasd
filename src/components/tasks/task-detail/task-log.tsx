@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { TaskLog } from "~/lib/types";
+import { format_date } from "~/utils/fomat-date";
 
 export default function Logs({ logs }: { logs: TaskLog[] }) {
   if (!logs.length) return null;
@@ -20,7 +21,7 @@ export default function Logs({ logs }: { logs: TaskLog[] }) {
               <strong>{log.name}</strong>
             </p>
             <p>
-              <i>{log.date}</i>
+              <i>{format_date(log.date)}</i>
             </p>
             <p>{log.content}</p>
           </div>

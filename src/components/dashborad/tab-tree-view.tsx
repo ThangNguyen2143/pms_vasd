@@ -14,8 +14,8 @@ export default function StaffTreeView({ data }: { data: WorkOverviewDTO[] }) {
       </h3>
 
       {/* Tree view container */}
-      <div className="overflow-auto max-h-[580px]">
-        <div className="grid grid-cols-1 min-w-max">
+      <div className="overflow-y-auto max-h-[580px]">
+        <div className="grid grid-cols-1">
           {data.map((user) => (
             <StaffColumn key={user.user_id} user={user} />
           ))}
@@ -33,7 +33,7 @@ function StaffColumn({ user }: { user: WorkOverviewDTO }) {
         {user.user_name || `Nhân sự ${user.user_id}`}
       </h4>
 
-      <div className="collapse-content space-y-3">
+      <div className="collapse-content grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
         <WorkBox title="Task" Icon={ClipboardList} items={user.tasks} />
         <WorkBox title="Bug" Icon={Bug} items={user.bugs} />
         <WorkBox title="Testcase" Icon={Route} items={user.testcases} />
@@ -43,6 +43,75 @@ function StaffColumn({ user }: { user: WorkOverviewDTO }) {
   );
 }
 
+// function WorkBox({
+//   title,
+//   Icon,
+//   items,
+// }: {
+//   Icon: LucideIcon;
+//   title: string;
+//   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+//   items: any[];
+// }) {
+//   let urls: string[] = [];
+//   if (title.includes("Task"))
+//     urls = items.map(
+//       (item) =>
+//         `/task/${encodeBase64({
+//           task_id: item.id,
+//         })}`
+//     );
+//   else if (title.includes("Bug"))
+//     urls = items.map(
+//       (item) =>
+//         `/bug/${encodeBase64({
+//           bug_id: item.id,
+//           product_id: item.product_id,
+//         })}`
+//     );
+//   else if (title.includes("Re-test"))
+//     urls = items.map(
+//       (item) =>
+//         `/bug/${encodeBase64({
+//           bug_id: item.bug_id,
+//           product_id: item.product_id,
+//         })}`
+//     );
+//   else if (title.includes("Testcase"))
+//     urls = items.map(
+//       (item) =>
+//         `/test_case/${encodeBase64({
+//           testcase_id: item.testcase_id,
+//         })}`
+//     );
+//   return (
+//     <div className="bg-base-200 p-2 rounded collapse">
+//       <input type="checkbox" id={title + "col"} defaultChecked />
+//       <h5 className="collapse-title font-semibold text-sm mb-1 flex gap-2">
+//         <Icon></Icon> <span>{title}</span>
+//       </h5>
+//       {items?.length > 0 ? (
+//         <ul className="collapse-content space-y-1 text-xs">
+//           {items.map((item, idx) => (
+//             <li key={idx} className="pl-2 border-l-2 border-primary">
+//               <Link href={urls[idx] || "/"}>
+//                 <p className="font-medium">{item.title || item.name}</p>
+//               </Link>
+//               <p className="text-xs text-gray-500">
+//                 {item.deadline ? `⏳ ${format_date(item.deadline)}` : ""}{" "}
+//                 {item.status ? `| 📌 ${item.status}` : ""}
+//               </p>
+//             </li>
+//           ))}
+//         </ul>
+//       ) : (
+//         <p className="collapse-content italic text-gray-500 text-xs">
+//           Không có công việc
+//         </p>
+//       )}
+//     </div>
+//   );
+// }
 function WorkBox({
   title,
   Icon,
@@ -84,16 +153,17 @@ function WorkBox({
           testcase_id: item.testcase_id,
         })}`
     );
+
   return (
-    <div className="bg-base-200 p-2 rounded collapse">
-      <input type="checkbox" id={title + "col"} defaultChecked />
-      <h5 className="collapse-title font-semibold text-sm mb-1 flex gap-2">
-        <Icon></Icon> <span>{title}</span>
-      </h5>
+    <div className="bg-base-100 p-3 rounded shadow border">
+      <h4 className="font-semibold text-primary mb-2 flex gap-2">
+        <Icon />
+        <span>{title}</span>
+      </h4>
       {items?.length > 0 ? (
-        <ul className="collapse-content space-y-1 text-xs">
+        <ul className="space-y-1 text-sm">
           {items.map((item, idx) => (
-            <li key={idx} className="pl-2 border-l-2 border-primary">
+            <li key={idx} className="border-b pb-1">
               <Link href={urls[idx] || "/"}>
                 <p className="font-medium">{item.title || item.name}</p>
               </Link>
@@ -105,9 +175,7 @@ function WorkBox({
           ))}
         </ul>
       ) : (
-        <p className="collapse-content italic text-gray-500 text-xs">
-          Không có công việc
-        </p>
+        <p className="italic text-gray-500">Không có công việc</p>
       )}
     </div>
   );

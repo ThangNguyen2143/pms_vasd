@@ -90,6 +90,23 @@ function statusToProgress(status: string): number {
 }
 
 function ClientDashboardPage() {
+  const version = "v1.0.5"; // hoặc import từ package.json
+
+  // Gán vào biến global
+  if (typeof window !== "undefined") {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (window as any).version = version;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (!(globalThis as any).version) {
+      Object.defineProperty(globalThis, "version", {
+        get() {
+          return version;
+        },
+        configurable: true,
+      });
+    }
+  }
+
   const [projectId, setProjectId] = useState<number>(0);
   const {
     data: overview,

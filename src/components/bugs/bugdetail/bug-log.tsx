@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { format_date } from "~/utils/fomat-date";
 
 type Log = {
   id: number;
@@ -24,7 +25,7 @@ export default function BugLogs({ logs }: { logs: Log[] }) {
               <strong>{log.name}</strong>
             </p>
             <p>
-              <i>{log.date}</i>
+              <i>{format_date(log.date)}</i>
             </p>
             <p>{log.content}</p>
           </div>

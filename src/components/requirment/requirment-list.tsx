@@ -115,20 +115,16 @@ function RequirementList({
               return (
                 <tr key={required.id}>
                   <td>{required.id}</td>
-                  <td>
-                    <div className="indicator">
-                      <span
-                        className={clsx(
-                          "indicator-item badge indicator-top indicator-end text-xs",
-                          `badge-${status_with_color(required.status)}`
-                        )}
-                      >
-                        {required.status}
-                      </span>
-                      <div className="grid place-items-center w-full m-2">
-                        {required.title}
-                      </div>
-                    </div>
+                  <td className="flex">
+                    <div className="grow">{required.title}</div>
+                    <span
+                      className={clsx(
+                        " badge text-xs",
+                        `badge-${status_with_color(required.status)}`
+                      )}
+                    >
+                      {required.status}
+                    </span>
                   </td>
                   <td>{required.priority}</td>
                   <td>{required.type}</td>

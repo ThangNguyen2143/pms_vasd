@@ -31,6 +31,28 @@ type CreateTestcaseData = {
     expected_result: string;
   }[];
 };
+type FormCreate = {
+  module: string;
+  info: {
+    name: string;
+    description: string;
+    environment: string;
+    tags: string[];
+    result_expect: string;
+    task_id: number;
+    test_data: string;
+  };
+  steps: {
+    id: string;
+    step: number;
+    name: string;
+    description: string;
+    input_data: string;
+    output_data: string;
+    note: string;
+    expected_result: string;
+  }[];
+};
 function CreateTestcaseForm({
   product_id,
   onSuccess,
@@ -38,28 +60,7 @@ function CreateTestcaseForm({
   product_id: string;
   onSuccess: () => void;
 }) {
-  const [formData, setFormData] = useState<{
-    module: string;
-    info: {
-      name: string;
-      description: string;
-      environment: string;
-      tags: string[];
-      result_expect: string;
-      task_id?: number;
-      test_data?: string;
-    };
-    steps: {
-      id: string;
-      step: number;
-      name: string;
-      description: string;
-      input_data?: string;
-      output_data?: string;
-      note?: string;
-      expected_result: string;
-    }[];
-  }>({
+  const [formData, setFormData] = useState<FormCreate>({
     module: "",
     info: {
       name: "",
@@ -78,6 +79,8 @@ function CreateTestcaseForm({
         description: "",
         expected_result: "",
         note: "",
+        input_data: "",
+        output_data: "",
       },
     ],
   });
@@ -86,7 +89,9 @@ function CreateTestcaseForm({
   const [files, setFile] = useState<File[]>([]);
   const [openAddModule, setopenAddModule] = useState(false);
   const { isUploading, uploadError, uploadMultiFiles } = useUploadFile();
-
+  const [stateError, setStateError] = useState<{
+    [key: string]: { message: string };
+  }>();
   const {
     getData: getEnv,
     data: environmentTest,
@@ -114,6 +119,41 @@ function CreateTestcaseForm({
     if (uploadError) toast.error(uploadError);
   }, [errorLoadEnv, uploadError]);
   const handleSubmit = async () => {
+    const errors: { [key: string]: { message: string } } = {};
+
+    if (!formData.info.name)
+      errors["name"] = { message: "Tên testcase là bắt buộc" };
+    if (!formData.info.description)
+      errors["description"] = { message: "Mô tả là bắt buộc" };
+    if (!formData.info.result_expect)
+      errors["result_expect"] = { message: "Kết quả mong đợi là bắt buộc" };
+    if (!formData.module) errors["module"] = { message: "Module là bắt buộc" };
+    if (formData.steps.length < 1)
+      errors["steps"] = { message: "Phải có ít nhất 1 bước" };
+
+    formData.steps.forEach((step, index) => {
+      if (!step.name)
+        errors[`steps.${index}.name`] = {
+          message: `Tên bước ${index + 1} là bắt buộc`,
+        };
+      if (!step.description)
+        errors[`steps.${index}.description`] = {
+          message: `Mô tả bước ${index + 1} là bắt buộc`,
+        };
+      if (!step.expected_result)
+        errors[`steps.${index}.expected_result`] = {
+          message: `Kết quả mong đợi bước ${index + 1} là bắt buộc`,
+        };
+    });
+
+    if (Object.keys(errors).length > 0) {
+      setStateError(errors);
+      toast.warning("Vui lòng kiểm tra lại các trường bị thiếu!");
+      return;
+    }
+
+    setStateError({});
+
     const data: CreateTestcaseData = {
       product_id,
       ...formData,
@@ -261,26 +301,54 @@ function CreateTestcaseForm({
 
   return (
     <div className="flex flex-col  gap-4 p-4 rounded-lg">
-      <div className="grid gap-2">
+      <div className="grid gap-2 bg-base-200 border-base-300 rounded-box border p-4">
         <fieldset className="fieldset md:grid-cols-2">
-          <legend className="fieldset-legend">Thông tin Testcase</legend>
-          <label>
-            <label className="label">Tên testcase</label>
+          <legend className="fieldset-legend text-xl">
+            Thông tin Testcase
+          </legend>
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">Tên testcase</legend>
             <input
-              className="input input-bordered w-full"
+              className="input w-full"
               type="text"
               placeholder="Tên testcase"
               value={formData.info.name}
-              onChange={(e) => handleInfoChange("name", e.target.value)}
+              onChange={(e) => {
+                handleInfoChange("name", e.target.value);
+                setStateError((pre) => {
+                  const updateState = pre;
+                  if (updateState && updateState.name) delete updateState.name;
+                  return updateState;
+                });
+              }}
             />
-          </label>
-          <div>
-            <label className="label">Kết quả mong đợi</label>
+            {stateError?.name && (
+              <span className="label text-error text-sm">
+                {stateError.name.message}
+              </span>
+            )}
+          </fieldset>
+
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">Kết quả mong đợi</legend>
             <RichTextEditor
               placeholder="Kết quả mong đợi"
               value={formData.info.result_expect}
-              onChange={(e) => handleInfoChange("result_expect", e)}
+              onChange={(e) => {
+                handleInfoChange("result_expect", e);
+                setStateError((pre) => {
+                  const updateState = pre;
+                  if (updateState && updateState.result_expect)
+                    delete updateState.result_expect;
+                  return updateState;
+                });
+              }}
             ></RichTextEditor>
+            {stateError?.result_expect && (
+              <span className="label text-error text-sm">
+                {stateError.result_expect.message}
+              </span>
+            )}
             {/* <input
               type="text"
               className="input w-full"
@@ -290,19 +358,30 @@ function CreateTestcaseForm({
                 handleInfoChange("result_expect", e.target.value)
               }
             /> */}
-          </div>
-          <div className="md:col-span-2">
-            <label className="label">Mô tả</label>
+          </fieldset>
+          <fieldset className="fieldset md:col-span-2">
+            <legend className="fieldset-legend">Mô tả</legend>
             <RichTextEditor
               placeholder="Mô tả testcase"
               value={formData.info.description}
-              onChange={(description) =>
-                handleInfoChange("description", description)
-              }
+              onChange={(description) => {
+                handleInfoChange("description", description);
+                setStateError((pre) => {
+                  const updateState = pre;
+                  if (updateState && updateState.description)
+                    delete updateState.description;
+                  return updateState;
+                });
+              }}
             />
-          </div>
-          <div>
-            <label className="label">Dữ liệu đầu vào</label>
+            {stateError?.description && (
+              <span className="label text-error text-sm">
+                {stateError.description.message}
+              </span>
+            )}
+          </fieldset>
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">Dữ liệu đầu vào</legend>
             <input
               type="text"
               className="input input-bordered w-full"
@@ -310,9 +389,9 @@ function CreateTestcaseForm({
               value={formData.info.test_data}
               onChange={(e) => handleInfoChange("test_data", e.target.value)}
             />
-          </div>
-          <div>
-            <label className="label">Môi trường</label>
+          </fieldset>
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">Môi trường</legend>
             <select
               className="select select-bordered w-full"
               value={formData.info.environment}
@@ -328,9 +407,9 @@ function CreateTestcaseForm({
                 <option>Lỗi tải môi trường</option>
               )}
             </select>
-          </div>
-          <div>
-            <label className="label">Liên kết task</label>
+          </fieldset>
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">Liên kết task</legend>
             <select
               className="select select-bordered w-full"
               value={formData.info.task_id}
@@ -351,16 +430,23 @@ function CreateTestcaseForm({
                 <option>Không có task nào</option>
               )}
             </select>
-          </div>
+          </fieldset>
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Module</legend>
             <div className="join">
               <select
                 className="select join-item w-full"
                 value={formData.module}
-                onChange={(e) =>
-                  setFormData((pre) => ({ ...pre, module: e.target.value }))
-                }
+                required
+                onChange={(e) => {
+                  setFormData((pre) => ({ ...pre, module: e.target.value }));
+                  setStateError((pre) => {
+                    const updateState = pre;
+                    if (updateState && updateState.module)
+                      delete updateState.module;
+                    return updateState;
+                  });
+                }}
               >
                 <option value={""}>Chọn moudle</option>
                 {modules ? (
@@ -381,6 +467,11 @@ function CreateTestcaseForm({
                 Thêm
               </button>
             </div>
+            {stateError?.module && (
+              <span className="label text-error text-sm">
+                {stateError.module.message}
+              </span>
+            )}
           </fieldset>
           <div>
             <label className="label">Tags</label>
@@ -444,10 +535,21 @@ function CreateTestcaseForm({
                     type="text"
                     placeholder="Tên bước"
                     value={step.name}
-                    onChange={(e) =>
-                      handleStepChange(index, "name", e.target.value)
-                    }
+                    onChange={(e) => {
+                      setStateError((pre) => {
+                        const updateState = pre;
+                        if (updateState && updateState[`steps.${index}.name`])
+                          delete updateState[`steps.${index}.name`];
+                        return updateState;
+                      });
+                      handleStepChange(index, "name", e.target.value);
+                    }}
                   />
+                  {stateError?.[`steps.${index}.name`] && (
+                    <span className="text-error text-sm">
+                      {stateError[`steps.${index}.name`].message}
+                    </span>
+                  )}
                 </div>
                 <div>
                   <label className="label">Kết quả mong đợi</label>
@@ -456,10 +558,28 @@ function CreateTestcaseForm({
                     className="input input-bordered w-full"
                     placeholder="Kết quả mong đợi"
                     value={step.expected_result}
-                    onChange={(e) =>
-                      handleStepChange(index, "expected_result", e.target.value)
-                    }
+                    onChange={(e) => {
+                      setStateError((pre) => {
+                        const updateState = pre;
+                        if (
+                          updateState &&
+                          updateState[`steps.${index}.expected_result`]
+                        )
+                          delete updateState[`steps.${index}.expected_result`];
+                        return updateState;
+                      });
+                      handleStepChange(
+                        index,
+                        "expected_result",
+                        e.target.value
+                      );
+                    }}
                   />
+                  {stateError?.[`steps.${index}.expected_result`] && (
+                    <span className="text-error text-sm">
+                      {stateError[`steps.${index}.expected_result`].message}
+                    </span>
+                  )}
                 </div>
                 <div>
                   <label className="label">Dữ liệu đầu vào</label>
@@ -478,7 +598,18 @@ function CreateTestcaseForm({
                   <label className="label">Mô tả</label>
                   <RichTextEditor
                     value={step.description}
-                    onChange={(e) => handleStepChange(index, "description", e)}
+                    onChange={(e) => {
+                      setStateError((pre) => {
+                        const updateState = pre;
+                        if (
+                          updateState &&
+                          updateState[`steps.${index}.description`]
+                        )
+                          delete updateState[`steps.${index}.description`];
+                        return updateState;
+                      });
+                      handleStepChange(index, "description", e);
+                    }}
                     placeholder="Mô tả bước"
                   />
                   {/* <textarea
@@ -489,6 +620,11 @@ function CreateTestcaseForm({
                       handleStepChange(index, "description", e.target.value)
                     }
                   /> */}
+                  {stateError?.[`steps.${index}.description`] && (
+                    <span className="text-error text-sm">
+                      {stateError[`steps.${index}.description`].message}
+                    </span>
+                  )}
                 </div>
 
                 <div>
