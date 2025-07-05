@@ -73,10 +73,13 @@ function RequirementList({
 
   // ⬅️ Khi load lại, đọc từ URL
   useEffect(() => {
+    const statusParams = searchParams.get("status");
     const pageParam = Number(searchParams.get("page")) || 1;
     if (pageParam >= 1 && pageParam <= totalPages) {
       setCurrentPage(pageParam);
     }
+    if (statusParams) setFilterStatus(statusParams);
+    else setFilterStatus("");
   }, [searchParams, totalPages]);
 
   // 📌 Reset trang về 1 khi filter thay đổi
@@ -90,6 +93,17 @@ function RequirementList({
     router.replace(`?${params.toString()}`);
     setCurrentPage(page);
   };
+  const handleStatusFill = (status: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (status != "") {
+      params.set("status", status);
+      router.replace(`?${params.toString()}`);
+    } else {
+      params.delete("status");
+      router.replace(`?${params.toString()}`);
+    }
+    setFilterStatus(status);
+  };
   return (
     <div className="flex flex-col">
       <div className="m-4">
@@ -97,7 +111,7 @@ function RequirementList({
           <span className="label">Trạng thái</span>
           <select
             value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
+            onChange={(e) => handleStatusFill(e.target.value)}
           >
             <option value="">Tất cả</option>
             {statusList?.map((status) => (

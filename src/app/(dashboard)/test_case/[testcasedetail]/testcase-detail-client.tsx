@@ -174,7 +174,7 @@ export default function TestcaseDetailClient({
   if (loading) return <div>Loading...</div>;
   if (!testcase) return <div>Testcase not found</div>;
   return (
-    <div className="max-w-7xl mx-auto  p-6 rounded-lg shadow-sm">
+    <div className="mx-auto  p-6 rounded-lg shadow-sm">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">📋 Chi tiết Test Case</h1>
         <button className="btn btn-dash" onClick={() => setShowCopyModal(true)}>
@@ -182,14 +182,17 @@ export default function TestcaseDetailClient({
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         {/* Testcase Info  Section */}
-        <TestcaseInfo
-          testcase={testcase}
-          modules={moduleList || undefined}
-          openUpdate={() => setShowEditModal(true)}
-          onUpdate={fetchTestcase}
-        />
+        <div className="md:col-span-2">
+          <TestcaseInfo
+            testcase={testcase}
+            modules={moduleList || undefined}
+            openUpdate={() => setShowEditModal(true)}
+            onUpdate={fetchTestcase}
+          />
+        </div>
+
         <div>
           <TestDependComp
             product_id={testcase.product_id}
@@ -215,14 +218,17 @@ export default function TestcaseDetailClient({
         openUpdateStep={() => setShowUpdateStep(true)} // hàm để refetch dữ liệu
       />
       <TestHistory testcase={testcase}></TestHistory>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Comment testcase */}
-        <CommentTestcase
-          testcase_id={testcase_id}
-          product_id={testcase.product_id}
-          comments={commentsList || []}
-          updateComment={fetchComment}
-        />
+        <div className="md:col-span-2">
+          <CommentTestcase
+            testcase_id={testcase_id}
+            product_id={testcase.product_id}
+            comments={commentsList || []}
+            updateComment={fetchComment}
+          />
+        </div>
+
         {/* Assign User Section */}
         <AssignedUser
           assignTo={testcase.testCaseAssigns}
@@ -234,7 +240,9 @@ export default function TestcaseDetailClient({
         {/* Test History Section */}
 
         {/* Activity Log Section */}
-        <TestcaseLog testLogs={testcase.testLogs} />
+        <div className="md:col-span-2">
+          <TestcaseLog testLogs={testcase.testLogs} />
+        </div>
       </div>
 
       {/* Modals */}

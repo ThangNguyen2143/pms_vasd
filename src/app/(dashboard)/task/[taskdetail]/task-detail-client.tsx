@@ -125,11 +125,7 @@ export default function TaskDetailClient({ task_id }: { task_id: number }) {
             data={criterList || []}
             critTypes={criteriaType || undefined}
           />
-          <Attachments
-            attachments={task.taskFiles || []}
-            onUpdate={reloadTaskData}
-            uploadFile={() => setShowAddFileAtachmentModal(true)}
-          />
+
           <TaskComments
             comments={comments || undefined}
             task={task}
@@ -140,6 +136,11 @@ export default function TaskDetailClient({ task_id }: { task_id: number }) {
         {/* Right Section */}
         <div className="space-y-6">
           <TaskLinks task_id={task_id} />
+          <Attachments
+            attachments={task.taskFiles || []}
+            onUpdate={reloadTaskData}
+            uploadFile={() => setShowAddFileAtachmentModal(true)}
+          />
           <TaskAssign
             assignTo={task.userAssigns}
             task_id={task_id}

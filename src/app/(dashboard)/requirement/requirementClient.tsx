@@ -21,10 +21,13 @@ import { endOfDay, startOfDay, subDays } from "date-fns";
 import DateTimePicker from "~/components/ui/date-time-picker";
 import RequirementList from "~/components/requirment/requirment-list";
 import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const productCache: Record<number, ProductDto[]> = {};
 const locationCache: Record<number, ProjectLocation[]> = {}; //Để cache dữ liệu khoa phòng trong trường hợp có biểu đồ dùng khoa phòng
 function RequirementsClient() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [tabContent, setTabContent] = useState<string>("List");
   const [productSelect, setproductSelect] = useState<string>("");
   const [projectSelect, setprojectSelect] = useState<number>(0);
@@ -46,7 +49,6 @@ function RequirementsClient() {
     isLoading: loadSearch,
   } = useApi<RequirementDto[]>();
   const { data: userList, getData: getUserList } = useApi<UserDto[]>();
-
   const {
     data: projectList,
     getData: getProjectJoin,
@@ -155,6 +157,12 @@ function RequirementsClient() {
       }, 3000);
     }
   }, [searchString]);
+  useEffect(() => {
+    const toParam = searchParams.get("to");
+    const fromParam = searchParams.get("from");
+    if (toParam) settoDate(toParam);
+    if (fromParam) setFromDate(fromParam);
+  }, [searchParams]);
   const onLoadRequire = async () => {
     const from = fromDate;
     const to = toDate;
@@ -177,6 +185,13 @@ function RequirementsClient() {
     await getLocations(
       "/project/location/" + encodeBase64({ project_id: projectSelect })
     );
+  };
+  const handleDateChange = (dateInput: string, type: "from" | "to") => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set(type, dateInput);
+    router.replace(`?${params.toString()}`);
+    if (type == "from") setFromDate(dateInput);
+    else settoDate(dateInput);
   };
   return (
     <main className="flex flex-col gap-4 p-4 items-center">
@@ -256,7 +271,7 @@ function RequirementsClient() {
                     <span className="label">Từ</span>
                     <DateTimePicker
                       value={fromDate}
-                      onChange={setFromDate}
+                      onChange={(e) => handleDateChange(e, "from")}
                       className="w-full"
                     />
                   </div>
@@ -264,7 +279,7 @@ function RequirementsClient() {
                     <span className="label">Đến</span>
                     <DateTimePicker
                       value={toDate}
-                      onChange={settoDate}
+                      onChange={(e) => handleDateChange(e, "to")}
                       className="w-full"
                     />
                   </div>

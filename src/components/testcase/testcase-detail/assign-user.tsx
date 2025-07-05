@@ -50,67 +50,71 @@ function AssignedUser({
           </button>
         </div>
       </div>
-      {assignTo && assignTo.length > 0 ? (
-        assignTo.map(({ assignInfo, code, status }) => (
-          <div
-            className="bg-base-100 p-3 rounded-lg border-l-4 border-info"
-            key={code}
-          >
-            <p>
-              <strong>{assignInfo.assign_name}</strong>{" "}
-              <span className="badge badge-info">{status}</span>
-            </p>
-            <p>Ngày giao: {assignInfo.assigned_at}</p>
-            <p>
-              Deadline:{" "}
-              <span
-                className={clsx(assignInfo.is_late ? "badge badge-error" : "")}
-              >
-                {assignInfo.dead_line}
-              </span>
-            </p>
-            {assignInfo.start_at ? (
-              <p>Bắt đầu: {assignInfo.start_at}</p>
-            ) : (
-              <p>Người dùng chưa bắt đầu</p>
-            )}
-            {assignInfo.end_at ? <p>Kết thúc: {assignInfo.end_at}</p> : ""}
-            <div className="flex justify-end gap-2">
-              <div className="join">
-                {status == "ASSIGNED" && (
-                  <button
-                    className="btn btn-primary btn-outline join-item tooltip"
-                    onClick={() => handleSubmit(code, "START")}
-                    data-tip={"Bắt đầu"}
-                  >
-                    <CirclePlay />
-                  </button>
-                )}
-                {status == "INPROGRESS" && (
-                  <button
-                    className="join-item btn btn-outline btn-info tooltip"
-                    data-tip="Ghi nhận test"
-                    onClick={() => openAddTest(code)}
-                  >
-                    <Plus></Plus>
-                  </button>
-                )}
-                {status == "INPROGRESS" && (
-                  <button
-                    className="btn btn-outline join-item btn-success tooltip"
-                    onClick={() => handleSubmit(code, "END")}
-                    data-tip={"Hoàn thành"}
-                  >
-                    <SquareCheckBig />
-                  </button>
-                )}
+      <div className="overflow-y-auto max-h-[400px]">
+        {assignTo && assignTo.length > 0 ? (
+          assignTo.map(({ assignInfo, code, status }) => (
+            <div
+              className="bg-base-100 p-3 rounded-lg border-l-4 border-info"
+              key={code}
+            >
+              <p>
+                <strong>{assignInfo.assign_name}</strong>{" "}
+                <span className="badge badge-info">{status}</span>
+              </p>
+              <p>Ngày giao: {assignInfo.assigned_at}</p>
+              <p>
+                Deadline:{" "}
+                <span
+                  className={clsx(
+                    assignInfo.is_late ? "badge badge-error" : ""
+                  )}
+                >
+                  {assignInfo.dead_line}
+                </span>
+              </p>
+              {assignInfo.start_at ? (
+                <p>Bắt đầu: {assignInfo.start_at}</p>
+              ) : (
+                <p>Người dùng chưa bắt đầu</p>
+              )}
+              {assignInfo.end_at ? <p>Kết thúc: {assignInfo.end_at}</p> : ""}
+              <div className="flex justify-end gap-2">
+                <div className="join">
+                  {status == "ASSIGNED" && (
+                    <button
+                      className="btn btn-primary btn-outline join-item tooltip"
+                      onClick={() => handleSubmit(code, "START")}
+                      data-tip={"Bắt đầu"}
+                    >
+                      <CirclePlay />
+                    </button>
+                  )}
+                  {status == "INPROGRESS" && (
+                    <button
+                      className="join-item btn btn-outline btn-info tooltip"
+                      data-tip="Ghi nhận test"
+                      onClick={() => openAddTest(code)}
+                    >
+                      <Plus></Plus>
+                    </button>
+                  )}
+                  {status == "INPROGRESS" && (
+                    <button
+                      className="btn btn-outline join-item btn-success tooltip"
+                      onClick={() => handleSubmit(code, "END")}
+                      data-tip={"Hoàn thành"}
+                    >
+                      <SquareCheckBig />
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        ))
-      ) : (
-        <div>Công việc chưa được giao cho ai</div>
-      )}
+          ))
+        ) : (
+          <div>Công việc chưa được giao cho ai</div>
+        )}
+      </div>
     </div>
   );
 }

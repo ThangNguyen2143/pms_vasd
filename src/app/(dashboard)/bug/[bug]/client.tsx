@@ -93,12 +93,7 @@ function BugDetailClient({
             onLinkRequirement={() => setShowLinkModal(true)}
             onUpdate={reloadDataBug}
           />
-          <BugAttachments
-            onUpdate={async () => await reloadDataBug()}
-            files={bugData.bugFiles || []}
-            bug_id={bug_id}
-            uploadFile={() => setShowAddFile(true)}
-          />
+
           <BugComments
             comments={bugcomments || []}
             bug_id={bug_id}
@@ -114,6 +109,12 @@ function BugDetailClient({
             testcaseId={bugData.test_case_ref_id || null}
             task_name={bugData.related_task_name || null}
             testcase_name={bugData.test_case_ref || null}
+          />
+          <BugAttachments
+            onUpdate={async () => await reloadDataBug()}
+            files={bugData.bugFiles || []}
+            bug_id={bug_id}
+            uploadFile={() => setShowAddFile(true)}
           />
           <AssignBug
             assignee={bugData.assignInfo || null}

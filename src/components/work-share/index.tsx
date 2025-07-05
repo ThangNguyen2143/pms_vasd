@@ -43,7 +43,7 @@ function MainWork() {
     const endpointWork =
       "/requirements/" +
       encodeBase64({ type: "project", project_id: projectSelected, from, to });
-    await getWorkList(endpointWork, "no-cache");
+    await getWorkList(endpointWork);
   };
   // const isGuess = !role || role == "Guess";
   useEffect(() => {
@@ -72,7 +72,7 @@ function MainWork() {
   }, [projectSelected]);
   useEffect(() => {
     if (projectSelected != 0) {
-      fetchData(fromDate, toDate);
+      fetchData(toISOString(fromDate), toISOString(toDate));
     }
   }, [projectSelected, fromDate, toDate]);
   return (

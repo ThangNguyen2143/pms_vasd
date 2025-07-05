@@ -178,34 +178,28 @@ function ChartOverviewRequirement({ tab, paraTab }: ChartOverviewProps) {
           </div>
         )}
       </div>
-      {tab == "reqByLocation" && (
-        <div
-          className={clsx(
-            "grid gap-2",
-            dataOverView && dataOverView.length > 0
-              ? `grid-cols-${dataOverView.length > 4 ? 4 : dataOverView.length}`
-              : "grid-cols-1"
-          )}
-        >
-          {dataOverView &&
-            dataOverView.length >= 1 &&
-            projectSelect != 0 &&
-            dataOverView.map((data: ReqByLocation) => {
-              const dataOnChart = data.statuses.map((st) => ({
-                label: st.code,
-                value: st.quantity,
-              }));
-              return (
-                <div className="w-full" key={data.location_id}>
-                  <ChartByLocation
-                    data={dataOnChart}
-                    name={data.location_name}
-                  />
-                </div>
-              );
-            })}
-        </div>
-      )}
+      {tab == "reqByLocation" &&
+        dataOverView &&
+        dataOverView.length > 0 &&
+        projectSelect != 0 && (
+          <div className={clsx("grid gap-2", `grid-cols-3`)}>
+            {Object.hasOwn(dataOverView[0], "location_id") &&
+              dataOverView.map((data: ReqByLocation) => {
+                const dataOnChart = data.statuses.map((st) => ({
+                  label: st.code,
+                  value: st.quantity,
+                }));
+                return (
+                  <div className="w-full" key={data.location_id}>
+                    <ChartByLocation
+                      data={dataOnChart}
+                      name={data.location_name}
+                    />
+                  </div>
+                );
+              })}
+          </div>
+        )}
       {tab == "reqByDate" && productSelect != "" && (
         <div className="mt-6">
           <ChartByDate

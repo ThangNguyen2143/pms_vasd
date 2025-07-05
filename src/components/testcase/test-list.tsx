@@ -65,7 +65,7 @@ function TestList({
         <thead className="bg-gray-100 text-xs text-gray-700 uppercase dark:bg-gray-700 dark:text-gray-300">
           <tr>
             {fieldTable.map((field) => (
-              <th key={field.code} className="px-4 py-3">
+              <th key={field.code} className="p-2">
                 {field.display}
               </th>
             ))}
@@ -73,14 +73,16 @@ function TestList({
         </thead>
         <tbody>
           {currentTests.length > 0 ? (
-            currentTests.map((testcase) => (
-              <TestRow
-                testcase={testcase}
-                users={userList || []}
-                statusList={statusList || []}
-                key={testcase.id}
-              />
-            ))
+            currentTests
+              .sort((a, b) => b.id - a.id)
+              .map((testcase) => (
+                <TestRow
+                  testcase={testcase}
+                  users={userList || []}
+                  statusList={statusList || []}
+                  key={testcase.id}
+                />
+              ))
           ) : (
             <tr>
               <td colSpan={6} className="text-center py-4">
