@@ -11,7 +11,8 @@ const bodyEmailHtml = (
   id: number,
   name: string,
   content: string,
-  link: string
+  link: string,
+  by?: string
 ) => `
 <!DOCTYPE html>
 <html>
@@ -20,13 +21,14 @@ const bodyEmailHtml = (
     <title>Email Notify</title>
   </head>
   <body>
-    <div style='display:flex; justify-conten:center;text-align:center;'>
-      <img src='https://pms-ui-vasd.vercel.app/icon.png?a939bbf917091023' alt='VASD' style='width:80px;height:80px;'>
+    <div style='display:flex; justify-content:center;text-align:center;gap:5px;'>
+      <img src='https://pm.vasd.vn/icon.png?a939bbf917091023' alt='VASD' style='width:80px;height:80px;'>
       <h2>${action}</h2>
     </div>
     <p>Có cập nhật mới:</p>
     <h1 style='font-size: 24px;'>${type} id [${id}]: ${name}</h1>
-    <p>${content}</p>
+    ${by}
+    ${content}
     <div style='text-align: center; margin: 20px 0;'>
       <a href='${link}'style='display: inline-block; padding: 10px 20px; background-color: #1eeafd; color: #ffeeee; text-decoration: none; border-radius: 6px; font-weight: bold; font-family: sans-serif;'>
         Truy cập
@@ -35,7 +37,8 @@ const bodyEmailHtml = (
     <hr>
     <p style='font-size: 12px'> CÔNG TY TNHH MỘT THÀNH VIÊN VASD<br>  
       Địa chỉ: 54/11a, Đường Trần Việt Châu, Thới Bình, Ninh Kiều, Cần Thơ<br> 
-      Hotline: 0396 116 119<br> Bản quyền &copy; 2024 thuộc về Công ty Trách nhiệm hữu hạn Một thành viên VASD Co.,Ltd
+      Hotline: 0396 116 119<br> 
+      Bản quyền &copy; 2024 thuộc về Công ty Trách nhiệm hữu hạn Một thành viên VASD Co.,Ltd
     </p>
   </body>
 </html>
@@ -70,7 +73,8 @@ async function sendEmail(
   email: string,
   action: string,
   link: string,
-  type: string
+  type: string,
+  createBy?: string
 ) {
   const data = {
     receiver_email: email,
@@ -81,7 +85,8 @@ async function sendEmail(
       content.id,
       content.name,
       content.massage,
-      link
+      link,
+      createBy
     ),
   };
   const res = await postItem({

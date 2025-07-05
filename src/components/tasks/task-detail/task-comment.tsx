@@ -72,7 +72,7 @@ function TaskComments({
       });
       const content = {
         id: task.id,
-        name: "Bạn đã được nhắc đến trong task",
+        name: `Bạn đã được ${user?.name} nhắc đến trong task`,
         massage: `Nội dung comment: ${DOMPurify.sanitize(newComment)}`,
       };
       const link =
@@ -81,7 +81,7 @@ function TaskComments({
           encodeBase64({ task_id: task.id }) || "https://pm.vasd.vn/";
       if (email.length > 0)
         email.forEach((e) =>
-          sendEmail(content, e, "Thông báo comment", link, "task")
+          sendEmail(content, e, "Thông báo comment", link, "task", user?.name)
             .then((mes) => {
               if (mes.message != "OK") toast(mes.message);
             })
@@ -96,7 +96,7 @@ function TaskComments({
       const content = {
         id: task.task_id,
         name: task.title,
-        massage: "Có bình luận mới",
+        massage: newComment,
       };
       const link =
         window.location.origin +

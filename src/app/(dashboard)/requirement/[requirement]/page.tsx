@@ -39,6 +39,7 @@ async function RequirementDetailPage(prop: {
     <RequirementDetailClient
       requirement_id={requirement_id}
       typeList={requireTypeList.value}
+      project_id={project_id}
       locations={location}
     />
   );

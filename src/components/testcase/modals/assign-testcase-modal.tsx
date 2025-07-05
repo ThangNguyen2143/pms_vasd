@@ -92,7 +92,8 @@ export default function AssignTestcaseModal({
   };
   useEffect(() => {
     if (errorData) toast.error(errorData.message || errorData.title);
-    console.log(errorData);
+    console.log("Payload:", assignData);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errorData]);
   if (!isOpen) return null;
 

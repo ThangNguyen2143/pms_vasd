@@ -36,9 +36,11 @@ interface DataRating {
 export default function RequirementDetailClient({
   requirement_id,
   typeList,
+  project_id,
   locations,
 }: {
   requirement_id: number;
+  project_id: number;
   locations: ProjectLocation[];
   typeList?: RequirementType[];
 }) {
@@ -128,6 +130,7 @@ export default function RequirementDetailClient({
           />
           <NoteRequirment
             comments={note_requirment || []}
+            project_id={project_id}
             onUpdate={updateNote}
             requirement_id={requirement_id}
           />

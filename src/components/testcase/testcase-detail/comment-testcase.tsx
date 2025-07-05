@@ -71,7 +71,7 @@ function CommentTestcase({
       });
       const content = {
         id: testcase_id,
-        name: "Bạn đã được nhắc đến trong testcase",
+        name: `Bạn đã được ${user?.name} nhắc đến trong testcase`,
         massage: `Nội dung comment: ${DOMPurify.sanitize(newComment)}`,
       };
       const link =
@@ -80,7 +80,14 @@ function CommentTestcase({
           encodeBase64({ testcase_id }) || "https://pm.vasd.vn/";
       if (email.length > 0)
         email.forEach((e) =>
-          sendEmail(content, e, "Thông báo comment", link, "testcase")
+          sendEmail(
+            content,
+            e,
+            "Thông báo comment",
+            link,
+            "testcase",
+            user?.name
+          )
             .then((mes) => {
               if (mes.message != "OK") toast(mes.message);
             })
@@ -98,7 +105,7 @@ function CommentTestcase({
       const content = {
         id: re.content.testcase_id,
         name: re.content.testcase_name,
-        massage: re.content.message,
+        massage: newComment,
       };
       const link =
         window.location.origin +
@@ -106,7 +113,14 @@ function CommentTestcase({
           encodeBase64({ testcase_id }) || "https://pm.vasd.vn/";
       if (email.length > 0)
         email.forEach((e) =>
-          sendEmail(content, e, "Thông báo comment", link, "Testcase")
+          sendEmail(
+            content,
+            e,
+            "Thông báo comment",
+            link,
+            "Testcase",
+            user?.name
+          )
             .then((mes) => {
               if (mes.message != "OK") toast(mes.message);
             })

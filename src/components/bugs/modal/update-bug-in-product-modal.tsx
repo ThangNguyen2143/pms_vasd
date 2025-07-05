@@ -17,17 +17,20 @@ function UpdateBugInProductModalConfirm({
   onUpdate,
   bugList,
 }: UpdateModalProps) {
-  const { postData, isLoading, errorData } = useApi();
+  const { postData, isLoading, errorData } = useApi<string>();
   useEffect(() => {
     if (errorData) toast.error(errorData.message || errorData.title);
   }, [errorData]);
   const handleUpdate = async () => {
     const re = await postData("/bugs/update", { bug_id: list });
-    if (re != "") return;
-    toast.success("Xử lý thành công");
+    // const re = null;
+    console.log(re);
+    if (re == null) return;
+    toast.success(re || "Xử lý thành công");
     await onUpdate();
     onClose();
   };
+
   return (
     <div className="modal modal-open">
       <div className="modal-backdrop">

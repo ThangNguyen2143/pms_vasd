@@ -71,7 +71,7 @@ export default function BugComments({
       });
       const content = {
         id: bug_id,
-        name: "Bạn đã được nhắc đến trong bug",
+        name: `Bạn đã được ${user?.name} nhắc đến trong bug`,
         massage: `Nội dung comment: ${DOMPurify.sanitize(newComment)}`,
       };
       const link =
@@ -98,7 +98,7 @@ export default function BugComments({
       const content = {
         id: re.content.bug_id,
         name: re.content.bug_name,
-        massage: re.content.message,
+        massage: newComment,
       };
       const link =
         window.location.origin +
@@ -106,7 +106,7 @@ export default function BugComments({
           encodeBase64({ bug_id, product_id }) || "https://pm.vasd.vn/";
       if (email.length > 0)
         email.forEach((e) =>
-          sendEmail(content, e, "Thông báo comment", link, "bug")
+          sendEmail(content, e, "Bình luận mới", link, "bug", user?.name)
             .then((mes) => {
               if (mes.message != "OK") toast(mes.message);
             })

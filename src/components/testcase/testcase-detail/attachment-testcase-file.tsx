@@ -92,7 +92,7 @@ function AttachmentTestcaseFile({
                   </span>
                   <span
                     className="btn btn-circle text-blue-500 tooltip"
-                    data-tip="Mở trong tab mới"
+                    data-tip="Mở tệp"
                     onClick={() => handleDownfile(f.file_id, "open")}
                   >
                     <ExternalLink />

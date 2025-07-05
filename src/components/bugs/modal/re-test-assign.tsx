@@ -88,6 +88,12 @@ export default function ReTestBugAssignModal({
   };
   useEffect(() => {
     if (errorData) toast.error(errorData.message || errorData.title);
+    console.log("Data:", {
+      bug_id,
+      assign_to: selectUser,
+      deadline,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errorData]);
   if (errorUser) {
     return (

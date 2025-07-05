@@ -6,7 +6,7 @@ import AddBugModal from "./modal/add-bug-modal";
 import BugList from "./bug-list";
 import { encodeBase64 } from "~/lib/services";
 import { useApi } from "~/hooks/use-api";
-import { BugDto } from "~/lib/types";
+import { BugDto, BugStatus } from "~/lib/types";
 import UpdateBugInProductModalConfirm from "./modal/update-bug-in-product-modal";
 
 function BugsClient() {
@@ -18,12 +18,16 @@ function BugsClient() {
   const endpoint = (product_id: string) =>
     "/bugs/" + encodeBase64({ product_id });
   const [bugList, setBugList] = useState([] as BugDto[]);
+  const { data: bugStatus, getData: getBugStatus } = useApi<BugStatus[]>();
   const {
     data: bugs,
     getData: getBugList,
     isLoading,
     errorData,
   } = useApi<BugDto[]>();
+  useEffect(() => {
+    getBugStatus("/system/config/eyJ0eXBlIjoiYnVnX3N0YXR1cyJ9", "default");
+  }, []);
   useEffect(() => {
     if (selectProduct != "") getBugList(endpoint(selectProduct), "reload");
   }, [selectProduct]);
@@ -75,51 +79,21 @@ function BugsClient() {
             value="×"
             onClick={() => setFilterStatus("")}
           />
-          <input
-            className="btn"
-            type="radio"
-            name="frameworks"
-            aria-label="New"
-            value={"NEW"}
-            checked={filterStatus === "NEW"}
-            onChange={() => setFilterStatus("NEW")}
-          />
-          <input
-            className="btn"
-            type="radio"
-            name="frameworks"
-            aria-label="Confirmed"
-            value={"CONFIRMED"}
-            checked={filterStatus === "CONFIRMED"}
-            onChange={() => setFilterStatus("CONFIRMED")}
-          />
-          <input
-            className="btn"
-            type="radio"
-            name="frameworks"
-            aria-label="Resolved"
-            value={"RESOLVED"}
-            checked={filterStatus === "RESOLVED"}
-            onChange={() => setFilterStatus("RESOLVED")}
-          />
-          <input
-            className="btn"
-            type="radio"
-            name="frameworks"
-            aria-label="Rejected"
-            value={"REJECTED"}
-            checked={filterStatus === "REJECTED"}
-            onChange={() => setFilterStatus("REJECTED")}
-          />
-          <input
-            className="btn"
-            type="radio"
-            name="frameworks"
-            aria-label="Closed"
-            value={"CLOSED"}
-            checked={filterStatus === "CLOSED"}
-            onChange={() => setFilterStatus("CLOSED")}
-          />
+
+          {bugStatus &&
+            bugStatus.length > 0 &&
+            bugStatus.map((status) => (
+              <input
+                className="btn"
+                key={status.code}
+                type="radio"
+                name="frameworks"
+                aria-label={status.code}
+                value={status.code}
+                checked={filterStatus === status.code}
+                onChange={() => setFilterStatus(status.code)}
+              />
+            ))}
         </form>
       </div>
 

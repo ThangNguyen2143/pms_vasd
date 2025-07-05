@@ -51,7 +51,7 @@ export default function AssignBugModal({
     const data: DataSend = {
       bug_id,
       assign_to: selectUser,
-      deadline,
+      deadline: deadline + ":00",
     };
     const re = await postData("/bugs/assign", data);
     if (!re) return;
@@ -89,8 +89,13 @@ export default function AssignBugModal({
   useEffect(() => {
     if (errorData) {
       toast.error(errorData.message || errorData.title);
-      console.log(errorData);
+      console.log("Data: ", {
+        bug_id,
+        assign_to: selectUser,
+        deadline: deadline + ":00",
+      });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errorData]);
   if (errorUser) {
     return (

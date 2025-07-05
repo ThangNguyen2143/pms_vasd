@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import DateTimePicker from "~/components/ui/date-time-picker";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
-import { Contact, ProjectMember, UserAssignsTask } from "~/lib/types";
+import { Contact, ProjectMember } from "~/lib/types";
 import { sendEmail } from "~/utils/send-notify";
 
 interface ResponseNotify {
@@ -23,19 +23,19 @@ interface DataSend {
 }
 export default function AssignUserModal({
   task_id,
+  deadline_task = "",
   product_id,
-  hasAssign,
   onClose,
   onUpdate,
 }: {
   task_id: number;
+  deadline_task: string;
   product_id: string;
-  hasAssign: UserAssignsTask[];
   onUpdate: () => Promise<void>;
   onClose: () => void;
 }) {
   const [selectUser, setSelectUser] = useState(0);
-  const [deadline, setDeadline] = useState("");
+  const [deadline, setDeadline] = useState(deadline_task);
   const { putData, isLoading, errorData } = useApi<ResponseNotify, DataSend>();
   const {
     data: users,
@@ -55,10 +55,10 @@ export default function AssignUserModal({
     const data = {
       task_id,
       user_id: selectUser,
-      cur_deadLine: deadline,
+      cur_deadLine: deadline + ":00",
     };
     const re = await putData("/tasks/assign", data);
-
+    console.log(data, re);
     if (!re) return;
     else {
       const email = re.contact.find((ct) => ct.code == "email")?.value;
@@ -91,6 +91,13 @@ export default function AssignUserModal({
   };
   useEffect(() => {
     if (errorData) toast.error(errorData.message);
+    console.log("PayLoad:", {
+      task_id,
+      user_id: selectUser,
+      cur_deadLine: deadline + ":00",
+    });
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errorData]);
 
   return (
@@ -108,13 +115,6 @@ export default function AssignUserModal({
               Chọn người thực hiện
             </option>
             {users?.map((us) => {
-              const alreadyUser = hasAssign.find((alr) => alr.user_id == us.id);
-              if (alreadyUser)
-                return (
-                  <option value={us.id} key={us.id} disabled>
-                    {us.name}
-                  </option>
-                );
               return (
                 <option value={us.id} key={us.id}>
                   {us.name}

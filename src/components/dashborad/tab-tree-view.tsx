@@ -161,7 +161,7 @@ function WorkBox({
         <span>{title}</span>
       </h4>
       {items?.length > 0 ? (
-        <ul className="space-y-1 text-sm">
+        <ul className="space-y-1 text-sm max-h-40 overflow-y-auto">
           {items.map((item, idx) => (
             <li key={idx} className="border-b pb-1">
               <Link href={urls[idx] || "/"}>

@@ -175,7 +175,7 @@ export default function TaskDetailClient({ task_id }: { task_id: number }) {
         <AssignUserModal
           onClose={() => setShowAssignModal(false)}
           product_id={task.product_id}
-          hasAssign={task.userAssigns || []}
+          deadline_task={task.dead_line}
           onUpdate={reloadTaskData}
           task_id={task_id}
         />
