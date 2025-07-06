@@ -87,11 +87,13 @@ function ProductTable({
                 <tr key={index}>
                   <th>{index + 1}</th>
                   <td>{item.name}</td>
-                  <td>{item.description}</td>
-                  <td>{item.createdBy}</td>
+                  <td className="max-w-[600px] text-sm">{item.description}</td>
+                  <td className="min-w-52">{item.createdBy}</td>
                   <td>
                     {item.status == "active" ? (
-                      <span className="badge badge-info">Đang hoạt động</span>
+                      <span className="badge badge-info badge-lg truncate max-w-24">
+                        {item.status}
+                      </span>
                     ) : (
                       <div>
                         <span className="badge badge-outline badge-secondary">
@@ -113,23 +115,25 @@ function ProductTable({
                       </div>
                     )}
                   </td>
-                  <td className="flex gap-1 justify-center items-center">
-                    <button
-                      className="btn btn-sm btn-outline btn-primary tooltip"
-                      data-tip="Cập nhật phần mềm"
-                      onClick={() => openEditDialog(item.id)}
-                    >
-                      <Pencil className="w-4 h-4" />
-                    </button>
-                    <label
-                      htmlFor={`detail-module-drawer`}
-                      className="btn btn-outline btn-soft"
-                      onClick={() => {
-                        setShowModuleDetail(item.id);
-                      }}
-                    >
-                      Module
-                    </label>
+                  <td>
+                    <div className="flex gap-1 justify-center items-center">
+                      <button
+                        className="btn btn-sm btn-outline btn-primary tooltip"
+                        data-tip="Cập nhật phần mềm"
+                        onClick={() => openEditDialog(item.id)}
+                      >
+                        <Pencil className="w-4 h-4" />
+                      </button>
+                      <label
+                        htmlFor={`detail-module-drawer`}
+                        className="btn btn-outline btn-soft"
+                        onClick={() => {
+                          setShowModuleDetail(item.id);
+                        }}
+                      >
+                        Module
+                      </label>
+                    </div>
                   </td>
                 </tr>
               );

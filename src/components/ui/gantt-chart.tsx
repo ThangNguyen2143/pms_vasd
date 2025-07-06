@@ -105,12 +105,22 @@ export function GanttChart({
       .on("mouseenter", function (event, d) {
         const [xPos, yPos] = d3.pointer(event);
         chart
-          .append("text")
+          .append("foreignObject")
           .attr("x", xPos + 10)
-          .attr("y", yPos)
+          .attr("y", yPos - 30)
+          .attr("width", 350) // giới hạn chiều rộng
+          .attr("height", 100)
           .attr("class", "gantt-tooltip")
-          .text(
-            `${d.name} (${d3.timeDay.count(
+          .append("xhtml:div")
+          .style("background", "#111")
+          .style("color", "#fff")
+          .style("padding", "4px 8px")
+          .style("border-radius", "4px")
+          .style("font-size", "12px")
+          .style("max-width", "200px")
+          .style("word-wrap", "break-word")
+          .html(
+            `${d.name} <br/> (${d3.timeDay.count(
               new Date(d.start),
               new Date(d.end)
             )}d): ${format_date(d.start)} → ${format_date(d.end)}`
