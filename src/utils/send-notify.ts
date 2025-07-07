@@ -3,7 +3,7 @@ import { postItem } from "~/lib/services";
 type Content = {
   id: number;
   name: string;
-  massage: string;
+  message: string;
 };
 const bodyEmailHtml = (
   type: string,
@@ -60,7 +60,7 @@ async function sendTelegram(
     content.id +
     "] " +
     content.name +
-    `. Cập nhật mới: ${content.massage}. link: ${link}`;
+    `. Cập nhật mới: ${content.message}. link: ${link}`;
   const res = await postItem({
     endpoint: "/notification/telegram",
     data: JSON.stringify({ message: parseToMessage, chatId: tele_id }),
@@ -84,7 +84,7 @@ async function sendEmail(
       action,
       content.id,
       content.name,
-      content.massage,
+      content.message,
       link,
       createBy
     ),

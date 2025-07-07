@@ -66,7 +66,7 @@ export default function AssignUserModal({
       const content = {
         id: re.content.task_id,
         name: re.content.task_name,
-        massage: re.content.message,
+        message: re.content.message,
       };
       const link =
         window.location.origin + "/task/" + encodeBase64({ task_id }) ||

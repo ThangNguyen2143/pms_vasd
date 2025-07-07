@@ -107,7 +107,7 @@ export default function TimelineDetailModal({
       const content = {
         id: re.content.timeline_id,
         name: re.content.timeline_name,
-        massage: re.content.message,
+        message: re.content.message,
       };
       const link =
         window.location.origin +

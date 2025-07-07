@@ -72,7 +72,7 @@ function CommentTestcase({
       const content = {
         id: testcase_id,
         name: `Bạn đã được ${user?.name} nhắc đến trong testcase`,
-        massage: `Nội dung comment: ${DOMPurify.sanitize(newComment)}`,
+        message: `Nội dung comment: ${DOMPurify.sanitize(newComment)}`,
       };
       const link =
         window.location.origin +
@@ -105,7 +105,7 @@ function CommentTestcase({
       const content = {
         id: re.content.testcase_id,
         name: re.content.testcase_name,
-        massage: newComment,
+        message: newComment,
       };
       const link =
         window.location.origin +

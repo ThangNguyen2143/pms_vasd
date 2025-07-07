@@ -70,7 +70,7 @@ export default function NoteRequirment({
       const content = {
         id: requirement_id,
         name: `Bạn đã được ${user?.name} nhắc đến trong ghi nhận yêu cầu`,
-        massage: `Nội dung comment: ${DOMPurify.sanitize(newComment)}`,
+        message: `Nội dung comment: ${DOMPurify.sanitize(newComment)}`,
       };
       const link =
         window.location.origin +

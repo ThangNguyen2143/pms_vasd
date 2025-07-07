@@ -73,7 +73,7 @@ function TaskComments({
       const content = {
         id: task.id,
         name: `Bạn đã được ${user?.name} nhắc đến trong task`,
-        massage: `Nội dung comment: ${DOMPurify.sanitize(newComment)}`,
+        message: `Nội dung comment: ${DOMPurify.sanitize(newComment)}`,
       };
       const link =
         window.location.origin +
@@ -96,7 +96,7 @@ function TaskComments({
       const content = {
         id: task.task_id,
         name: task.title,
-        massage: newComment,
+        message: newComment,
       };
       const link =
         window.location.origin +

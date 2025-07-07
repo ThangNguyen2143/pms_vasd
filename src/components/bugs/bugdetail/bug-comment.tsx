@@ -72,7 +72,7 @@ export default function BugComments({
       const content = {
         id: bug_id,
         name: `Bạn đã được ${user?.name} nhắc đến trong bug`,
-        massage: `Nội dung comment: ${DOMPurify.sanitize(newComment)}`,
+        message: `Nội dung comment: ${DOMPurify.sanitize(newComment)}`,
       };
       const link =
         window.location.origin +
@@ -98,7 +98,7 @@ export default function BugComments({
       const content = {
         id: re.content.bug_id,
         name: re.content.bug_name,
-        massage: newComment,
+        message: newComment,
       };
       const link =
         window.location.origin +

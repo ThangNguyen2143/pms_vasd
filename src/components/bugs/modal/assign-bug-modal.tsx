@@ -61,7 +61,7 @@ export default function AssignBugModal({
       const content = {
         id: re.content.bug_id,
         name: re.content.bug_name,
-        massage: re.content.message,
+        message: re.content.message,
       };
       const link =
         window.location.origin +

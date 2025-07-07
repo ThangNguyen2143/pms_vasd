@@ -20,6 +20,7 @@ import { status_with_color } from "~/utils/status-with-color";
 import TaskLinks from "~/components/tasks/task-detail/task-link";
 import CriteriaTask from "~/components/tasks/task-detail/criterial-task";
 import AddCriterialModal from "~/components/tasks/modals/add-criterial-modal";
+import { sendEmail } from "~/utils/send-notify";
 
 export default function TaskDetailClient({ task_id }: { task_id: number }) {
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -79,7 +80,35 @@ export default function TaskDetailClient({ task_id }: { task_id: number }) {
       }
     }
   }, [errorComment]);
-
+  const sendNotification = async (except_user_id: number) => {
+    // Send notification to all users except the one with except_user_id
+    if (task && task.userAssigns && task.userAssigns.length > 0) {
+      const notificationPromises = task.userAssigns
+        .filter((assignee) => assignee.user_id !== except_user_id)
+        .map((assignee) => {
+          // Send notification to each assignee
+          const content = {
+            id: task_id,
+            name: "Thông báo cập nhật task",
+            message: `Công việc "${task.title}" đã được cập nhật.`,
+          };
+          const email = assignee.contact?.filter((ct) => ct.code == "email")[0]
+            ?.value;
+          const link =
+            window.location.origin + "/task/" + encodeBase64({ task_id }) ||
+            "https://pm.vasd.vn/";
+          if (email)
+            return sendEmail(content, email, "Thông báo", link, "task");
+        });
+      try {
+        await Promise.all(notificationPromises);
+        await reloadTaskData();
+      } catch (error) {
+        console.error("Lỗi gửi thông báo:", error);
+        toast.error("Lỗi gửi thông báo đến người dùng");
+      }
+    }
+  };
   if (!task) {
     if (errorTask?.code == 404) return notFound();
     return (
@@ -144,7 +173,7 @@ export default function TaskDetailClient({ task_id }: { task_id: number }) {
           <TaskAssign
             assignTo={task.userAssigns}
             task_id={task_id}
-            onUpdate={reloadTaskData}
+            onUpdate={sendNotification}
           />
           <Logs logs={task.taskLogs || []} />
         </div>

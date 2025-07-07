@@ -90,7 +90,7 @@ function statusToProgress(status: string): number {
 }
 
 function ClientDashboardPage() {
-  const version = "v1.0.7"; // hoặc import từ package.json
+  const version = "v1.0.8"; // hoặc import từ package.json
 
   // Gán vào biến global
   if (typeof window !== "undefined") {

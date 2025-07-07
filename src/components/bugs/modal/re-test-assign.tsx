@@ -51,7 +51,7 @@ export default function ReTestBugAssignModal({
     const data = {
       bug_id,
       assign_to: selectUser,
-      deadline,
+      deadline: deadline + ":00",
     };
     const re = await postData("/bugs/retesting", data);
     if (!re) return;
@@ -61,7 +61,7 @@ export default function ReTestBugAssignModal({
       const content = {
         id: re.content.bug_id,
         name: re.content.bug_name,
-        massage: re.content.message,
+        message: re.content.message,
       };
       const link =
         window.location.origin +
@@ -91,7 +91,7 @@ export default function ReTestBugAssignModal({
     console.log("Data:", {
       bug_id,
       assign_to: selectUser,
-      deadline,
+      deadline: deadline + ":00",
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errorData]);
