@@ -1,11 +1,12 @@
 [Unit]
 Description=Next.js App
 After=network.target
+Requires=nextjs-build.service
 
 [Service]
 Type=simple
 WorkingDirectory=/home/youruser/my-next-app
-ExecStart=/usr/bin/npm run start
+ExecStart=/usr/bin/npm run start -- --hostname 0.0.0.0 --port 3000
 Restart=always
 Environment=NODE_ENV=production
 User=youruser
