@@ -2,6 +2,8 @@
 import { BadgeInfo } from "lucide-react";
 import React, { useState } from "react";
 import InforTaskRef from "../modal/info-task-ref";
+import Link from "next/link";
+import { encodeBase64 } from "~/lib/services";
 
 export default function BugLinks({
   taskId,
@@ -39,9 +41,12 @@ export default function BugLinks({
         <p>
           <strong>TestCase #:</strong>{" "}
           {testcaseId ? (
-            <a className="link text-blue-500" href={`/testcases/${testcaseId}`}>
+            <Link
+              className="link text-blue-500"
+              href={`/test_case/${encodeBase64({ testcase_id: testcaseId })}`}
+            >
               {testcase_name}
-            </a>
+            </Link>
           ) : (
             <span className="italic text-gray-500">Chưa liên kết</span>
           )}

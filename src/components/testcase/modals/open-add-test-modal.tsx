@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { TestStep } from "~/lib/types";
 import { useUser } from "~/providers/user-context";
 import RichTextEditor from "~/components/ui/rich-text-editor";
+import SafeHtmlViewer from "~/components/ui/safeHTMLviewer";
 
 interface AddTestRunModalProps {
   steps: TestStep[];
@@ -120,9 +121,7 @@ export default function AddTestRunModal({
                         <h4 className="font-medium">
                           Bước {step.step}: {step.name}
                         </h4>
-                        <p className="text-sm text-gray-600">
-                          {step.description}
-                        </p>
+                        <SafeHtmlViewer html={step.description} />
                       </div>
                       <div className="flex gap-4">
                         <label className="flex items-center gap-1">

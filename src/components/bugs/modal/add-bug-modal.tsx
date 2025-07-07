@@ -7,7 +7,14 @@ import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
 import { useUploadFile } from "~/hooks/use-upload-file";
 import { encodeBase64 } from "~/lib/services";
-import { BugSeverity, Priority, TaskDTO, TestcaseDto } from "~/lib/types";
+import {
+  BugSeverity,
+  OptionType,
+  Priority,
+  TaskDTO,
+  TestcaseDto,
+} from "~/lib/types";
+import Select from "react-select";
 
 interface AddBugProps {
   product_id: string;
@@ -127,7 +134,11 @@ export default function AddBugModal({
       onClose();
     }
   };
-
+  const options: OptionType[] =
+    taskList?.map((task) => ({
+      value: task.id.toString(),
+      label: task.title,
+    })) ?? [];
   return (
     <div className="modal modal-open ">
       <div className="modal-box max-w-5xl w-full">
@@ -212,18 +223,14 @@ export default function AddBugModal({
           </fieldset>
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Task liên quan</legend>
-            <select
-              className="select select-neutral"
-              value={taskSelected}
-              onChange={(e) => setTaskSelected(e.target.value)}
-            >
-              <option value="">Chọn Task liên kết</option>
-              {taskList?.map((task) => (
-                <option key={task.id} value={task.id}>
-                  {task.title}
-                </option>
-              ))}
-            </select>
+            <Select
+              className="w-full"
+              placeholder="Chọn task liên kết"
+              value={options.find((opt) => opt.value === taskSelected) || null}
+              onChange={(selected) => setTaskSelected(selected?.value ?? "")}
+              options={options}
+              isClearable
+            />
           </fieldset>
           <div>
             <div className="join w-full">

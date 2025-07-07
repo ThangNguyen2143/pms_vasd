@@ -45,3 +45,7 @@ export type ProjectMember = {
   id: number;
   name: string;
 };
+export type OptionType = {
+  value: string;
+  label: string;
+};

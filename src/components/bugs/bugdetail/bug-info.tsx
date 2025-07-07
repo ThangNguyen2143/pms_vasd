@@ -113,7 +113,7 @@ export default function BugInfo({
               </button>
             </div>
             <div className="join">
-              <div className="select join-item select-sm" data-tip="Bug hợp lệ">
+              <div className="select join-item select-sm">
                 <select
                   name=""
                   id=""

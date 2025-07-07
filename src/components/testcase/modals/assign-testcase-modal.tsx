@@ -8,6 +8,7 @@ import { encodeBase64 } from "~/lib/services";
 import { Contact, ProjectMember } from "~/lib/types";
 import { toISOString } from "~/utils/fomat-date";
 import { sendEmail } from "~/utils/send-notify";
+import Select from "react-select";
 interface ResponseNotify {
   action: string;
   content: {
@@ -45,11 +46,7 @@ export default function AssignTestcaseModal({
     ResponseNotify,
     typeof assignData
   >();
-  const {
-    data: users,
-    getData: getUsers,
-    errorData: errorUser,
-  } = useApi<ProjectMember[]>();
+  const { data: users, getData: getUsers } = useApi<ProjectMember[]>();
   useEffect(() => {
     getUsers(
       "/system/config/" + encodeBase64({ type: "project_member", product_id })
@@ -100,7 +97,11 @@ export default function AssignTestcaseModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errorData]);
   if (!isOpen) return null;
-
+  const options =
+    users?.map((user) => ({
+      value: user.id,
+      label: user.name,
+    })) ?? [];
   return (
     <div className="modal modal-open">
       <div className="modal-box">
@@ -109,32 +110,22 @@ export default function AssignTestcaseModal({
           <div className="space-y-4">
             <div>
               <label className="block mb-1">Người nhận</label>
-              <select
-                className="select select-bordered w-full"
-                value={assignData.assign_to}
-                onChange={(e) =>
+              <Select
+                className="w-full"
+                placeholder="Chọn người thực hiện"
+                value={
+                  options.find((opt) => opt.value === assignData.assign_to) ||
+                  null
+                }
+                onChange={(selected) =>
                   setAssignData({
                     ...assignData,
-                    assign_to: parseInt(e.target.value),
+                    assign_to: selected?.value ?? 0,
                   })
                 }
-                required
-              >
-                <option value={0} disabled>
-                  Chọn nhân viên
-                </option>
-                {users ? (
-                  users.map((us) => (
-                    <option value={us.id} key={us.id + "sl"}>
-                      {us.name}
-                    </option>
-                  ))
-                ) : errorUser ? (
-                  <option>Lỗi: {errorUser.message}</option>
-                ) : (
-                  <option>Không xác định</option>
-                )}
-              </select>
+                options={options}
+                isClearable
+              />
             </div>
             <div>
               <label className="block mb-1">Deadline</label>

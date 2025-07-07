@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 import { ProjectMemberDto, ProjectRole, UserDto } from "~/lib/types";
+import Select from "react-select";
 interface AddMemberToProject {
   project_id: number;
   user_id: number;
@@ -51,40 +52,31 @@ function AddMemberProjectModal({
       onClose();
     }
   };
+  const options =
+    listEmployee
+      ?.filter((us) => {
+        return memberGroup?.find((mem) => mem.id == us.userid) == undefined;
+      })
+      .map((user) => {
+        return {
+          value: user.userid,
+          label: user.userData.display_name,
+        };
+      }) ?? [];
   return (
     <div className="modal modal-open">
       <div className="modal-box">
         <h3 className="font-bold text-lg">Thêm thành viên dự án</h3>
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Tên thành viên</legend>
-          <select
-            name="user_id"
-            className="select"
-            value={userSelected}
-            required
-            onChange={(e) => setuserSelected(Number.parseInt(e.target.value))}
-          >
-            <option value={0} disabled>
-              Chọn người dùng
-            </option>
-            {listEmployee ? (
-              listEmployee
-                .filter((us) => {
-                  return (
-                    memberGroup?.find((mem) => mem.id == us.userid) == undefined
-                  );
-                })
-                .map((user) => {
-                  return (
-                    <option value={user.userid} key={user.userid + "user"}>
-                      {user.userData.display_name}
-                    </option>
-                  );
-                })
-            ) : (
-              <option>Không thể tải danh sách</option>
-            )}
-          </select>
+          <Select
+            className="w-full"
+            placeholder="Chọn thành viên"
+            value={options.find((emp) => emp.value === userSelected) || null}
+            onChange={(selected) => setuserSelected(selected?.value ?? 0)}
+            options={options}
+            isClearable
+          />
         </fieldset>
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Vai trò</legend>

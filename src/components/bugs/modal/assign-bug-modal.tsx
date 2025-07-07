@@ -4,9 +4,10 @@ import { toast } from "sonner";
 import DateTimePicker from "~/components/ui/date-time-picker";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
-import { Contact, ProjectMember } from "~/lib/types";
+import { Contact, OptionType, ProjectMember } from "~/lib/types";
 import { sendEmail } from "~/utils/send-notify";
-
+import Select from "react-select";
+import { toISOString } from "~/utils/fomat-date";
 interface ResponseNotify {
   action: string;
   content: {
@@ -32,7 +33,7 @@ export default function AssignBugModal({
   onUpdate: () => Promise<void>;
   onClose: () => void;
 }) {
-  const [selectUser, setSelectUser] = useState(0);
+  const [selectUser, setSelectUser] = useState<string>("");
   const [deadline, setDeadline] = useState("");
   const { postData, isLoading, errorData } = useApi<ResponseNotify, DataSend>();
   const {
@@ -50,8 +51,8 @@ export default function AssignBugModal({
   const handleSubmit = async () => {
     const data: DataSend = {
       bug_id,
-      assign_to: selectUser,
-      deadline: deadline + ":00",
+      assign_to: Number(selectUser),
+      deadline: toISOString(deadline) || "",
     };
     const re = await postData("/bugs/assign", data);
     if (!re) return;
@@ -86,13 +87,18 @@ export default function AssignBugModal({
       onClose();
     }
   };
+  const options: OptionType[] =
+    users?.map((user) => ({
+      value: user.id.toString(),
+      label: user.name,
+    })) ?? [];
   useEffect(() => {
     if (errorData) {
       toast.error(errorData.message || errorData.title);
       console.log("Data: ", {
         bug_id,
         assign_to: selectUser,
-        deadline: deadline + ":00",
+        deadline: toISOString(deadline) || "",
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -116,22 +122,14 @@ export default function AssignBugModal({
         <h3 className="font-bold text-lg">Giao việc</h3>
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Người thực hiện</legend>
-          <select
-            className="select"
-            value={selectUser}
-            onChange={(e) => setSelectUser(parseInt(e.target.value))}
-          >
-            <option value={0} disabled>
-              Chọn người thực hiện
-            </option>
-            {users?.map((us) => {
-              return (
-                <option value={us.id} key={us.id}>
-                  {us.name}
-                </option>
-              );
-            })}
-          </select>
+          <Select
+            className="w-full"
+            placeholder="Chọn người thực hiện"
+            value={options.find((opt) => opt.value === selectUser) || null}
+            onChange={(selected) => setSelectUser(selected?.value ?? "")}
+            options={options}
+            isClearable
+          />
         </fieldset>
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Deadline</legend>

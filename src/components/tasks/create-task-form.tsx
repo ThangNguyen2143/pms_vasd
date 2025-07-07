@@ -9,6 +9,7 @@ import RichTextEditor from "../ui/rich-text-editor";
 import DateTimePicker from "../ui/date-time-picker";
 import { ProductModule } from "~/lib/types";
 import { useUploadFile } from "~/hooks/use-upload-file";
+import Select from "react-select";
 interface Criteria {
   id: string;
   title: string;
@@ -124,6 +125,11 @@ function CreateTaskForm({
       )
     );
   };
+  const options =
+    modules?.map((module) => ({
+      value: module.id,
+      label: module.display,
+    })) ?? [];
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-2 p-4 rounded-lg">
       <fieldset className="fieldset">
@@ -209,22 +215,14 @@ function CreateTaskForm({
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Module</legend>
           <div className="join w-full">
-            <select
-              className="select join-item "
-              value={selectModule}
-              onChange={(e) => setSelectModule(e.target.value)}
-            >
-              <option value={""}>Chọn moudle</option>
-              {modules ? (
-                modules.map((module) => (
-                  <option key={module.id + "-ref-module"} value={module.id}>
-                    {module.display}
-                  </option>
-                ))
-              ) : (
-                <option>Không có module nào</option>
-              )}
-            </select>
+            <Select
+              className="select join-item w-full"
+              isClearable
+              value={options.find((opt) => opt.value === selectModule) || null}
+              onChange={(selected) => setSelectModule(selected?.value ?? "")}
+              options={options}
+              placeholder="Chọn module"
+            />
             <button className="btn join-item" onClick={onAddModule}>
               Thêm
             </button>
