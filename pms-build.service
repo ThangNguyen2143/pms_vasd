@@ -4,8 +4,8 @@ After=network.target
 
 [Service]
 Type=oneshot
-WorkingDirectory=/home/youruser/my-next-app
+WorkingDirectory=/var/www/pms_vasd
 ExecStart=/usr/bin/npm install
 ExecStart=/usr/bin/npm run build
-User=youruser
+User=cntt
 RemainAfterExit=yes

@@ -1,15 +1,17 @@
 [Unit]
 Description=Next.js App
 After=network.target
-Requires=nextjs-build.service
+Requires=pms-build.service
 
 [Service]
 Type=simple
-WorkingDirectory=/home/youruser/my-next-app
-ExecStart=/usr/bin/npm run start -- --hostname 0.0.0.0 --port 3000
+WorkingDirectory=/var/www/pms_vasd
+ExecStart=/usr/bin/npm run start -- --hostname=172.251.109.221 --port=61569
 Restart=always
+RestartSet=10
+SyslogIndentifier=api_doc
+User=cntt
 Environment=NODE_ENV=production
-User=youruser
 
 [Install]
 WantedBy=multi-user.target
