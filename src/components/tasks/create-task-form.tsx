@@ -216,7 +216,7 @@ function CreateTaskForm({
           <legend className="fieldset-legend">Module</legend>
           <div className="join w-full">
             <Select
-              className="select join-item w-full"
+              className="join-item w-full"
               isClearable
               value={options.find((opt) => opt.value === selectModule) || null}
               onChange={(selected) => setSelectModule(selected?.value ?? "")}
@@ -236,12 +236,17 @@ function CreateTaskForm({
             onChange={(e) => setSelectedRequirement(parseInt(e.target.value))}
           >
             <option value={0}>Chọn yêu cầu</option>
-            {requireds &&
+            {requireds ? (
               requireds.map((req) => (
                 <option key={req.id} value={req.id}>
                   {req.title}
                 </option>
-              ))}
+              ))
+            ) : (
+              <option value={0} disabled>
+                Không có yêu cầu nào
+              </option>
+            )}
           </select>
         </fieldset>
         <fieldset className="fieldset">

@@ -6,7 +6,7 @@ import { ChartByDate } from "../requirment/charts/bar-line-chart";
 import DateTimePicker from "../ui/date-time-picker";
 import { encodeBase64 } from "~/lib/services";
 import { useApi } from "~/hooks/use-api";
-import { toISOString } from "~/utils/fomat-date";
+import { format_date, toISOString } from "~/utils/fomat-date";
 import { endOfDay, startOfDay, subDays } from "date-fns";
 import GroupProductToChart from "./charts/group-product-to-chart";
 import { RadarChartByUser } from "./charts/radar-chart";
@@ -35,10 +35,10 @@ function BugOverview() {
     }[]
   >();
   const [fromDate, setFromDate] = useState<string>(
-    toISOString(startOfDay(subDays(new Date(), 7))) //Mặc định 1 tuần trước
+    format_date(startOfDay(subDays(new Date(), 7))) //Mặc định 1 tuần trước
   );
   const [toDate, settoDate] = useState<string>(
-    toISOString(endOfDay(new Date()))
+    format_date(endOfDay(new Date()))
   );
   const { data: productList, getData: getProducts } =
     useApi<{ id: string; name: string }[]>();
@@ -137,7 +137,7 @@ function BugOverview() {
               data={
                 dataOverViewDate
                   ? dataOverViewDate.map((d) => ({
-                      date: d.date,
+                      date: format_date(d.date).slice(9),
                       bar_data: d.bug_reported,
                       line_data: d.bug_resolved,
                     }))

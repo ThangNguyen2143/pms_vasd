@@ -13,22 +13,26 @@ export default function RequirmentLogs({
       <h3 className="text-lg font-semibold text-primary mb-2">
         📜 Nhật ký yêu cầu
       </h3>
-      <div className="flex flex-col-reverse overflow-y-auto max-h-96">
+      <div className="flex flex-col overflow-y-auto max-h-96">
         {logs.length > 0 ? (
-          logs.map((log) => (
-            <div
-              key={log.id + " " + log.date}
-              className="bg-base-100 p-3 mb-2 rounded border-l-4 border-info"
-            >
-              <p>
-                <strong>{log.name}</strong>
-              </p>
-              <p>
-                <i>{format_date(log.date)}</i>
-              </p>
-              <p>{formatContent(log.content)}</p>
-            </div>
-          ))
+          logs
+            .sort(
+              (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+            )
+            .map((log) => (
+              <div
+                key={log.id + " " + log.date}
+                className="bg-base-100 p-3 mb-2 rounded border-l-4 border-info"
+              >
+                <p>
+                  <strong>{log.name}</strong>
+                </p>
+                <p>
+                  <i>{format_date(log.date)}</i>
+                </p>
+                <p>{formatContent(log.content)}</p>
+              </div>
+            ))
         ) : (
           <p>
             <i>Chưa có nhật ký.</i>

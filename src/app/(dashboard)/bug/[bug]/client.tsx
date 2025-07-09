@@ -20,6 +20,8 @@ import LinkTaskOrTestToBugModal from "~/components/bugs/modal/ref-update-modal";
 import UpdateBugModal from "~/components/bugs/modal/edit-info-bug";
 import { Copy } from "lucide-react";
 import CopyBugModal from "~/components/bugs/modal/copy-bug-modal";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 function BugDetailClient({
   bug_id,
@@ -28,6 +30,7 @@ function BugDetailClient({
   bug_id: number;
   product_id: string;
 }) {
+  const route = useRouter();
   const [retestAssign, setRetestAssign] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showLinkModal, setShowLinkModal] = useState(false);
@@ -37,11 +40,17 @@ function BugDetailClient({
   const { data: bugData, getData, isLoading, errorData } = useApi<BugDetail>();
   const { data: bugcomments, getData: getListComment } = useApi<BugComment[]>();
   const { data: bugStatus, getData: getBugStatus } = useApi<BugStatus[]>();
+  const { removeData: deleteBug, errorData: errorDel } = useApi();
   useEffect(() => {
     getData("/bugs/detail/" + encodeBase64({ bug_id }));
     getListComment("/bugs/comments/" + encodeBase64({ bug_id }), "reload");
     getBugStatus("/system/config/eyJ0eXBlIjoiYnVnX3N0YXR1cyJ9", "default");
   }, [bug_id]);
+  useEffect(() => {
+    if (errorDel) {
+      toast.error("Xóa bug thất bại: " + errorDel.message);
+    }
+  }, [errorDel]);
   const reloadDataBug = async () => {
     await getData("/bugs/detail/" + encodeBase64({ bug_id }), "reload");
   };
@@ -50,6 +59,15 @@ function BugDetailClient({
       "/bugs/comments/" + encodeBase64({ bug_id }),
       "reload"
     );
+  };
+  const handleDeleteBug = async () => {
+    if (confirm("Bạn có chắc chắn muốn xóa bug này?")) {
+      const re = await deleteBug("/bugs/" + encodeBase64({ bug_id }));
+      if (re != null) {
+        toast.success("Xóa bug thành công");
+        route.back();
+      }
+    }
   };
   if (isLoading)
     return (
@@ -75,13 +93,18 @@ function BugDetailClient({
       <div className="max-w-6xl mx-auto bg-base-100 shadow-lg rounded-xl p-6 grid md:grid-cols-3 gap-6">
         <div className="md:col-span-3 flex justify-between items-center border-b pb-4">
           <h2 className="text-2xl font-bold text-primary">🐞 Chi tiết Bug</h2>
-          <button
-            className={"btn btn-dash"}
-            onClick={() => setShowCopyModal(true)}
-          >
-            <Copy />
-            Sao chép bug
-          </button>
+          <div>
+            <button
+              className={"btn btn-dash"}
+              onClick={() => setShowCopyModal(true)}
+            >
+              <Copy />
+              Sao chép bug
+            </button>
+            <button className="btn btn-error ml-2" onClick={handleDeleteBug}>
+              Xóa bug
+            </button>
+          </div>
         </div>
         {/* Left side: Bug info + Attachments + Comments */}
         <div className="md:col-span-2 space-y-6">

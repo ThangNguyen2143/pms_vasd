@@ -22,7 +22,7 @@ export default function DateTimePicker({
 
     const fp = flatpickr(inputRef.current, {
       enableTime: true,
-      dateFormat: "Y-m-d H:i",
+      dateFormat: "H:i:S d/m/Y",
       time_24hr: true, // 24-hour format
       locale: Vietnamese, // Vietnamese language
       defaultDate: value || undefined,

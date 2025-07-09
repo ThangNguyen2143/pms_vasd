@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import DateTimePicker from "~/components/ui/date-time-picker";
 import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
 import { RequirementDetail, RequirementType } from "~/lib/types";
@@ -111,14 +112,18 @@ export default function EditRequirementModal({
               })}
             </select>
           </label>
-          <label className="input w-full">
-            <span className="label">Ngày ghi nhận</span>
-            <input
-              type="datetime-local"
+          <div className="join w-full">
+            <span className="join-item text-sm label border border-neutral px-2">
+              Ngày ghi nhận
+            </span>
+            <DateTimePicker
+              className="input-neutral join-item w-full"
               value={dateReceive}
-              onChange={(e) => setdateReceive(e.target.value)}
+              onChange={setdateReceive}
+              placeholder="Ngày ghi nhận"
             />
-          </label>
+          </div>
+
           <label className="join w-full">
             <span className="join-item border w-1/5 text-center items-center">
               Thẻ

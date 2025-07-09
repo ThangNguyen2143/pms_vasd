@@ -42,7 +42,6 @@ export default function NoteRequirment({
     getUser("/user/" + encodeBase64({ type: "all" }));
     getUsers("/project/member/" + encodeBase64({ project_id }));
   }, []);
-  console.log(memberProject);
   useEffect(() => {
     if (errorNote) toast.error(errorNote.message);
   }, [errorNote]);
@@ -111,7 +110,7 @@ export default function NoteRequirment({
     <div className="bg-base-200 p-4 rounded-lg">
       <h3 className="text-lg font-semibold text-primary mb-2">💬 Bình luận</h3>
       <div className="space-y-2 mb-4 max-h-96 overflow-auto">
-        {comments ? (
+        {comments && comments.length > 0 ? (
           comments.map((comment) => {
             return (
               <div className="chat chat-start" key={comment.date}>
@@ -136,7 +135,9 @@ export default function NoteRequirment({
             );
           })
         ) : (
-          <div className="text-base-200 text-center">Chưa có bình luận nào</div>
+          <div className="text-base-content text-center">
+            Chưa có bình luận nào
+          </div>
         )}
       </div>
       <div className="flex items-start gap-2">

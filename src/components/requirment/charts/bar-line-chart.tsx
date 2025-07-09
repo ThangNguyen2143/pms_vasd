@@ -36,6 +36,7 @@ export function ChartByDate({ data }: { data: DataChart[] }) {
         label: "Đã tạo",
         data: data.map((d) => d.bar_data),
         backgroundColor: "#3b82f6",
+        order: 2,
       },
       {
         type: "line" as const,
@@ -43,6 +44,7 @@ export function ChartByDate({ data }: { data: DataChart[] }) {
         data: data.map((d) => d.line_data),
         borderColor: "#f97316",
         borderWidth: 2,
+        order: 1,
       },
     ],
   };

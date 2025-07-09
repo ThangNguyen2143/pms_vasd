@@ -1,4 +1,5 @@
 import { useState } from "react";
+import RichTextEditor from "~/components/ui/rich-text-editor";
 
 import { TestStep } from "~/lib/types";
 type StepTest = {
@@ -116,7 +117,7 @@ function UpdateStepTestModal({
       <form method="dialog" className="modal-backdrop">
         <button onClick={onClose}>close</button>
       </form>
-      <div className="modal-box">
+      <div className="modal-box max-w-5xl w-full">
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Các bước thực hiện</legend>
           <div className="space-y-4">
@@ -140,12 +141,12 @@ function UpdateStepTestModal({
                   </div>
                   <div>
                     <label className="label">Mô tả</label>
-                    <textarea
-                      className="textarea w-full"
-                      placeholder="Mô tả bước"
+                    <RichTextEditor
+                      className="w-full"
+                      placeholder="Mô tả chi tiết bước thực hiện"
                       value={step.description}
                       onChange={(e) =>
-                        handleStepChange(index, "description", e.target.value)
+                        handleStepChange(index, "description", e)
                       }
                     />
                   </div>

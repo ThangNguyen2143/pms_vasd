@@ -166,10 +166,9 @@ export default function LinkRequirementModal({
     <div className="modal modal-open">
       <div className="modal-box">
         <h3 className="font-bold text-lg">Liên kết yêu cầu</h3>
-        {loadData && (
+        {loadData ? (
           <span className="loading loading-infinity loading-xl"></span>
-        )}
-        {requirementList.length > 0 && (
+        ) : requirementList.length > 0 ? (
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Yêu cầu</legend>
             <div className="flex gap-2 items-center">
@@ -192,6 +191,10 @@ export default function LinkRequirementModal({
               </button>
             </div>
           </fieldset>
+        ) : (
+          <div className="alert alert-info">
+            <span>Không có yêu cầu nào để liên kết</span>
+          </div>
         )}
         {/* Danh sách các yêu cầu đã có sẵn */}
         {linkedRequirements && linkedRequirements.length > 0 && (

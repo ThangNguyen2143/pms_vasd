@@ -1,7 +1,6 @@
 "use client";
 import { useMemo } from "react"; // <- component bạn đã có
 import { StackedBarChart } from "./stack-bar-chart";
-import clsx from "clsx";
 function GroupProductToChart({ data, getProductName }: Props) {
   // Nhóm theo product_id
   const groupedData = useMemo(() => {
@@ -14,26 +13,20 @@ function GroupProductToChart({ data, getProductName }: Props) {
     });
     return map;
   }, [data]);
-
   return (
     <div
-      className={clsx(
-        "grid",
-        `grid-cols-${
-          [...groupedData.entries()].length <= 3
-            ? [...groupedData.entries()].length
-            : 3
-        }`
-      )}
+      className={
+        "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-center"
+      }
     >
       {[...groupedData.entries()].map(([productId, productData]) => (
-        <div key={productId}>
-          <h2 className="text-lg font-semibold mb-2">
+        <div key={productId} className=" flex flex-col gap-4 justify-center">
+          <h2 className="text-lg font-semibold my-2">
             {getProductName
               ? getProductName(productId)
               : `Phần mềm ${productId}`}
           </h2>
-          <div className="bg-white p-4 rounded-lg shadow">
+          <div className="bg-white p-4 rounded-lg shadow max-h-[200px]">
             <StackedBarChart data={productData} />
           </div>
         </div>

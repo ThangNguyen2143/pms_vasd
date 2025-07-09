@@ -10,18 +10,24 @@ function TestcaseLog({ testLogs }: { testLogs: TestLog[] }) {
       </h2>
       <div className="overflow-y-auto max-h-96">
         {testLogs.length > 0 ? (
-          <ul className="space-y-3 flex flex-col-reverse gap-2">
-            {testLogs.map((log: TestLog) => (
-              <li key={log.id + " " + log.date} className="flex items-start">
-                <span className="mr-2">🕓</span>
-                <div>
-                  <strong>{format_date(log.date)}</strong> - <em>{log.name}</em>
-                  :
-                  <br />
-                  {formatContent(log.content)}
-                </div>
-              </li>
-            ))}
+          <ul className="space-y-3 flex flex-col gap-2">
+            {testLogs
+              .sort(
+                (a, b) =>
+                  new Date(b.date).getTime() - new Date(a.date).getTime()
+              )
+              .map((log: TestLog) => (
+                <li key={log.id + " " + log.date} className="flex items-start">
+                  <span className="mr-2">🕓</span>
+                  <div>
+                    <strong>{format_date(log.date)}</strong> -{" "}
+                    <em>{log.name}</em>
+                    :
+                    <br />
+                    {formatContent(log.content)}
+                  </div>
+                </li>
+              ))}
           </ul>
         ) : (
           <p className="text-gray-500">Chưa có nhật ký hoạt động</p>

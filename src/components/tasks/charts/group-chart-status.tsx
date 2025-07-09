@@ -93,7 +93,7 @@ export function StackedBarChartByModule({ data, moduleProduct }: Props) {
         },
         scales: {
           x: { stacked: true },
-          y: { stacked: true, beginAtZero: true },
+          y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } },
         },
       }}
     />

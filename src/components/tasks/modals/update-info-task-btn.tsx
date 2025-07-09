@@ -96,13 +96,13 @@ export default function UpdateInfoTaskModal({
   };
   return (
     <div className="modal modal-open">
-      <div className="modal-box w-1/4">
+      <div className="modal-box max-w-4xl w-full">
         <h3 className="font-bold text-lg">Cập nhật thông tin nhiệm vụ</h3>
         <div className="flex flex-col gap-2">
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Tiêu đề</legend>
             <input
-              className="input input-bordered"
+              className="input w-full"
               type="text"
               placeholder="Tiêu đề công việc"
               value={title}

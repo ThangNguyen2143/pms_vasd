@@ -14,7 +14,7 @@ import {
 } from "~/lib/types";
 // import { useUser } from "~/providers/user-context";
 import OverviewWork from "./orverview-work";
-import { toISOString } from "~/utils/fomat-date";
+import { format_date, toISOString } from "~/utils/fomat-date";
 import { endOfDay, startOfDay, subDays } from "date-fns";
 import DateTimePicker from "../ui/date-time-picker";
 
@@ -28,10 +28,10 @@ function MainWork() {
   const { data: typeWorkList, getData: getTypeWork } =
     useApi<RequirementType[]>();
   const [fromDate, setFromDate] = useState<string>(
-    toISOString(startOfDay(subDays(new Date(), 7))) //Mặc định 1 tuần trước
+    format_date(startOfDay(subDays(new Date(), 7))) //Mặc định 1 tuần trước
   );
   const [toDate, settoDate] = useState<string>(
-    toISOString(endOfDay(new Date()))
+    format_date(endOfDay(new Date()))
   );
   const {
     data: workList,

@@ -7,7 +7,7 @@ import { encodeBase64 } from "~/lib/services";
 import { Contact, ProjectMember } from "~/lib/types";
 import { sendEmail } from "~/utils/send-notify";
 import Select from "react-select";
-import { toISOString } from "~/utils/fomat-date";
+import { format_date, toISOString } from "~/utils/fomat-date";
 interface ResponseNotify {
   action: string;
   content: {
@@ -36,7 +36,7 @@ export default function AssignUserModal({
   onClose: () => void;
 }) {
   const [selectUser, setSelectUser] = useState(0);
-  const [deadline, setDeadline] = useState(deadline_task.slice(0, 15) || "");
+  const [deadline, setDeadline] = useState(format_date(deadline_task) || "");
   const { putData, isLoading, errorData } = useApi<ResponseNotify, DataSend>();
   const {
     data: users,
@@ -91,12 +91,14 @@ export default function AssignUserModal({
     }
   };
   useEffect(() => {
-    if (errorData) toast.error(errorData.message);
-    console.log("PayLoad:", {
-      task_id,
-      user_id: selectUser,
-      cur_deadLine: toISOString(deadline) || "",
-    });
+    if (errorData) {
+      toast.error(errorData.message || errorData.title);
+      console.log("PayLoad:", {
+        task_id,
+        user_id: selectUser,
+        cur_deadLine: toISOString(deadline) || "",
+      });
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errorData]);
@@ -107,7 +109,7 @@ export default function AssignUserModal({
     })) ?? [];
   return (
     <div className="modal modal-open">
-      <div className="modal-box w-1/4">
+      <div className="modal-box max-w-md w-full overflow-visible">
         <h3 className="font-bold text-lg">Giao việc</h3>
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Người thực hiện</legend>

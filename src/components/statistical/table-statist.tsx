@@ -6,7 +6,7 @@ import { Config, ProjectMember, StatistPara } from "~/lib/types";
 import DateTimePicker from "../ui/date-time-picker";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
-import { toISOString } from "~/utils/fomat-date";
+import { format_date } from "~/utils/fomat-date";
 import { endOfDay, startOfDay, subDays } from "date-fns";
 
 function TableStatist({
@@ -39,13 +39,13 @@ function TableStatist({
     if (hasFrom && !filterParas["from"]) {
       setFilterParas((pre) => ({
         ...pre,
-        from: toISOString(startOfDay(subDays(new Date(), 7))),
+        from: format_date(startOfDay(subDays(new Date(), 7))),
       }));
     }
     if (hasTo && !filterParas["to"]) {
       setFilterParas((pre) => ({
         ...pre,
-        to: toISOString(endOfDay(new Date())),
+        to: format_date(endOfDay(new Date())),
       }));
     }
     if (hasProject && !filterParas["project_id"]) {

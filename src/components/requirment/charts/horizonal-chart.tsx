@@ -37,7 +37,7 @@ export function ChartByLocation({
       {
         label: "Số lượng",
         data: data.map((d) => d.value),
-        backgroundColor: data.map((d) => colorMap[d.label]),
+        backgroundColor: data.map((d) => colorMap[d.label] ?? "#10a4d0"),
       },
     ];
 

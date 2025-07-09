@@ -5,7 +5,7 @@ import { endOfDay, startOfDay, subDays } from "date-fns";
 import { useEffect, useState } from "react";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
-import { toISOString } from "~/utils/fomat-date";
+import { format_date, toISOString } from "~/utils/fomat-date";
 import DateTimePicker from "../ui/date-time-picker";
 import { ProductModule } from "~/lib/types";
 import { StackedBarChartByModule } from "../tasks/charts/group-chart-status";
@@ -46,10 +46,10 @@ function TestcaseOverView() {
     }[]
   >();
   const [fromDate, setFromDate] = useState<string>(
-    toISOString(startOfDay(subDays(new Date(), 7))) //Mặc định 1 tuần trước
+    format_date(startOfDay(subDays(new Date(), 7))) //Mặc định 1 tuần trước
   );
   const [toDate, settoDate] = useState<string>(
-    toISOString(endOfDay(new Date()))
+    format_date(endOfDay(new Date()))
   );
   const { data: productList, getData: getProducts } =
     useApi<{ id: string; name: string }[]>();

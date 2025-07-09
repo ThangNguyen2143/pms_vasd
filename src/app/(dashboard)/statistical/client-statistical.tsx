@@ -17,6 +17,7 @@ import TableStatist from "~/components/statistical/table-statist";
 import { useApi } from "~/hooks/use-api";
 import { decodeBase64, encodeBase64 } from "~/lib/services";
 import { Config, StatistPara } from "~/lib/types";
+import { toISOString } from "~/utils/fomat-date";
 
 function ClientStatisticalPage() {
   const router = useRouter();
@@ -119,7 +120,8 @@ function ClientStatisticalPage() {
             queryObj[field] = Boolean(rawValue);
             break;
           case "datetime":
-            queryObj[field] = rawValue;
+            queryObj[field] = toISOString(rawValue);
+            break;
           case "string":
           default:
             queryObj[field] = String(rawValue);

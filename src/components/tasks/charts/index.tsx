@@ -9,7 +9,7 @@ import DateTimePicker from "~/components/ui/date-time-picker";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { ProductModule } from "~/lib/types";
-import { toISOString } from "~/utils/fomat-date";
+import { format_date, toISOString } from "~/utils/fomat-date";
 import { StackedBarChartByModule } from "./group-chart-status";
 import { ChartByStatus } from "~/components/requirment/charts/vertical-chart";
 import { ChartByLocation } from "~/components/requirment/charts/horizonal-chart";
@@ -28,10 +28,10 @@ function ChartOverviewTask({ tab, paraTab }: ChartOverviewProps) {
   const { data: dataOverView, getData } = useApi<any[]>();
   const { data: dataOverView1, getData: getData1 } = useApi<any[]>();
   const [fromDate, setFromDate] = useState<string>(
-    toISOString(startOfDay(subDays(new Date(), 7))) //Mặc định 1 tuần trước
+    format_date(startOfDay(subDays(new Date(), 7))) //Mặc định 1 tuần trước
   );
   const [toDate, settoDate] = useState<string>(
-    toISOString(endOfDay(new Date()))
+    format_date(endOfDay(new Date()))
   );
   const [productSelect, setproductSelect] = useState<string>("");
 

@@ -16,21 +16,25 @@ export default function BugLogs({ logs }: { logs: Log[] }) {
       <h3 className="text-lg font-semibold text-primary mb-2">
         📜 Lịch sử bug
       </h3>
-      <div className="flex flex-col-reverse shadow max-h-96 overflow-y-auto">
-        {logs.map((log) => (
-          <div
-            key={log.id + "" + log.date}
-            className="bg-base-100 p-3 mb-2 rounded border-l-4 border-info"
-          >
-            <p>
-              <strong>{log.name}</strong>
-            </p>
-            <p>
-              <i>{format_date(log.date)}</i>
-            </p>
-            <p>{formatContent(log.content)}</p>
-          </div>
-        ))}
+      <div className="flex flex-col shadow max-h-96 overflow-y-auto">
+        {logs
+          .sort(
+            (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+          )
+          .map((log) => (
+            <div
+              key={log.id + "" + log.date}
+              className="bg-base-100 p-3 mb-2 rounded border-l-4 border-info"
+            >
+              <p>
+                <strong>{log.name}</strong>
+              </p>
+              <p>
+                <i>{format_date(log.date)}</i>
+              </p>
+              <p>{formatContent(log.content)}</p>
+            </div>
+          ))}
       </div>
     </div>
   );

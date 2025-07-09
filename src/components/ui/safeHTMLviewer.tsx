@@ -48,7 +48,7 @@ export default function SafeHtmlViewer({ html, className }: Props) {
     <>
       <div
         ref={ref}
-        className={clsx("ql-editor max-h-[1000px] overflow-auto", className)}
+        className={clsx("ql-editor max-h-[500px] overflow-auto", className)}
         dangerouslySetInnerHTML={{
           __html: DOMPurify.sanitize(html),
         }}

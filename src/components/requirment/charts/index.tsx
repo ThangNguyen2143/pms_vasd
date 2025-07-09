@@ -5,7 +5,7 @@ import DateTimePicker from "~/components/ui/date-time-picker";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { ProjectMember } from "~/lib/types";
-import { toISOString } from "~/utils/fomat-date";
+import { format_date, toISOString } from "~/utils/fomat-date";
 import { ChartByLocation } from "./horizonal-chart";
 import { ChartByDate } from "./bar-line-chart";
 import { ChartByStatus } from "./vertical-chart";
@@ -35,10 +35,10 @@ function ChartOverviewRequirement({ tab, paraTab }: ChartOverviewProps) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data: dataOverView, getData } = useApi<any[]>();
   const [fromDate, setFromDate] = useState<string>(
-    toISOString(startOfDay(subDays(new Date(), 7))) //Mặc định 1 tuần trước
+    format_date(startOfDay(subDays(new Date(), 7))) //Mặc định 1 tuần trước
   );
   const [toDate, settoDate] = useState<string>(
-    toISOString(endOfDay(new Date()))
+    format_date(endOfDay(new Date()))
   );
   const [productSelect, setproductSelect] = useState<string>("");
   const [projectSelect, setprojectSelect] = useState<number>(0);
@@ -201,27 +201,31 @@ function ChartOverviewRequirement({ tab, paraTab }: ChartOverviewProps) {
           </div>
         )}
       {tab == "reqByDate" && productSelect != "" && (
-        <div className="mt-6">
+        <div className="mt-6 max-h-[500px] items-center justify-center flex">
           <ChartByDate
             data={
               dataOverView
-                ? dataOverView.map((d) => ({
-                    date: d.date,
-                    bar_data: d.created_count,
-                    line_data: d.resolved_count,
-                  }))
+                ? dataOverView.map((d) => {
+                    return {
+                      date: d.date,
+                      bar_data: d.created_count,
+                      line_data: d.resolved_count,
+                    };
+                  })
                 : []
             }
           />
         </div>
       )}
       {tab == "reqByStatus" && productSelect != "" && (
-        <div className="mt-6">
+        <div className="mt-6 max-h-[500px] items-center justify-center flex">
           <ChartByStatus data={dataOverView || []} />
         </div>
       )}
       {tab == "reqByType" && productSelect != "" && (
-        <ChartByType data={dataOverView || []} />
+        <div className="mt-6 max-h-[500px] items-center justify-center flex">
+          <ChartByType data={dataOverView || []} />
+        </div>
       )}
     </div>
   );

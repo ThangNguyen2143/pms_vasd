@@ -55,6 +55,14 @@ export default function AssignTestcaseModal({
   }, [product_id]);
 
   const handleSubmit = async () => {
+    if (!assignData.assign_to) {
+      toast.error("Vui lòng chọn người nhận");
+      return;
+    }
+    if (!assignData.dead_line) {
+      toast.error("Vui lòng chọn deadline");
+      return;
+    }
     const re = await postData("/testcase/assign", {
       ...assignData,
       dead_line: toISOString(assignData.dead_line),
@@ -92,8 +100,10 @@ export default function AssignTestcaseModal({
     }
   };
   useEffect(() => {
-    if (errorData) toast.error(errorData.message || errorData.title);
-    console.log("Payload:", assignData);
+    if (errorData) {
+      toast.error(errorData.message || errorData.title);
+      console.log("Payload:", assignData);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [errorData]);
   if (!isOpen) return null;

@@ -7,6 +7,6 @@ export function formatContent(content: string): string {
     const parsed = new Date(match);
     // Nếu parse không thành công thì trả lại chuỗi gốc
     if (isNaN(parsed.getTime())) return match;
-    return format_date(match); // hoặc format_date(parsed.toISOString())
+    return format_date(parsed); // hoặc format_date(parsed.toISOString())
   });
 }

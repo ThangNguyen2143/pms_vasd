@@ -343,7 +343,7 @@ function CreateTestcaseForm({
                   return updateState;
                 });
               }}
-            ></RichTextEditor>
+            />
             {stateError?.result_expect && (
               <span className="label text-error text-sm">
                 {stateError.result_expect.message}

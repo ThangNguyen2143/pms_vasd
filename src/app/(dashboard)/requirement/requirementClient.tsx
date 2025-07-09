@@ -15,7 +15,7 @@ import OverviewRequirement from "~/components/requirment/overview-required-tab";
 import clsx from "clsx";
 import AddLocationModal from "~/components/requirment/modals/add-location-modal";
 import AddRequirementModal from "~/components/requirment/modals/add-requirement-modal";
-import { toISOString } from "~/utils/fomat-date";
+import { format_date, toISOString } from "~/utils/fomat-date";
 import { endOfDay, startOfDay, subDays } from "date-fns";
 // import { toast } from "sonner";
 import DateTimePicker from "~/components/ui/date-time-picker";
@@ -36,10 +36,10 @@ function RequirementsClient() {
   const [loading, setloading] = useState(false);
   const [searchString, setSearchString] = useState<string>("");
   const [fromDate, setFromDate] = useState<string>(
-    toISOString(startOfDay(subDays(new Date(), 7))) //Mặc định 1 tuần trước
+    format_date(startOfDay(subDays(new Date(), 7))) //Mặc định 1 tuần trước
   );
   const [toDate, settoDate] = useState<string>(
-    toISOString(endOfDay(new Date()))
+    format_date(endOfDay(new Date()))
   );
   const { data: requiredList, getData: getRequiredList } =
     useApi<RequirementDto[]>();
@@ -113,27 +113,41 @@ function RequirementsClient() {
   }, [projectSelect]);
   useEffect(() => {
     if (projectSelect !== 0) {
-      const from = toISOString(fromDate);
-      const to = toISOString(toDate);
-      let endpoint =
-        "/requirements/" +
-        encodeBase64({ type: "project", project_id: projectSelect, from, to });
-      if (productSelect != "") {
-        endpoint =
+      let from: string = "";
+      let to: string = "";
+      try {
+        from = toISOString(fromDate);
+        to = toISOString(toDate);
+        let endpoint =
           "/requirements/" +
           encodeBase64({
-            type: "product",
-            product_id: productSelect,
+            type: "project",
+            project_id: projectSelect,
             from,
             to,
           });
+        if (productSelect != "") {
+          endpoint =
+            "/requirements/" +
+            encodeBase64({
+              type: "product",
+              product_id: productSelect,
+              from,
+              to,
+            });
+        }
+        setloading(true);
+        setTimeout(() => {
+          getRequiredList(endpoint, "reload");
+          setloading(false);
+        }, 3000);
+      } catch (error) {
+        console.error("Error converting dates:", error);
+        // Xử lý lỗi nếu không thể chuyển đổi ngày
       }
-
-      setloading(true);
-      setTimeout(() => {
-        getRequiredList(endpoint, "reload");
-        setloading(false);
-      }, 3000);
+      // const from = toISOString(fromDate);
+      // const to = toISOString(toDate);
+      // Nếu có chọn sản phẩm thì gọi API
     }
   }, [projectSelect, productSelect, fromDate, toDate]);
   useEffect(() => {

@@ -80,7 +80,7 @@ export default function StatusTag({
               </div>
             );
           })
-        : "Khum có đánh giá nào"}
+        : "Chưa có đánh giá nào"}
     </div>
   );
 }

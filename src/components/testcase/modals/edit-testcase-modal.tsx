@@ -41,11 +41,12 @@ export default function EditTestcaseModal({
     description: testcase.description,
     environment: testcase.environment,
     module: testcase.module,
-    tags: testcase.tags.join(", "),
+    tags: testcase.tags,
     task_id: testcase.task?.id || 0,
     test_data: testcase.test_data || "",
     result_expect: testcase.result_expect,
   });
+  const [currentTag, setCurrentTag] = useState("");
   const { getData: getlistTasks, data: tasks } = useApi<TaskDTO[]>();
   useEffect(() => {
     getlistTasks("/tasks/" + encodeBase64({ product_id }));
@@ -56,8 +57,24 @@ export default function EditTestcaseModal({
     onSubmit({
       info: {
         ...formData,
-        tags: formData.tags.split(",").map((tag) => tag.trim()),
       },
+    });
+  };
+
+  const addTag = () => {
+    if (currentTag.trim() && !formData.tags.includes(currentTag.trim())) {
+      setFormData({
+        ...formData,
+        tags: [...formData.tags, currentTag.trim()],
+      });
+      setCurrentTag("");
+    }
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    setFormData({
+      ...formData,
+      tags: formData.tags.filter((tag) => tag !== tagToRemove),
     });
   };
 
@@ -126,16 +143,35 @@ export default function EditTestcaseModal({
               </select>
             </div>
             <div>
-              <label className="block mb-1">Tags</label>
-              <input
-                type="text"
-                className="input input-bordered w-full"
-                placeholder="Ghi chú Phân cách bằng dấu phẩy"
-                value={formData.tags}
-                onChange={(e) =>
-                  setFormData({ ...formData, tags: e.target.value })
-                }
-              />
+              <label className="label">Tags</label>
+              <div className="flex gap-2">
+                <input
+                  className="input input-bordered flex-1"
+                  type="text"
+                  placeholder="Thêm tag"
+                  value={currentTag}
+                  onChange={(e) => setCurrentTag(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      addTag();
+                    }
+                  }}
+                />
+                <button className="btn btn-outline" onClick={addTag}>
+                  Thêm
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {formData.tags.map((tag) => (
+                  <span key={tag} className="badge badge-primary">
+                    {tag}
+                    <button className="ml-2" onClick={() => removeTag(tag)}>
+                      ×
+                    </button>
+                  </span>
+                ))}
+              </div>
             </div>
             <div>
               <label className="label">Module</label>
