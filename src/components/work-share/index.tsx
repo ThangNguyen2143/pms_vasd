@@ -8,6 +8,8 @@ import { encodeBase64 } from "~/lib/services";
 import { useApi } from "~/hooks/use-api";
 import {
   Priority,
+  ProductDto,
+  ProjectLocation,
   RequirementDto,
   RequirementStatus,
   RequirementType,
@@ -17,11 +19,14 @@ import OverviewWork from "./orverview-work";
 import { format_date, toISOString } from "~/utils/fomat-date";
 import { endOfDay, startOfDay, subDays } from "date-fns";
 import DateTimePicker from "../ui/date-time-picker";
+import AddRequirementModal from "../requirment/modals/add-requirement-modal";
 
 function MainWork() {
   // const { user } = useUser();
   // const role = user?.role;
   const [projectSelected, setProjectSelect] = useState<number>(0);
+
+  const [showAddRequirment, setShowAddRequirment] = useState(false);
   const { data: statusList, getData: getStatusList } =
     useApi<RequirementStatus[]>();
   const { data: priorityList, getData: getPriority } = useApi<Priority[]>();
@@ -45,7 +50,9 @@ function MainWork() {
       encodeBase64({ type: "project", project_id: projectSelected, from, to });
     await getWorkList(endpointWork);
   };
-  // const isGuess = !role || role == "Guess";
+  const { data: productList, getData: getProducts } = useApi<ProductDto[]>();
+  const { data: locations, getData: getLocations } =
+    useApi<ProjectLocation[]>();
   useEffect(() => {
     // Lấy projectSelected từ localStorage khi component mount
     const saved = sessionStorage.getItem("projectSelected");
@@ -68,6 +75,13 @@ function MainWork() {
   useEffect(() => {
     if (projectSelected !== 0) {
       sessionStorage.setItem("projectSelected", projectSelected.toString());
+      const endpoint =
+        "/product/" +
+        encodeBase64({ type: "all", project_id: projectSelected });
+      const endpointLocation =
+        "/project/location/" + encodeBase64({ project_id: projectSelected });
+      getLocations(endpointLocation, "reload");
+      getProducts(endpoint, "reload");
     }
   }, [projectSelected]);
   useEffect(() => {
@@ -77,37 +91,38 @@ function MainWork() {
   }, [projectSelected, fromDate, toDate]);
   return (
     <div className="mt-4 flex flex-col gap-4">
-      <div className="container flex flex-1 gap-2.5">
-        <ListProject
-          projectSelected={projectSelected}
-          setProjectSelect={setProjectSelect}
-        />
-        <div className="flex">
-          <span className="label">Từ</span>
-          <DateTimePicker
-            value={fromDate}
-            onChange={setFromDate}
-            className="w-full"
+      <div className="container flex justify-between items-center gap-4">
+        <div className="flex gap-2 w-full">
+          <ListProject
+            projectSelected={projectSelected}
+            setProjectSelect={setProjectSelect}
           />
+          <div className="flex gap-2">
+            <span className="label">Từ</span>
+            <DateTimePicker
+              value={fromDate}
+              onChange={setFromDate}
+              className="w-full"
+            />
+          </div>
+          <div className="flex gap-2">
+            <span className="label">Đến</span>
+            <DateTimePicker
+              value={toDate}
+              onChange={settoDate}
+              className="w-full"
+            />
+          </div>
         </div>
-        <div className="flex">
-          <span className="label">Đến</span>
-          <DateTimePicker
-            value={toDate}
-            onChange={settoDate}
-            className="w-full"
-          />
+
+        <div className="flex gap-2">
+          <button
+            className="btn btn-info"
+            onClick={() => setShowAddRequirment(true)}
+          >
+            Thêm yêu cầu
+          </button>
         </div>
-        {/* {isGuess || !priorityList || !typeWorkList ? (
-          ""
-        ) : (
-          <AddWorkBtn
-            project_id={projectSelected.toString()}
-            priority={priorityList}
-            typeWork={typeWorkList}
-            onSuccess={fetchData}
-          />
-        )} */}
       </div>
       {loadingWork ? (
         <span className="loading loading-infinity loading-lg"></span>
@@ -158,6 +173,16 @@ function MainWork() {
         <div className="flex justify-center items-center h-screen">
           Chưa dự án nào được chọn
         </div>
+      )}
+      {showAddRequirment && (
+        <AddRequirementModal
+          product_list={productList || []}
+          locationList={locations || []}
+          onClose={() => setShowAddRequirment(false)}
+          onCreated={async () => {
+            await fetchData(fromDate, toDate);
+          }}
+        />
       )}
     </div>
   );

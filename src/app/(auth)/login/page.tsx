@@ -10,7 +10,7 @@ async function LoginPage(props: { searchParams: SearchParams }) {
     redirect(callbackurl ? callbackurl : "/");
   }
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen p-4 bg-base-100">
+    <main>
       <div
         className="hero min-h-screen"
         style={{

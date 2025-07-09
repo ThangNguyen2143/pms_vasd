@@ -12,7 +12,7 @@ import { ProductDto, RequirementType } from "~/lib/types";
 interface AddRequirementProps {
   product_list: ProductDto[];
   locationList: { id: number; name: string }[];
-  onAddNewLocation: () => void;
+  onAddNewLocation?: () => void;
   onClose: () => void;
   onCreated: () => Promise<void>;
 }
@@ -253,13 +253,15 @@ export default function AddRequirementModal({
                   </option>
                 ))}
               </select>
-              <button
-                type="button"
-                className="btn btn-outline join-item"
-                onClick={onAddNewLocation}
-              >
-                + Thêm
-              </button>
+              {onAddNewLocation && (
+                <button
+                  type="button"
+                  className="btn btn-outline join-item"
+                  onClick={onAddNewLocation}
+                >
+                  + Thêm
+                </button>
+              )}
             </div>
           </label>
 
