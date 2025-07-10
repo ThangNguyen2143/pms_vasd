@@ -100,6 +100,8 @@ export function useUploadFile<T = string>(method: "post" | "put" = "post") {
           maxBodyLength: Infinity,
         });
       }
+      console.log("data request:", payload.data);
+      console.log("data response", res.data);
       if (res.data.code !== 200) setUploadError(res.data.message);
       setResponse(res.data);
       return res.data;
