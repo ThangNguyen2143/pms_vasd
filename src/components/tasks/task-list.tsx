@@ -47,9 +47,17 @@ function TaskList({
     { code: "create_at", display: "Ngày tạo" },
     { code: "dead_line", display: "Deadline" },
     { code: "status", display: "Trạng thái" },
-    { code: "", display: "Thao tác" },
     { code: "check_update", display: "" },
   ];
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectTask(
+        currentTasks.filter((task) => !task.is_update).map((task) => task.id)
+      );
+    } else {
+      setSelectTask([]);
+    }
+  };
   return (
     <div className="overflow-x-auto shadow-md sm:rounded-lg">
       <table className="min-w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -61,7 +69,16 @@ function TaskList({
                   field.display
                 ) : (
                   <label>
-                    <input type="checkbox" className="checkbox" />
+                    <input
+                      type="checkbox"
+                      className="checkbox"
+                      onChange={handleSelectAll}
+                      checked={
+                        selectTask.length ===
+                          currentTasks.filter((task) => !task.is_update)
+                            .length && currentTasks.length > 0
+                      }
+                    />
                   </label>
                 )}
               </th>
@@ -75,10 +92,14 @@ function TaskList({
                 task={task}
                 statusList={statusList || []}
                 modules={modules}
-                select={() => setSelectTask((pre) => [...pre, task.id])}
-                unSelect={() =>
-                  setSelectTask((pre) => pre.filter((t) => t != task.id))
-                }
+                isSelected={selectTask.includes(task.id)}
+                setSelect={(id: number, isSelected: boolean) => {
+                  if (isSelected) {
+                    setSelectTask((pre) => [...pre, id]);
+                  } else {
+                    setSelectTask((pre) => pre.filter((t) => t != id));
+                  }
+                }}
                 key={task.id}
                 product_id={product_id}
               />
@@ -96,12 +117,14 @@ function TaskList({
         <tfoot>
           <tr>
             <td colSpan={9} className="text-end">
-              <button
-                className="btn btn-accent"
-                onClick={() => onUpdateInProduct(selectTask)}
-              >
-                Cập nhật trong hệ thống
-              </button>
+              {selectTask.length > 0 && (
+                <button
+                  className="btn btn-accent"
+                  onClick={() => onUpdateInProduct(selectTask)}
+                >
+                  Cập nhật trong hệ thống
+                </button>
+              )}
             </td>
           </tr>
         </tfoot>

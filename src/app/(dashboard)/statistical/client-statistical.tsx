@@ -24,7 +24,7 @@ function ClientStatisticalPage() {
   const searchParams = useSearchParams();
   const [statistTable, setStatistTable] = useState<Config>();
   const { data: configGeneral, getData } = useApi<Config[]>();
-  const { getData: getDataTabel } = useApi<any[]>();
+  const { getData: getDataTabel, errorData } = useApi<any[]>();
   const initialFilterParas: Record<string, any> = (() => {
     const q = searchParams.get("q");
     if (!q) return {};
@@ -36,7 +36,11 @@ function ClientStatisticalPage() {
       return {};
     }
   })();
-
+  useEffect(() => {
+    if (errorData) {
+      console.log(errorData);
+    }
+  }, [errorData]);
   const [filterParas, setFilterParas] =
     useState<Record<string, any>>(initialFilterParas);
   useEffect(() => {
@@ -119,16 +123,30 @@ function ClientStatisticalPage() {
           case "boolean":
             queryObj[field] = Boolean(rawValue);
             break;
-          case "datetime":
+          case "datetime": {
+            if (!rawValue) {
+              queryObj[field] = null;
+              break;
+            }
             queryObj[field] = toISOString(rawValue);
             break;
+          }
           case "string":
           default:
             queryObj[field] = String(rawValue);
             break;
         }
       });
+      //Kiểm tra queryObj có đầy đủ các trường trong paras hay không?
+      //Nếu không có trả về null
+      const isMissingField = paras.some((para) => {
+        const val = queryObj[para.field];
+        return val === null || val === undefined || val === "";
+      });
 
+      if (isMissingField) {
+        return null;
+      }
       const encoded = encodeBase64(queryObj);
       const endpoint = `/statistic/${encoded}`;
       return await getDataTabel(endpoint, "reload");

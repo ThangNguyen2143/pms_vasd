@@ -38,7 +38,6 @@ function InforTaskRef({
                 task={data}
                 onAssign={() => {}}
                 onEdit={() => {}}
-                onLinkRequirement={() => {}}
                 onUpdate={async () => {}}
                 hidden_button
               />

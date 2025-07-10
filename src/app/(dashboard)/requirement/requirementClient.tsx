@@ -22,6 +22,7 @@ import DateTimePicker from "~/components/ui/date-time-picker";
 import RequirementList from "~/components/requirment/requirment-list";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 
 const productCache: Record<number, ProductDto[]> = {};
 const locationCache: Record<number, ProjectLocation[]> = {}; //Để cache dữ liệu khoa phòng trong trường hợp có biểu đồ dùng khoa phòng
@@ -41,8 +42,11 @@ function RequirementsClient() {
   const [toDate, settoDate] = useState<string>(
     format_date(endOfDay(new Date()))
   );
-  const { data: requiredList, getData: getRequiredList } =
-    useApi<RequirementDto[]>();
+  const {
+    data: requiredList,
+    getData: getRequiredList,
+    errorData: errorRequired,
+  } = useApi<RequirementDto[]>();
   const {
     data: searchResult,
     getData: getDataSearch,
@@ -61,7 +65,6 @@ function RequirementsClient() {
   } = useApi<ProductDto[]>();
   const {
     data: locations,
-    errorData: erroLocation,
     getData: getLocations,
     setData: setLocations,
   } = useApi<ProjectLocation[]>();
@@ -71,6 +74,13 @@ function RequirementsClient() {
     const saved = sessionStorage.getItem("projectSelected");
     if (saved) setprojectSelect(parseInt(saved));
   }, []);
+  useEffect(() => {
+    if (errorRequired && errorRequired.code != 404) {
+      // Xử lý lỗi nếu có
+      toast.error("Lỗi khi tải danh sách yêu cầu: " + errorRequired.message);
+      console.error("Error loading requirements:", errorRequired);
+    }
+  }, [errorRequired]);
   useEffect(() => {
     if (projectSelect != 0) {
       setloading(true);
@@ -93,9 +103,10 @@ function RequirementsClient() {
           }
         });
       }
-      if (locations) {
+      const locationCached = locationCache[projectSelect];
+      if (locationCached) {
         // 🔁 Nếu có cache → dùng luôn
-        setLocations(locations);
+        setLocations(locationCached);
       } else {
         // 📡 Gọi API nếu chưa cache
         const endpoint =
@@ -104,9 +115,10 @@ function RequirementsClient() {
           if (result) {
             locationCache[projectSelect] = result;
             setLocations(result);
+          } else {
+            locationCache[projectSelect] = [];
           }
         });
-        if (erroLocation?.code == 404) locationCache[projectSelect] = [];
       }
       sessionStorage.setItem("projectSelected", projectSelect.toString());
     }
@@ -136,18 +148,14 @@ function RequirementsClient() {
               to,
             });
         }
-        setloading(true);
+        setloading(() => true);
         setTimeout(() => {
           getRequiredList(endpoint, "reload");
-          setloading(false);
+          setloading(() => false);
         }, 3000);
       } catch (error) {
         console.error("Error converting dates:", error);
-        // Xử lý lỗi nếu không thể chuyển đổi ngày
       }
-      // const from = toISOString(fromDate);
-      // const to = toISOString(toDate);
-      // Nếu có chọn sản phẩm thì gọi API
     }
   }, [projectSelect, productSelect, fromDate, toDate]);
   useEffect(() => {
@@ -178,8 +186,8 @@ function RequirementsClient() {
     if (fromParam) setFromDate(fromParam);
   }, [searchParams]);
   const onLoadRequire = async () => {
-    const from = fromDate;
-    const to = toDate;
+    const from = toISOString(fromDate);
+    const to = toISOString(toDate);
     let endpoint =
       "/requirements/" +
       encodeBase64({ type: "project", project_id: projectSelect, from, to });
@@ -193,7 +201,16 @@ function RequirementsClient() {
           to,
         });
     }
-    getRequiredList(endpoint, "reload");
+    setloading(() => true);
+
+    const re = await getRequiredList(endpoint, "reload");
+    if (re) {
+      setloading(() => false);
+      // toast.success("Cập nhật danh sách yêu cầu thành công");
+    } else {
+      // toast.error("Cập nhật danh sách yêu cầu thất bại");
+    }
+    setloading(() => false);
   };
   const reloadLocation = async () => {
     await getLocations(
@@ -281,7 +298,7 @@ function RequirementsClient() {
                       ))}
                     </select>
                   )}
-                  <div className="flex">
+                  <div className="flex gap-2">
                     <span className="label">Từ</span>
                     <DateTimePicker
                       value={fromDate}
@@ -289,7 +306,7 @@ function RequirementsClient() {
                       className="w-full"
                     />
                   </div>
-                  <div className="flex">
+                  <div className="flex gap-2">
                     <span className="label">Đến</span>
                     <DateTimePicker
                       value={toDate}
@@ -365,12 +382,18 @@ function RequirementsClient() {
             )}
             {projectSelect != 0 ? (
               <div className="flex flex-col">
-                <RequirementList
-                  loading={loading}
-                  project_id={projectSelect}
-                  requiredList={requiredList}
-                  userList={userList}
-                />
+                {loading ? (
+                  <div className="flex justify-center mt-4">
+                    <span className="loading loading-dots loading-lg"></span>
+                  </div>
+                ) : (
+                  <RequirementList
+                    project_id={projectSelect}
+                    onUpdate={onLoadRequire}
+                    requiredList={requiredList}
+                    userList={userList}
+                  />
+                )}
               </div>
             ) : (
               <div className="alert alert-info mt-4">Chưa chọn dự án nào</div>
@@ -384,7 +407,7 @@ function RequirementsClient() {
           locationList={locations || []}
           onAddNewLocation={() => setShowAddLocation(true)}
           onClose={() => setShowAddRequirment(false)}
-          onCreated={() => onLoadRequire()}
+          onCreated={onLoadRequire}
         />
       )}
       {showAddLocation && (

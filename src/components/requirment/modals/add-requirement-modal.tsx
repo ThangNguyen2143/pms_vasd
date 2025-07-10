@@ -64,7 +64,14 @@ export default function AddRequirementModal({
   }, []);
   useEffect(() => {
     // if (errorData) toast.error(errorData.message);
-    if (uploadError) toast.error(uploadError);
+    if (uploadError) {
+      // Nếu có lỗi upload, hiển thị thông báo lỗi
+      console.error("Upload error:", uploadError);
+      // Hiển thị thông báo lỗi
+      toast.error(uploadError);
+      // Hoặc nếu uploadError là một chuỗi, bạn có thể hiển thị trực tiếp
+      // toast.error(uploadError);
+    }
   }, [uploadError]);
   if (!typeList) {
     if (errorListType) toast.error(errorListType.message);
@@ -126,8 +133,7 @@ export default function AddRequirementModal({
       },
     });
 
-    if (re?.value != "") return;
-    else {
+    if (re && re.code == 200) {
       toast.success("Tạo yêu cầu thành công");
       await onCreated();
       onClose();

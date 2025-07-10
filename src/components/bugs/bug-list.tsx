@@ -39,10 +39,17 @@ function BugList({ product_id, bugList, onUpdateInProduct }: BugListProps) {
     { code: "date_create", display: "Ngày tạo" },
     { code: "dead_line", display: "Deadline" },
     { code: "status", display: "Trạng thái" },
-    { code: "", display: "Thao tác" },
     { code: "update", display: "" },
   ];
-
+  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      setSelectBug(
+        currentBugs.filter((bug) => !bug.is_update).map((bug) => bug.bug_id)
+      );
+    } else {
+      setSelectBug([]);
+    }
+  };
   return (
     <div className="overflow-x-auto shadow-md sm:rounded-lg">
       <table className="min-w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -54,7 +61,16 @@ function BugList({ product_id, bugList, onUpdateInProduct }: BugListProps) {
                   field.display
                 ) : (
                   <label>
-                    <input type="checkbox" className="checkbox" />
+                    <input
+                      type="checkbox"
+                      className="checkbox"
+                      onChange={handleSelectAll}
+                      checked={
+                        selectBug.length ===
+                          currentBugs.filter((bug) => !bug.is_update).length &&
+                        currentBugs.length > 0
+                      }
+                    />
                   </label>
                 )}
               </th>
@@ -66,10 +82,14 @@ function BugList({ product_id, bugList, onUpdateInProduct }: BugListProps) {
             currentBugs.map((bug) => (
               <BugRow
                 key={"bug" + bug.bug_id}
-                select={() => setSelectBug((pre) => [...pre, bug.bug_id])}
-                unSelect={() =>
-                  setSelectBug((pre) => pre.filter((t) => t != bug.bug_id))
-                }
+                isSelected={selectBug.includes(bug.bug_id)}
+                setSelect={(id: number, isSelected: boolean) => {
+                  if (isSelected) {
+                    setSelectBug((pre) => [...pre, id]);
+                  } else {
+                    setSelectBug((pre) => pre.filter((t) => t != id));
+                  }
+                }}
                 bug={bug}
                 product_id={product_id}
               />
@@ -87,12 +107,14 @@ function BugList({ product_id, bugList, onUpdateInProduct }: BugListProps) {
         <tfoot>
           <tr>
             <td colSpan={9} className="text-end">
-              <button
-                className="btn btn-accent"
-                onClick={() => onUpdateInProduct(selectBug)}
-              >
-                Cập nhật trong hệ thống
-              </button>
+              {selectBug.length > 0 && (
+                <button
+                  className="btn btn-accent"
+                  onClick={() => onUpdateInProduct(selectBug)}
+                >
+                  Cập nhật trong hệ thống
+                </button>
+              )}
             </td>
           </tr>
         </tfoot>

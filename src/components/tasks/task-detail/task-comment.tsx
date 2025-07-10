@@ -131,7 +131,7 @@ function TaskComments({
           💬 Bình luận
         </h4>
         <div className="border border-amber-100 shadow max-h-[400px] overflow-y-auto p-2 rounded-lg">
-          {comments ? (
+          {comments && comments.length > 0 ? (
             comments.map((comment) => {
               return (
                 <div className="chat chat-start" key={comment.id}>
@@ -148,9 +148,7 @@ function TaskComments({
               );
             })
           ) : (
-            <div className="text-base-200 text-center">
-              Chưa có bình luận nào
-            </div>
+            <div className="text-center">Chưa có bình luận nào</div>
           )}
         </div>
         <div className="flex items-start gap-2">

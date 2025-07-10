@@ -8,7 +8,7 @@ import CreateTestcaseForm from "~/components/testcase/modals/create-testcase-for
 import TestList from "~/components/testcase/test-list";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
-import { TestcaseDto, UserDto, WorkStatus } from "~/lib/types";
+import { ProductModule, TestcaseDto, UserDto, WorkStatus } from "~/lib/types";
 
 function ClientTestCasesPage() {
   const route = useRouter();
@@ -23,6 +23,8 @@ function ClientTestCasesPage() {
     "/testcase/" + encodeBase64({ product_id });
   const endpointUser = "/user/" + encodeBase64({ type: "all" });
   const endpointStatus = "/system/config/eyJ0eXBlIjoidGVzdF9zdGF0dXMifQ==";
+  const endpointModule =
+    "/product/" + encodeBase64({ type: "module", product_id: selectProduct });
   const {
     data: tests,
     getData: getTestList,
@@ -31,13 +33,17 @@ function ClientTestCasesPage() {
   } = useApi<TestcaseDto[]>();
   const { data: userList, getData: getUser } = useApi<UserDto[]>();
   const { data: statusList, getData: getStatus } = useApi<WorkStatus[]>();
+  const { data: moduleList, getData: getModule } = useApi<ProductModule[]>();
   useEffect(() => {
     getStatus(endpointStatus);
     getUser(endpointUser);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {
-    if (selectProduct != "") getTestList(endpoint(selectProduct), "reload");
+    if (selectProduct != "") {
+      getModule(endpointModule);
+      getTestList(endpoint(selectProduct), "reload");
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectProduct]);
 
@@ -122,6 +128,7 @@ function ClientTestCasesPage() {
       ) : (
         <TestList
           product_id={selectProduct}
+          moduleList={moduleList || []}
           statusList={statusList || []}
           testList={testList}
           userList={userList || []}

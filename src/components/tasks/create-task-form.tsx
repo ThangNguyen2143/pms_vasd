@@ -67,6 +67,22 @@ function CreateTaskForm({
     if (uploadError) toast.error(uploadError);
   }, [uploadError]);
   const handleSubmit = async () => {
+    if (title.trim() === "") {
+      toast.error("Vui lòng nhập tiêu đề công việc");
+      return;
+    }
+    if (description.trim() === "") {
+      toast.error("Vui lòng nhập mô tả công việc");
+      return;
+    }
+    if (deadline.trim() === "") {
+      toast.error("Vui lòng chọn deadline");
+      return;
+    }
+    if (criteriaList.some((crit) => crit.title.trim() === "")) {
+      toast.error("Vui lòng nhập tiêu chí chấp thuận");
+      return;
+    }
     const data: DataPost = {
       product_id,
       title,
@@ -90,7 +106,7 @@ function CreateTaskForm({
         ...data,
       },
     });
-    if (result?.value == "") {
+    if (result && result.code == 200) {
       toast.success("Tạo công việc thành công");
       onSuccess(); // gọi lại TaskList để reload
       setTitle("");

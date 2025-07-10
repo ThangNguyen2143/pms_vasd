@@ -20,15 +20,24 @@ import { format_date, toISOString } from "~/utils/fomat-date";
 import { endOfDay, startOfDay, subDays } from "date-fns";
 import DateTimePicker from "../ui/date-time-picker";
 import AddRequirementModal from "../requirment/modals/add-requirement-modal";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Search } from "lucide-react";
+import Link from "next/link";
 
 function MainWork() {
-  // const { user } = useUser();
-  // const role = user?.role;
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [tabContent, setTabContent] = useState<string>("List");
   const [projectSelected, setProjectSelect] = useState<number>(0);
-
+  const [searchString, setSearchString] = useState<string>("");
   const [showAddRequirment, setShowAddRequirment] = useState(false);
   const { data: statusList, getData: getStatusList } =
     useApi<RequirementStatus[]>();
+  const {
+    data: searchResult,
+    getData: getDataSearch,
+    isLoading: loadSearch,
+  } = useApi<RequirementDto[]>();
   const { data: priorityList, getData: getPriority } = useApi<Priority[]>();
   const { data: typeWorkList, getData: getTypeWork } =
     useApi<RequirementType[]>();
@@ -89,6 +98,40 @@ function MainWork() {
       fetchData(toISOString(fromDate), toISOString(toDate));
     }
   }, [projectSelected, fromDate, toDate]);
+  useEffect(() => {
+    const toParam = searchParams.get("to");
+    const fromParam = searchParams.get("from");
+    if (toParam) settoDate(toParam);
+    if (fromParam) setFromDate(fromParam);
+  }, [searchParams]);
+  useEffect(() => {
+    if (searchString.trim() != "") {
+      const finalString = searchString
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/đ/g, "d")
+        .replace(/Đ/g, "D")
+        .toLowerCase()
+        .replace(/\s+/g, " ")
+        .trim();
+      setTimeout(() => {
+        getDataSearch(
+          "/requirements/search/" +
+            encodeBase64({
+              project_id: projectSelected,
+              search_string: finalString,
+            })
+        );
+      }, 3000);
+    }
+  }, [searchString]);
+  const handleDateChange = (dateInput: string, type: "from" | "to") => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set(type, dateInput);
+    router.replace(`?${params.toString()}`);
+    if (type == "from") setFromDate(dateInput);
+    else settoDate(dateInput);
+  };
   return (
     <div className="mt-4 flex flex-col gap-4">
       <div className="container flex justify-between items-center gap-4">
@@ -101,7 +144,7 @@ function MainWork() {
             <span className="label">Từ</span>
             <DateTimePicker
               value={fromDate}
-              onChange={setFromDate}
+              onChange={(e) => handleDateChange(e, "from")}
               className="w-full"
             />
           </div>
@@ -109,13 +152,65 @@ function MainWork() {
             <span className="label">Đến</span>
             <DateTimePicker
               value={toDate}
-              onChange={settoDate}
+              onChange={(e) => handleDateChange(e, "to")}
               className="w-full"
             />
           </div>
         </div>
 
         <div className="flex gap-2">
+          <div className="dropdown">
+            <div tabIndex={0} role="button">
+              <label className="input">
+                <input
+                  type="text"
+                  placeholder="Tìm kiếm..."
+                  value={searchString}
+                  onChange={(e) => setSearchString(e.target.value)}
+                />
+                <button className="label">
+                  <Search />
+                </button>
+              </label>
+            </div>
+            {searchString.length > 0 ? (
+              <ul
+                tabIndex={0}
+                className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+              >
+                {loadSearch && (
+                  <li>
+                    Đang tải <span className="loading loading-spinner"></span>
+                  </li>
+                )}
+                {searchResult ? (
+                  searchResult.map((res) => (
+                    <li key={res.id + "searchRes"}>
+                      <Link
+                        href={
+                          `/work_share/` +
+                          encodeBase64({
+                            requirement_id: res.id,
+                            project_id: projectSelected,
+                          })
+                        }
+                        className="max-w-48 truncate"
+                      >
+                        {res.title}
+                      </Link>
+                    </li>
+                  ))
+                ) : (
+                  <li>
+                    Không có kết quả tìm kiếm cho &quot;{searchString}
+                    &quot;
+                  </li>
+                )}
+              </ul>
+            ) : (
+              ""
+            )}
+          </div>
           <button
             className="btn btn-info"
             onClick={() => setShowAddRequirment(true)}
@@ -137,8 +232,9 @@ function MainWork() {
               type="radio"
               name="tab_swap"
               className="tab"
-              defaultChecked
               id="overview"
+              onChange={() => setTabContent("Overview")}
+              checked={tabContent === "Overview"}
               aria-label="Tổng quan"
             />
             <div className="tab-content">
@@ -156,6 +252,8 @@ function MainWork() {
               id="detail"
               aria-label="Danh sách"
               className="tab"
+              checked={tabContent === "List"}
+              onChange={() => setTabContent("List")}
             />
             <div className="tab-content">
               <TableWork
@@ -163,6 +261,7 @@ function MainWork() {
                 priorityList={priorityList || undefined}
                 statusList={statusList || undefined}
                 typeList={typeWorkList || undefined}
+                project_id={projectSelected}
                 // isGuess={isGuess}
                 // onUpdate={() => fetchData()}
               />

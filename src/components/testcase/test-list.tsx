@@ -1,5 +1,5 @@
 "use client";
-import { UserDto, WorkStatus } from "~/lib/types";
+import { ProductModule, UserDto, WorkStatus } from "~/lib/types";
 import { TestcaseDto } from "~/lib/types/testcase";
 import TestRow from "./test-row";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -9,6 +9,7 @@ interface TestListProps {
   product_id: string;
   testList?: TestcaseDto[];
   userList?: UserDto[];
+  moduleList?: ProductModule[];
   statusList?: WorkStatus[];
   externalTestCreated?: TestcaseDto;
 }
@@ -16,6 +17,7 @@ function TestList({
   product_id,
   testList,
   userList,
+  moduleList,
   statusList,
   externalTestCreated,
 }: TestListProps) {
@@ -51,12 +53,12 @@ function TestList({
   const fieldTable = [
     { code: "id", display: "ID" },
     { code: "name", display: "Tiêu đề" },
+    { code: "module", display: "Module" },
     { code: "created_by", display: "Người tạo" },
     { code: "create_at", display: "Ngày tạo" },
     { code: "time_start", display: "Ngày bắt đầu" },
     { code: "time_end", display: "Ngày kết thúc" },
     { code: "status", display: "Trạng thái" },
-    { code: "", display: "Thao tác" },
   ];
 
   return (
@@ -78,6 +80,7 @@ function TestList({
               .map((testcase) => (
                 <TestRow
                   testcase={testcase}
+                  moduleList={moduleList || []}
                   users={userList || []}
                   statusList={statusList || []}
                   key={testcase.id}

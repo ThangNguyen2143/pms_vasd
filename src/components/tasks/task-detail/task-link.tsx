@@ -1,11 +1,17 @@
 "use client";
-import { BadgeInfo } from "lucide-react";
+import { BadgeInfo, Link2 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import InforBugRefModal from "../modals/infor-bug-ref-modal";
 
-export default function TaskLinks({ task_id }: { task_id: number }) {
+export default function TaskLinks({
+  task_id,
+  onLinkRequirement,
+}: {
+  task_id: number;
+  onLinkRequirement: () => void;
+}) {
   const [showBugModal, setshowBugModal] = useState<number>();
   const { data: bugList, getData } = useApi<
     {
@@ -22,9 +28,19 @@ export default function TaskLinks({ task_id }: { task_id: number }) {
   }, [task_id]);
   return (
     <div className="bg-base-200 p-4 rounded-lg">
-      <h3 className="text-lg font-semibold text-primary mb-2">
-        🔗 Bug of Task
-      </h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-primary mb-2">
+          🔗 Bug of Task
+        </h3>
+        <div
+          className="btn btn-circle tooltip"
+          data-tip="Đính kèm yêu cầu liên quan"
+        >
+          <button onClick={onLinkRequirement}>
+            <Link2 />
+          </button>
+        </div>
+      </div>
       <div className="space-y-1 max-h-60 overflow-y-auto">
         {bugList ? (
           bugList.map((bug) => (

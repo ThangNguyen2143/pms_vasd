@@ -1,8 +1,8 @@
 "use client";
 import clsx from "clsx";
-import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ReactNode, useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { RequirementDto, RequirementStatus, UserDto } from "~/lib/types";
@@ -21,7 +21,7 @@ function ContructionTable({ children }: { children: ReactNode }) {
           <th>Ngày tạo</th>
           <th>Tác giả</th>
           <th>Ngày hoàn thành</th>
-          <th>Chi tiết</th>
+          <th>Thao tác</th>
         </tr>
       </thead>
       <tbody>{children}</tbody>
@@ -32,12 +32,12 @@ function RequirementList({
   requiredList,
   userList,
   project_id,
-  loading,
+  onUpdate,
 }: {
   requiredList: RequirementDto[] | null;
   userList: UserDto[] | null;
   project_id: number;
-  loading: boolean;
+  onUpdate: () => Promise<void>;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -47,7 +47,8 @@ function RequirementList({
 
   const { data: statusList, getData: getStatus } =
     useApi<RequirementStatus[]>();
-
+  const { removeData: removeRequirement, errorData: errorRemove } =
+    useApi<string>();
   useEffect(() => {
     getStatus("/system/config/" + encodeBase64({ type: "requirement_status" }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -86,7 +87,14 @@ function RequirementList({
   useEffect(() => {
     setCurrentPage(1);
   }, [filterStatus]);
-
+  // 📌 Hiển thị thông báo lỗi khi xóa yêu cầu thất bại
+  useEffect(() => {
+    if (errorRemove) {
+      toast.error(
+        errorRemove.message || errorRemove.title || "Xóa yêu cầu thất bại"
+      );
+    }
+  }, [errorRemove]);
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", page.toString());
@@ -103,6 +111,26 @@ function RequirementList({
       router.replace(`?${params.toString()}`);
     }
     setFilterStatus(status);
+  };
+  const handleClickRow = (required: RequirementDto) => {
+    router.push(
+      `/requirement/` +
+        encodeBase64({
+          requirement_id: required.id,
+          project_id,
+        })
+    );
+  };
+  const handleDeleteRequirement = async (id: number) => {
+    if (!confirm("Bạn có chắc chắn muốn xóa yêu cầu này?")) return;
+    const res = await removeRequirement(
+      `/requirements/${encodeBase64({ requirement_id: id })}`
+    );
+    if (res != null) {
+      toast.success("Xóa yêu cầu thành công");
+      // Cập nhật lại danh sách yêu cầu
+      await onUpdate();
+    }
   };
   return (
     <div className="flex flex-col">
@@ -127,7 +155,11 @@ function RequirementList({
           {paginatedRequireds.length > 0 ? (
             paginatedRequireds.map((required) => {
               return (
-                <tr key={required.id}>
+                <tr
+                  key={required.id}
+                  className="hover:bg-base-200"
+                  onClick={() => handleClickRow(required)}
+                >
                   <td>{required.id}</td>
                   <td className="flex">
                     <div className="grow">{required.title}</div>
@@ -153,29 +185,19 @@ function RequirementList({
                     {required.date_end ? format_date(required.date_end) : "-"}
                   </td>
                   <td>
-                    <Link
-                      href={
-                        `/requirement/` +
-                        encodeBase64({
-                          requirement_id: required.id,
-                          project_id,
-                        })
-                      }
+                    <button
+                      className="btn btn-outline btn-error"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDeleteRequirement(required.id);
+                      }}
                     >
-                      <button className="btn btn-outline btn-primary">
-                        Chi tiết
-                      </button>
-                    </Link>
+                      Xóa
+                    </button>
                   </td>
                 </tr>
               );
             })
-          ) : loading ? (
-            <tr>
-              <td colSpan={8} className="text-center">
-                <span className="loading loading-dots loading-xl"></span>
-              </td>
-            </tr>
           ) : (
             <tr>
               <td colSpan={8} className="text-center">

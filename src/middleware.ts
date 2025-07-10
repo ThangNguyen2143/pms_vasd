@@ -44,7 +44,12 @@ export default async function middleware(req: NextRequest) {
 
   //   return NextResponse.redirect(loginUrl);
   // }
-  if (role === "Guess" && !guessRoutes.includes(path)) {
+  if (
+    (role === "Guess" || role === "Customer") &&
+    !guessRoutes.some(
+      (allowed) => path === allowed || path.startsWith(allowed + "/")
+    )
+  ) {
     return NextResponse.redirect(new URL(defaultGuessRoute, req.nextUrl));
   }
   // 5. Redirect to /dashboard if the user is authenticated

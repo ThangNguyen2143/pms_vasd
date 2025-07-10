@@ -2,7 +2,6 @@
 import {
   BookmarkX,
   CirclePlay,
-  Link2,
   OctagonX,
   Pencil,
   RotateCcw,
@@ -20,14 +19,12 @@ import { encodeBase64 } from "~/lib/services";
 export default function TaskInfo({
   task,
   onEdit,
-  onLinkRequirement,
   onAssign,
   onUpdate,
   hidden_button,
 }: {
   task: Task;
   onEdit: () => void;
-  onLinkRequirement: () => void;
   onAssign: () => void;
   onUpdate: () => Promise<void>;
   hidden_button?: boolean;
@@ -74,14 +71,7 @@ export default function TaskInfo({
                 <Pencil />
               </button>
             </div>
-            <div
-              className="btn btn-circle tooltip"
-              data-tip="Đính kèm yêu cầu liên quan"
-            >
-              <button onClick={onLinkRequirement}>
-                <Link2 />
-              </button>
-            </div>
+
             <div className="btn btn-circle tooltip" data-tip="Giao việc">
               <button onClick={onAssign}>
                 <UserPlus />

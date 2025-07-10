@@ -83,135 +83,142 @@ function ProductModuleModal({
     }
   };
   return (
-    <div className="bg-base-200 text-base-content h-full max-w-1/2 w-md">
-      <div className="p-5">
+    <div className="bg-base-200 text-base-content h-full max-w-1/2 w-lg overflow-hidden">
+      <div className="p-5 max-h-11/12 overflow-y-auto">
         <h3>Chi tiết module phần mềm</h3>
-        <ul className="list bg-base-100 rounded-box shadow-md pl-2">
-          {data ? (
-            data.map((m) => {
-              if (updateModule != m.code)
-                return (
-                  <li key={m.id} className="list-row">
-                    <div className="text-center items-center flex">
-                      {m.code}
-                    </div>
-                    <div className="text-center items-center flex">
-                      {m.display}
-                    </div>
-                    <button
-                      className="btn btn-info btn-outline"
-                      onClick={() => {
-                        setUpdateModule(m.code);
-                        setFormUpdate({
-                          code: m.code,
-                          display: m.display,
-                          module_id: m.id,
-                        });
-                      }}
-                    >
-                      Sửa
-                    </button>
-                    <button
-                      className="btn btn-primary btn-sm"
-                      onClick={() => onOpenFunc(m.id)}
-                    >
-                      Chức năng
-                    </button>
-                  </li>
-                );
-              else
-                return (
-                  <li key={m.id} className="list-row">
-                    <div className="text-center items-center flex">
-                      <label className="floating-label">
-                        <span className="label">Mã modlue</span>
-                        <input
-                          type="text"
-                          value={formUpdate.code}
-                          onChange={(e) =>
-                            setFormUpdate((pre) => ({
-                              ...pre,
-                              code: e.target.value,
-                            }))
-                          }
-                        />
-                      </label>
-                    </div>
-                    <div className="text-center items-center flex">
-                      <label className="floating-label">
-                        <span className="label">Tên hiển thị</span>
-                        <input
-                          type="text"
-                          value={formUpdate.display}
-                          onChange={(e) =>
-                            setFormUpdate((pre) => ({
-                              ...pre,
-                              display: e.target.value,
-                            }))
-                          }
-                        />
-                      </label>
-                    </div>
-                    <button
-                      className="btn btn-info btn-outline"
-                      onClick={handleUpdate}
-                    >
-                      Ok
-                    </button>
-                    <button
-                      className="btn btn-ghost"
-                      onClick={() => {
-                        setUpdateModule(undefined);
-                        setFormUpdate({ code: "", display: "", module_id: "" });
-                      }}
-                    >
-                      Hủy
-                    </button>
-                  </li>
-                );
-            })
-          ) : (
-            <li>Chưa có module nào</li>
-          )}
-        </ul>
+        <div className="max-h-10/12 overflow-y-auto">
+          <ul className="list bg-base-100 rounded-box shadow-md pl-2">
+            {data ? (
+              data.map((m) => {
+                if (updateModule != m.code)
+                  return (
+                    <li key={m.id} className="list-row">
+                      <div className="text-center items-center flex">
+                        {m.code}
+                      </div>
+                      <div className="text-center items-center flex">
+                        {m.display}
+                      </div>
+                      <button
+                        className="btn btn-info btn-outline"
+                        onClick={() => {
+                          setUpdateModule(m.code);
+                          setFormUpdate({
+                            code: m.code,
+                            display: m.display,
+                            module_id: m.id,
+                          });
+                        }}
+                      >
+                        Sửa
+                      </button>
+                      <button
+                        className="btn btn-primary btn-sm"
+                        onClick={() => onOpenFunc(m.id)}
+                      >
+                        Chức năng
+                      </button>
+                    </li>
+                  );
+                else
+                  return (
+                    <li key={m.id} className="list-row">
+                      <div className="text-center items-center flex">
+                        <label className="floating-label">
+                          <span className="label">Mã modlue</span>
+                          <input
+                            type="text"
+                            value={formUpdate.code}
+                            onChange={(e) =>
+                              setFormUpdate((pre) => ({
+                                ...pre,
+                                code: e.target.value,
+                              }))
+                            }
+                          />
+                        </label>
+                      </div>
+                      <div className="text-center items-center flex">
+                        <label className="floating-label">
+                          <span className="label">Tên hiển thị</span>
+                          <input
+                            type="text"
+                            value={formUpdate.display}
+                            onChange={(e) =>
+                              setFormUpdate((pre) => ({
+                                ...pre,
+                                display: e.target.value,
+                              }))
+                            }
+                          />
+                        </label>
+                      </div>
+                      <button
+                        className="btn btn-info btn-outline"
+                        onClick={handleUpdate}
+                      >
+                        Ok
+                      </button>
+                      <button
+                        className="btn btn-ghost"
+                        onClick={() => {
+                          setUpdateModule(undefined);
+                          setFormUpdate({
+                            code: "",
+                            display: "",
+                            module_id: "",
+                          });
+                        }}
+                      >
+                        Hủy
+                      </button>
+                    </li>
+                  );
+              })
+            ) : (
+              <li>Chưa có module nào</li>
+            )}
+          </ul>
+        </div>
+
+        {addModule && (
+          <div className="mt-4 flex flex-col gap-2">
+            <h5 className="text-lg">Thêm module</h5>
+            <label className="input">
+              <span className="label">Mã module</span>
+              <input
+                type="text"
+                value={formAdd.code}
+                onChange={(e) =>
+                  setFormAdd((pre) => ({ ...pre, code: e.target.value }))
+                }
+              />
+            </label>
+            <label className="input">
+              <span className="label">Tên module</span>
+              <input
+                type="text"
+                value={formAdd.display}
+                onChange={(e) =>
+                  setFormAdd((pre) => ({ ...pre, display: e.target.value }))
+                }
+              />
+            </label>
+            <div>
+              <button className="btn btn-primary" onClick={handleAddModule}>
+                Thêm
+              </button>
+              <button
+                className="btn btn-accent"
+                onClick={() => setAddModule(false)}
+              >
+                Hủy
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
-      {addModule && (
-        <div className="mt-4 flex flex-col gap-2">
-          <h5 className="text-lg">Thêm module</h5>
-          <label className="input">
-            <span className="label">Mã module</span>
-            <input
-              type="text"
-              value={formAdd.code}
-              onChange={(e) =>
-                setFormAdd((pre) => ({ ...pre, code: e.target.value }))
-              }
-            />
-          </label>
-          <label className="input">
-            <span className="label">Tên module</span>
-            <input
-              type="text"
-              value={formAdd.display}
-              onChange={(e) =>
-                setFormAdd((pre) => ({ ...pre, display: e.target.value }))
-              }
-            />
-          </label>
-          <div>
-            <button className="btn btn-primary" onClick={handleAddModule}>
-              Thêm
-            </button>
-            <button
-              className="btn btn-accent"
-              onClick={() => setAddModule(false)}
-            >
-              Hủy
-            </button>
-          </div>
-        </div>
-      )}
       <div className="modal-action">
         <button
           className="btn btn-primary"

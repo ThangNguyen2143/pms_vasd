@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import axios, { AxiosResponse } from "axios";
 import { DataResponse } from "~/lib/types";
 import { createSession } from "~/lib/session";
+import { setMenuRoute } from "~/app/(auth)/login/actions/auth";
 type SignInRespone = {
   token: string;
   username: string;
@@ -37,7 +38,7 @@ export async function POST(request: Request) {
       name: user.display,
       role: user.account_type,
     });
-
+    await setMenuRoute();
     // 5. Trả về thông tin user (không bao gồm mật khẩu)
     return NextResponse.json(user);
   } catch (error) {

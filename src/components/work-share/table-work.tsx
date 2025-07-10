@@ -14,17 +14,20 @@ import { format_date } from "~/utils/fomat-date";
 import { format } from "date-fns";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { ArrowDownZA, ArrowUpAZ, ChevronDown } from "lucide-react";
+import { ArrowDownZA, ArrowUpAZ, Funnel } from "lucide-react";
+import { encodeBase64 } from "~/lib/services";
 
 function TableWork({
   workList,
   typeList,
   priorityList,
   statusList,
+  project_id,
 }: // onUpdate,
 {
   workList?: RequirementDto[];
   priorityList?: Priority[];
+  project_id?: number;
   typeList?: RequirementType[];
   statusList?: RequirementStatus[];
   // onUpdate: () => Promise<void>;
@@ -72,6 +75,16 @@ function TableWork({
   // 🔄 Cắt dữ liệu theo trang
   const startIndex = (currentPage - 1) * 10;
   const currentWorks = filteredWorkList.slice(startIndex, startIndex + 10);
+  const handleClickRow = (work: RequirementDto) => {
+    router.push(
+      `/work_share/` +
+        encodeBase64({
+          requirement_id: work.id,
+          project_id,
+        })
+    );
+  };
+
   if (!workList)
     return (
       <>
@@ -132,8 +145,12 @@ function TableWork({
               <th scope="col" className="flex items-center  py-3">
                 Trạng thái
                 <div className="dropdown">
-                  <div tabIndex={0} role="button" className="btn m-1">
-                    <ChevronDown />
+                  <div
+                    tabIndex={0}
+                    role="button"
+                    className="btn btn-circle m-1"
+                  >
+                    <Funnel />
                   </div>
                   <ul
                     tabIndex={0}
@@ -188,7 +205,11 @@ function TableWork({
           <tbody>
             {currentWorks.map((item, index) => {
               return (
-                <tr key={index}>
+                <tr
+                  key={index}
+                  className="hover:bg-base-300"
+                  onClick={() => handleClickRow(item)}
+                >
                   <td className="px-6 py-4 font-medium  whitespace-nowrap ">
                     {item.id}
                   </td>
@@ -205,63 +226,25 @@ function TableWork({
                       )?.display
                     }
                   </td>
-                  <td>
-                    {/* {!isGuess && statusList ? (
-                    <EditStatus
-                      display={
-                        statusList?.find(
-                          (status) => status.code === item.status
-                        )?.display ?? ""
-                      }
-                      onUpdated={onUpdate}
-                      statusList={statusList}
-                      work_id={item.id}
-                    />
-                  ) : ( */}
+                  <td className="max-w-36">
                     <span
                       className={clsx(
-                        "badge",
-                        `badge-${status_with_color(item.status)}`
+                        "tooltip badge",
+                        "badge-" + status_with_color(item.status)
                       )}
+                      data-tip={
+                        statusList?.find(
+                          (status) => status.code === item.status
+                        )?.description ?? ""
+                      }
                     >
-                      {statusList?.find((status) => status.code === item.status)
-                        ?.description ?? ""}
+                      <span className={clsx("max-w-32 truncate")}>
+                        {item.status}
+                      </span>
                     </span>
-                    {/* )} */}
                   </td>
                   <td className="px-6 py-4">{format_date(item.date_create)}</td>
-                  <td>
-                    {
-                      // isGuess ? (
-                      item.creator ? item.creator : "-"
-                      // ) : (
-                      //   <UpdateDeadline
-                      //     display={item.deadline}
-                      //     work_id={item.id}
-                      //     onUpdate={onUpdate}
-                      //   />
-                      // )
-                    }
-                  </td>
-                  {/* <td>
-                  {
-                  // isGuess ? (
-                    item.date_end ? (
-                      format_date(item.date_create)
-                    ) : (
-                      "-"
-                    )
-                  // )
-                  //  : (
-                  //   <UpdateWork
-                  //     display={item.update_at}
-                  //     work_id={item.id}
-                  //     onUpdate={onUpdate}
-                  //   />
-                  // )
-                  }
-                </td> */}
-
+                  <td>{item.creator ? item.creator : "-"}</td>
                   <td className="px-6 py-4">
                     {item.date_end ? format(item.date_end, "dd/MM/yyyy") : "-"}
                   </td>

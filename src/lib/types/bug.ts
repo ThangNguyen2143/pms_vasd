@@ -6,6 +6,7 @@ export type BugDto = {
   name: string;
   date_create: string;
   status: string;
+  is_update: boolean;
   create_by: string;
   dead_line?: string;
 };

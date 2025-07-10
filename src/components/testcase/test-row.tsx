@@ -1,27 +1,40 @@
 "use client";
 import clsx from "clsx";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { encodeBase64 } from "~/lib/services";
-import { UserDto, WorkStatus } from "~/lib/types";
+import { ProductModule, UserDto, WorkStatus } from "~/lib/types";
 import { TestcaseDto } from "~/lib/types/testcase";
 import { status_with_color } from "~/utils/status-with-color";
 
 interface TestRowProps {
   testcase: TestcaseDto;
   users: UserDto[];
+  moduleList?: ProductModule[];
   statusList: WorkStatus[];
 }
 
-function TestRow({ testcase, users, statusList }: TestRowProps) {
+function TestRow({ testcase, users, statusList, moduleList }: TestRowProps) {
+  const router = useRouter();
   const creator = users.find((u) => u.userid === testcase.created_by);
   const statusDisplay = statusList.find(
     (s) => s.code === testcase.status
   )?.display;
-
+  const handleClickRow = (testcase: TestcaseDto) => {
+    router.push("/test_case/" + encodeBase64({ testcase_id: testcase.id }));
+  };
+  console.log("testcase", testcase);
   return (
-    <tr className="hover:bg-gray-50 dark:hover:bg-gray-700">
+    <tr
+      className="hover:bg-base-300 dark:hover:bg-gray-700"
+      onClick={() => handleClickRow(testcase)}
+    >
       <td className="px-4 py-2">{testcase.id}</td>
       <td className="px-4 py-2 truncate max-w-96">{testcase.name}</td>
+      <td className="px-4 py-2">
+        {moduleList?.find((m) => m.id === testcase.module)?.display ||
+          testcase.module ||
+          "Không rõ"}
+      </td>
       <td className="px-4 py-2 w-fit">
         {creator?.userData.display_name || "Không rõ"}
       </td>
@@ -37,15 +50,6 @@ function TestRow({ testcase, users, statusList }: TestRowProps) {
         >
           {statusDisplay || "Không rõ"}
         </span>
-      </td>
-      <td className="px-4 py-2">
-        {/* Có thể thêm nút sửa/xoá ở đây */}
-        <Link
-          href={"/test_case/" + encodeBase64({ testcase_id: testcase.id })}
-          className="btn btn-sm btn-secondary"
-        >
-          Chi tiết
-        </Link>
       </td>
     </tr>
   );

@@ -56,14 +56,14 @@ export default function Attachments({
         <h3 className="text-lg font-semibold text-primary mb-2">
           📎 Tệp đính kèm
         </h3>
-        <div className="tooltip tooltip-bottom" data-tip="Thêm tệp đính kèm">
-          <button
-            className="btn btn-outline btn-primary btn-sm"
-            onClick={() => uploadFile()}
-          >
-            <Paperclip />
-          </button>
-        </div>
+
+        <button
+          className="btn btn-ghost btn-circle tooltip"
+          data-tip="Thêm tệp đính kèm"
+          onClick={() => uploadFile()}
+        >
+          <Paperclip />
+        </button>
       </div>
       {attachments.length > 0 ? (
         <ul className="space-y-1">

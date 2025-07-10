@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { useUser } from "~/providers/user-context";
 import { format_date } from "~/utils/fomat-date";
 import { formatContent } from "~/utils/format-content";
 
@@ -8,6 +9,14 @@ export default function RequirmentLogs({
 }: {
   logs: { id: number; name: string; content: string; date: string }[];
 }) {
+  const user = useUser();
+  if (
+    !user.user ||
+    user.user?.role === "Guess" ||
+    user.user?.role === "Customer"
+  ) {
+    return null; // Không hiển thị nhật ký cho người dùng khách
+  }
   return (
     <div className="bg-base-200 p-4 rounded-lg">
       <h3 className="text-lg font-semibold text-primary mb-2">

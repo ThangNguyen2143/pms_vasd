@@ -4,6 +4,7 @@ export type TestcaseDto = {
   id: number;
   name: string;
   create_date: string;
+  module: string;
   created_by: number;
   time_start?: string;
   time_end?: string;

@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { encodeBase64 } from "~/lib/services";
 import { BugDto } from "~/lib/types";
 import { format_date } from "~/utils/fomat-date";
@@ -8,18 +8,25 @@ import { status_with_color } from "~/utils/status-with-color";
 interface BugRowProps {
   bug: BugDto;
   product_id: string;
-  select: () => void;
-  unSelect: () => void;
+  isSelected?: boolean;
+  setSelect?: (id: number, isSelected: boolean) => void;
 }
 
 export default function BugRow({
   bug,
   product_id,
-  select,
-  unSelect,
+  isSelected,
+  setSelect,
 }: BugRowProps) {
+  const router = useRouter();
+  const handleClickRow = (bug: BugDto) => {
+    router.push("/bug/" + encodeBase64({ bug_id: bug.bug_id, product_id }));
+  };
   return (
-    <tr className="hover:bg-gray-50 dark:hover:bg-gray-700">
+    <tr
+      className="hover:bg-base-300 dark:hover:bg-gray-700"
+      onClick={() => handleClickRow(bug)}
+    >
       <td className="px-4 py-2">{bug.bug_id}</td>
       <td className="px-4 py-2">{bug.name}</td>
       <td className="px-4 py-2">{bug.create_by || "Không rõ"}</td>
@@ -34,26 +41,25 @@ export default function BugRow({
           {bug.status}
         </span>
       </td>
-      <td className="px-4 py-2">
-        {/* Có thể thêm nút sửa/xoá ở đây */}
-        <Link
-          href={"/bug/" + encodeBase64({ bug_id: bug.bug_id, product_id })}
-          className="btn btn-sm btn-secondary"
-        >
-          Chi tiết
-        </Link>
-      </td>
       <td className="py-2 px-4">
-        <label>
+        {bug.is_update ? (
+          <input
+            type="checkbox"
+            defaultChecked
+            disabled
+            className="checkbox checkbox-success"
+          />
+        ) : (
           <input
             type="checkbox"
             className="checkbox"
+            checked={isSelected || false}
             onChange={(e) => {
-              if (e.target.checked) select();
-              else unSelect();
+              if (setSelect) setSelect(bug.bug_id, e.target.checked);
             }}
+            onClick={(e) => e.stopPropagation()}
           />
-        </label>
+        )}
       </td>
     </tr>
   );

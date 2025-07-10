@@ -139,7 +139,7 @@ export default function BugComments({
           💬 Bình luận
         </h4>
         <div className="border border-amber-100 shadow max-h-96 overflow-y-auto">
-          {comments ? (
+          {comments && comments.length > 0 ? (
             comments.map((comment) => {
               return (
                 <div className="chat chat-start" key={comment.id}>
@@ -160,9 +160,7 @@ export default function BugComments({
               );
             })
           ) : (
-            <div className="text-base-200 text-center">
-              Chưa có bình luận nào
-            </div>
+            <div className="text-center p-4">Chưa có bình luận nào</div>
           )}
         </div>
         <div className="flex items-start gap-2">

@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import clsx from "clsx";
-import { notFound } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import AddFileAttachmentModal from "~/components/tasks/modals/add-attachment-file-task";
@@ -23,6 +23,7 @@ import AddCriterialModal from "~/components/tasks/modals/add-criterial-modal";
 import { sendEmail } from "~/utils/send-notify";
 
 export default function TaskDetailClient({ task_id }: { task_id: number }) {
+  const route = useRouter();
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [showLinkModal, setShowLinkModal] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState(false);
@@ -30,7 +31,7 @@ export default function TaskDetailClient({ task_id }: { task_id: number }) {
   const [showAddFileAtachmentModal, setShowAddFileAtachmentModal] =
     useState(false);
   const { data: task, getData: getTask, errorData: errorTask } = useApi<Task>();
-
+  const { removeData: deleteTask } = useApi();
   const { data: taskStatus, getData: getTaskStatus } = useApi<WorkStatus[]>();
   const {
     data: comments,
@@ -109,6 +110,15 @@ export default function TaskDetailClient({ task_id }: { task_id: number }) {
       }
     }
   };
+  const handleDeleteTask = async () => {
+    if (confirm("Bạn có chắc chắn muốn xóa nhiệm vụ này?")) {
+      const re = await deleteTask("/tasks/" + encodeBase64({ task_id }));
+      if (re != null) {
+        toast.success("Xóa nhiệm vụ thành công");
+        route.back();
+      }
+    }
+  };
   if (!task) {
     if (errorTask?.code == 404) return notFound();
     return (
@@ -126,16 +136,26 @@ export default function TaskDetailClient({ task_id }: { task_id: number }) {
           <h2 className="text-2xl font-bold text-primary">
             📋 Chi tiết Nhiệm vụ
           </h2>
-          <span
-            className={clsx(
-              "badge text-sm px-4 py-2 rounded-full",
-              `badge-${status_with_color(task.status)}`
+          <div>
+            <span
+              className={clsx(
+                "badge text-sm px-4 py-2 rounded-full",
+                `badge-${status_with_color(task.status)}`
+              )}
+            >
+              {taskStatus
+                ? taskStatus.find((st) => st.code == task.status)?.display
+                : task.status}
+            </span>
+            {task.status == "NEW" && (
+              <button
+                className="btn btn-error btn-outline ml-2"
+                onClick={handleDeleteTask}
+              >
+                Xóa task
+              </button>
             )}
-          >
-            {taskStatus
-              ? taskStatus.find((st) => st.code == task.status)?.display
-              : task.status}
-          </span>
+          </div>
         </div>
 
         {/* Left Section */}
@@ -143,7 +163,6 @@ export default function TaskDetailClient({ task_id }: { task_id: number }) {
           <TaskInfo
             task={task}
             onEdit={() => setShowUpdateModal(true)}
-            onLinkRequirement={() => setShowLinkModal(true)}
             onUpdate={reloadTaskData}
             onAssign={() => setShowAssignModal(true)}
           />
@@ -164,7 +183,10 @@ export default function TaskDetailClient({ task_id }: { task_id: number }) {
 
         {/* Right Section */}
         <div className="space-y-6">
-          <TaskLinks task_id={task_id} />
+          <TaskLinks
+            task_id={task_id}
+            onLinkRequirement={() => setShowLinkModal(true)}
+          />
           <Attachments
             attachments={task.taskFiles || []}
             onUpdate={reloadTaskData}

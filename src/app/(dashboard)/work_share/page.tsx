@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import MainWork from "~/components/work-share";
 
 export const metadata = {
@@ -7,8 +8,16 @@ export const metadata = {
 async function WorkSharePage() {
   return (
     <div className="container p-4 mx-auto">
-      <h1 className="text-3xl text-center font-bold">Theo dõi tiến độ</h1>
-      <MainWork />
+      <h1 className="text-3xl text-center font-bold">Tiến độ dự án</h1>
+      <Suspense
+        fallback={
+          <div>
+            Loading <span className="loading loading-dot"></span>
+          </div>
+        }
+      >
+        <MainWork />
+      </Suspense>
     </div>
   );
 }
