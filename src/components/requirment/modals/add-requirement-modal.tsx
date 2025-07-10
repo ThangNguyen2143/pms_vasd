@@ -8,6 +8,7 @@ import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
 import { useUploadFile } from "~/hooks/use-upload-file";
 import { ProductDto, RequirementType } from "~/lib/types";
+import { toISOString } from "~/utils/fomat-date";
 
 interface AddRequirementProps {
   product_list: ProductDto[];
@@ -66,7 +67,19 @@ export default function AddRequirementModal({
     // if (errorData) toast.error(errorData.message);
     if (uploadError) {
       // Nếu có lỗi upload, hiển thị thông báo lỗi
-      console.error("Upload error:", uploadError);
+      console.log("data send:", {
+        product_id: productSelect,
+        title,
+        description,
+        type: typeSelected,
+        date_receive: dateReceive,
+        tags,
+        request: {
+          requester,
+          location_id: Number(locationId),
+          role,
+        },
+      });
       // Hiển thị thông báo lỗi
       toast.error(uploadError);
       // Hoặc nếu uploadError là một chuỗi, bạn có thể hiển thị trực tiếp
@@ -114,7 +127,7 @@ export default function AddRequirementModal({
       title,
       description,
       type: typeSelected,
-      date_receive: dateReceive,
+      date_receive: toISOString(dateReceive),
       tags,
       request: {
         requester,
