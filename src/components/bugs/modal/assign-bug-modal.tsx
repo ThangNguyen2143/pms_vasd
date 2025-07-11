@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import DateTimePicker from "~/components/ui/date-time-picker";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
-import { Contact, OptionType, ProjectMember } from "~/lib/types";
+import { Contact, ProjectMember } from "~/lib/types";
 import { sendEmail } from "~/utils/send-notify";
 import Select from "react-select";
 import { toISOString } from "~/utils/fomat-date";
@@ -33,7 +33,7 @@ export default function AssignBugModal({
   onUpdate: () => Promise<void>;
   onClose: () => void;
 }) {
-  const [selectUser, setSelectUser] = useState<string>("");
+  const [selectUser, setSelectUser] = useState(0);
   const [deadline, setDeadline] = useState("");
   const { postData, isLoading, errorData } = useApi<ResponseNotify, DataSend>();
   const {
@@ -50,8 +50,8 @@ export default function AssignBugModal({
 
   const handleSubmit = async () => {
     const data: DataSend = {
-      bug_id: Number(bug_id),
-      assign_to: Number(selectUser),
+      bug_id,
+      assign_to: selectUser,
       deadline: toISOString(deadline) || "",
     };
     const re = await postData("/bugs/assign", data);
@@ -87,9 +87,9 @@ export default function AssignBugModal({
       onClose();
     }
   };
-  const options: OptionType[] =
+  const options =
     users?.map((user) => ({
-      value: user.id.toString(),
+      value: user.id,
       label: user.name,
     })) ?? [];
   useEffect(() => {
@@ -126,7 +126,7 @@ export default function AssignBugModal({
             className="w-full"
             placeholder="Chọn người thực hiện"
             value={options.find((opt) => opt.value === selectUser) || null}
-            onChange={(selected) => setSelectUser(selected?.value ?? "")}
+            onChange={(selected) => setSelectUser(selected?.value ?? 0)}
             options={options}
             isClearable
           />

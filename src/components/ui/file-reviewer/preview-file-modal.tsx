@@ -22,7 +22,7 @@ function PreviewFileModal({
             ✕
           </button>
         </form>
-        <div className="max-h-[90vh] overflow-y-auto w-full">
+        <div className="max-h-[100vh] overflow-y-auto w-full">
           <FilePreview file={file} />
         </div>
         {/* <FilePreview file={file}></FilePreview> */}

@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-import React, { useEffect, useState } from "react";
-import { Activity, Pencil, X } from "lucide-react";
+import React, { useEffect } from "react";
+import { Pencil } from "lucide-react";
 import clsx from "clsx";
 import { status_with_color } from "~/utils/status-with-color";
 import { useApi } from "~/hooks/use-api";
@@ -30,8 +30,8 @@ export default function RequirementInfo({
   onEdit: () => void;
   onUpdate: () => Promise<void>;
 }) {
-  const [selectStatus, setSelectStatus] = useState<string>(info.status);
-  const [showUpdateStatus, setshowUpdateStatus] = useState(false);
+  // const [selectStatus, setSelectStatus] = useState<string>(info.status);
+  // const [showUpdateStatus, setshowUpdateStatus] = useState(false);
   const {
     data: statusList,
     getData: getStatus,
@@ -47,27 +47,57 @@ export default function RequirementInfo({
   useEffect(() => {
     if (errorData) toast.error(errorData.message);
   }, [errorData]);
-  const handlerUpdateStatus = async () => {
+  const handlerUpdateStatus = async (status: string) => {
     const dataSend = {
       id: info.id,
-      status: selectStatus,
+      status,
     };
     const re = await putData("/requirements/status", dataSend);
     if (re != "") return;
     else {
       toast.success("Cập nhật trạng thái thành công");
-      setshowUpdateStatus(false);
+      // setshowUpdateStatus(false);
       await onUpdate();
     }
+  };
+  const RenderStatusGroup = ({
+    list,
+    currentStatus,
+  }: {
+    list: RequirementStatus[];
+    currentStatus: string;
+  }) => {
+    const allowStatus = list.find(
+      (st) => st.code == currentStatus
+    )?.allow_transit;
+
+    return (
+      <div className="join">
+        {allowStatus &&
+          allowStatus.map((st) => {
+            const color = status_with_color(st);
+            return (
+              <button
+                key={st}
+                className={`btn btn-sm btn-${color} join-item tooltip`}
+                data-tip={list.find((s) => st == s.code)?.description}
+                onClick={() => handlerUpdateStatus(st)}
+              >
+                {st}
+              </button>
+            );
+          })}
+      </div>
+    );
   };
   if (errorStatus) toast.error(errorStatus.message);
   return (
     <div className="bg-base-200 p-4 rounded-lg">
-      <div className="flex justify-between items-center mb-2">
+      <div className="flex flex-col justify-between mb-2 xl:flex-row">
         <h3 className="text-lg font-semibold text-primary">
           📌 Thông tin yêu cầu
         </h3>
-        <div className="items-center flex">
+        <div className="flex flex-col xl:flex-row">
           <button
             className="btn btn-sm btn-ghost tooltip"
             data-tip="Chỉnh sửa"
@@ -75,53 +105,14 @@ export default function RequirementInfo({
           >
             <Pencil />
           </button>
-          <div className="join">
-            <label className="join-item swap swap-rotate btn btn-secondary btn-sm btn-ghost">
-              <input
-                type="checkbox"
-                onChange={() => setshowUpdateStatus(!showUpdateStatus)}
-                checked={showUpdateStatus}
-              />
-              <Activity className="swap-off" />
-              <X className="swap-on" />
-            </label>
-            {showUpdateStatus && (
-              <>
-                <select
-                  className="select join-item select-sm max-w-20"
-                  onChange={(e) => setSelectStatus(e.target.value)}
-                  value={selectStatus}
-                >
-                  {!errorStatus &&
-                    statusList &&
-                    statusList.length > 0 &&
-                    statusList.map((st) => {
-                      if (st.code == info.status)
-                        return (
-                          <option key={st.code} disabled value={st.code}>
-                            {st.description}
-                          </option>
-                        );
-                      return (
-                        <option key={st.code} value={st.code}>
-                          {st.description}
-                        </option>
-                      );
-                    })}
-                </select>
-                <button
-                  className="btn join-item btn-sm"
-                  onClick={() => handlerUpdateStatus()}
-                >
-                  {isLoading ? (
-                    <span className="loading loading-spinner loading-xs"></span>
-                  ) : (
-                    "Cập nhật"
-                  )}
-                </button>
-              </>
-            )}
-          </div>
+          {isLoading ? (
+            <span className="loading loading-spinner"></span>
+          ) : (
+            <RenderStatusGroup
+              currentStatus={info.status}
+              list={statusList || []}
+            />
+          )}
         </div>
       </div>
       <div className="space-y-2">

@@ -10,6 +10,7 @@ import DateTimePicker from "../ui/date-time-picker";
 import { ProductModule } from "~/lib/types";
 import { useUploadFile } from "~/hooks/use-upload-file";
 import Select from "react-select";
+import { toISOString } from "~/utils/fomat-date";
 interface Criteria {
   id: string;
   title: string;
@@ -64,7 +65,21 @@ function CreateTaskForm({
   }, [product_id]);
   useEffect(() => {
     // if (postError) toast.error(postError.message);
-    if (uploadError) toast.error(uploadError);
+    if (uploadError) {
+      toast.error(uploadError);
+      console.log("data: ", {
+        product_id,
+        title,
+        description,
+        module: selectModule,
+        dead_line: toISOString(deadline),
+        requirement_id: selectedRequirement,
+        acceptances: criteriaList.map((crit) => ({
+          title: crit.title,
+          type: crit.type,
+        })),
+      });
+    }
   }, [uploadError]);
   const handleSubmit = async () => {
     if (title.trim() === "") {
@@ -88,7 +103,7 @@ function CreateTaskForm({
       title,
       description,
       module: selectModule,
-      dead_line: deadline,
+      dead_line: toISOString(deadline),
       requirement_id: selectedRequirement,
       acceptances: criteriaList.map((crit) => ({
         title: crit.title,
@@ -98,7 +113,7 @@ function CreateTaskForm({
     if (data.requirement_id == 0) delete data.requirement_id;
     if (data.module == "") delete data.module;
     if (data.acceptances?.length == 0) delete data.acceptances;
-    // const result = await postData("/tasks", data);
+    console.log(data);
     const result = await uploadMultiFiles({
       files,
       uploadUrl: "/tasks",
@@ -106,6 +121,7 @@ function CreateTaskForm({
         ...data,
       },
     });
+    // const result = null;
     if (result && result.code == 200) {
       toast.success("Tạo công việc thành công");
       onSuccess(); // gọi lại TaskList để reload

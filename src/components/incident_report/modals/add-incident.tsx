@@ -6,6 +6,7 @@ import DateTimePicker from "~/components/ui/date-time-picker";
 import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
 import { IncidentType, BugSeverity } from "~/lib/types";
+import { toISOString } from "~/utils/fomat-date";
 
 interface AddIncidentProps {
   product_id: string;
@@ -82,9 +83,9 @@ export default function AddIncidentModal({
       type: typeSelected,
       severity: severitySelect,
       handle,
-      occurred_at: occurredAt,
+      occurred_at: toISOString(occurredAt),
       reporter,
-      time_end: timeEnd,
+      time_end: toISOString(timeEnd),
     };
     const re = await postData("/incident", data);
 

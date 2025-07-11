@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import DocxViewer from "./docx-viewer";
 import ExcelViewer from "./excel-viewer";
-import { Download } from "lucide-react";
+import { Download, Redo, Undo } from "lucide-react";
 import {
   blobToBase64,
   compressFileGzip,
@@ -28,6 +28,7 @@ export function FilePreview({ file }: FilePreviewProps) {
     "config",
     "log",
   ];
+  const [rotateImg, setRotate] = useState(0);
   useEffect(() => {
     const textExts = ["html", "css", "js"];
     if (ext && textExts.includes(ext)) {
@@ -48,12 +49,43 @@ export function FilePreview({ file }: FilePreviewProps) {
     );
   if (ext?.startsWith("png") || ext?.startsWith("jpg"))
     return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        src={URL.createObjectURL(file)}
-        alt={file.name}
-        className="max-w-full max-h-[80vh]"
-      />
+      <div className="flex flex-col items-center justify-center">
+        <div className="flex gap-2 z-auto">
+          <button className="btn btn-circle btn-sm">
+            <Redo
+              onClick={() => {
+                setRotate((pre) => {
+                  if (pre > 360) return 0;
+                  else return pre + 90;
+                });
+              }}
+            />
+          </button>
+          <button className="btn btn-circle btn-sm">
+            <Undo
+              strokeWidth={1.25}
+              onClick={() => {
+                setRotate((pre) => {
+                  if (pre < -360) return 0;
+                  else return pre - 90;
+                });
+              }}
+            />
+          </button>
+        </div>
+        <div className="relative w-full max-h-[80vh] overflow-auto flex justify-center items-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={URL.createObjectURL(file)}
+            alt={file.name}
+            className="max-w-full max-h-[80vh] block"
+            style={{
+              transform: `rotate(${rotateImg}deg)`,
+              transition: "transform 0.3s ease",
+            }}
+          />
+        </div>
+      </div>
     );
   if (ext === "html" && textContent)
     return (

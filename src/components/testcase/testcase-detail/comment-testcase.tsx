@@ -193,7 +193,9 @@ function CommentTestcase({
               <button
                 className="btn btn-ghost btn-sm rounded-full"
                 onClick={handleAddComment}
-                disabled={newComment.trim().length == 0}
+                disabled={
+                  newComment.trim().length == 0 || newComment == "<p><br></p>"
+                }
                 aria-label="Gửi"
               >
                 <Send />

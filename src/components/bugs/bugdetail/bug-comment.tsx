@@ -179,7 +179,10 @@ export default function BugComments({
             <RichTextEditor
               value={newComment}
               className="join-item resize-none not-last:focus-visible:outline-none focus-visible:border-none focus-visible:ring-0"
-              onChange={(e) => setNewComment(e)}
+              onChange={(e) => {
+                console.log(newComment);
+                setNewComment(e);
+              }}
               placeholder="Nhập bình luận..."
               suggestList={memberProject?.map((mem) => mem.name)}
             />
@@ -198,7 +201,9 @@ export default function BugComments({
                   // console.log(newComment);
                   handleAddComment();
                 }}
-                disabled={newComment.trim().length == 0}
+                disabled={
+                  newComment.trim().length == 0 || newComment == "<p><br></p>"
+                }
                 aria-label="Gửi"
               >
                 <Send />

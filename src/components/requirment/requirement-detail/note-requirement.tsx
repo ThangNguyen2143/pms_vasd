@@ -159,8 +159,12 @@ export default function NoteRequirment({
           <div className="join-item flex justify-end">
             <button
               className="btn btn-ghost btn-sm rounded-full"
-              onClick={handleSubmit}
-              disabled={newComment.trim().length == 0}
+              onClick={() => {
+                handleSubmit();
+              }}
+              disabled={
+                newComment.trim().length == 0 || newComment == "<p><br></p>"
+              }
               aria-label="Gửi"
             >
               <Send />

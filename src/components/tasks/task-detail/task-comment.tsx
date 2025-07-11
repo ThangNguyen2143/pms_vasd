@@ -176,7 +176,11 @@ function TaskComments({
                 className="btn btn-ghost btn-sm rounded-full"
                 onClick={handleAddComment}
                 aria-label="Gửi"
-                disabled={isLoading || newComment.trim().length == 0}
+                disabled={
+                  isLoading ||
+                  newComment.trim().length == 0 ||
+                  newComment == "<p><br></p>"
+                }
               >
                 {isLoading ? (
                   <span className="loading loading-spinner loading-sm"></span>
