@@ -50,7 +50,7 @@ export default function AssignBugModal({
 
   const handleSubmit = async () => {
     const data: DataSend = {
-      bug_id,
+      bug_id: Number(bug_id),
       assign_to: Number(selectUser),
       deadline: toISOString(deadline) || "",
     };
