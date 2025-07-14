@@ -94,7 +94,7 @@ function UpdateInfoProjectModal({
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Bắt đầu</legend>
           <input
-            type="datetime-local"
+            type="date"
             className="input w-full validator"
             value={dateStart}
             required
@@ -105,7 +105,7 @@ function UpdateInfoProjectModal({
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Kết thúc</legend>
           <input
-            type="datetime-local"
+            type="date"
             className="input w-full validator"
             value={dateEnd}
             required

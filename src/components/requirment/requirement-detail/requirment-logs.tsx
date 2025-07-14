@@ -28,9 +28,9 @@ export default function RequirmentLogs({
             .sort(
               (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
             )
-            .map((log) => (
+            .map((log, index) => (
               <div
-                key={log.id + " " + log.date}
+                key={log.id + " " + log.date + "index" + index}
                 className="bg-base-100 p-3 mb-2 rounded border-l-4 border-info"
               >
                 <p>

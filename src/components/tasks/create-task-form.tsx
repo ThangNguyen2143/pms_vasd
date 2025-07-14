@@ -49,12 +49,18 @@ function CreateTaskForm({
   const [selectedRequirement, setSelectedRequirement] = useState<number>(0);
   const [selectModule, setSelectModule] = useState<string>("");
   const [files, setFile] = useState<File[]>([]);
-
-  const { isUploading, uploadError, uploadMultiFiles } = useUploadFile();
+  const [fileUploadStatus, setFileUploadStatus] = useState<
+    { name: string; status: "idle" | "uploading" | "done" | "error" }[]
+  >([]);
+  const { uploadError, uploadChunkedFile } = useUploadFile();
 
   const { data: requireds, getData: getRequiredList } =
     useApi<{ id: number; title: string }[]>();
-  // const { postData, isLoading, errorData: postError } = useApi<"">();
+  const {
+    postData,
+    isLoading,
+    errorData: postError,
+  } = useApi<{ id: number }>();
   const { data: criteriaType, getData: getCriterial } =
     useApi<{ code: string; display: string }[]>();
   useEffect(() => {
@@ -64,23 +70,17 @@ function CreateTaskForm({
     getRequiredList("/requirements/list/" + encodeBase64({ product_id }));
   }, [product_id]);
   useEffect(() => {
-    // if (postError) toast.error(postError.message);
+    if (postError) toast.error(postError.message);
     if (uploadError) {
       toast.error(uploadError);
-      console.log("data: ", {
-        product_id,
-        title,
-        description,
-        module: selectModule,
-        dead_line: toISOString(deadline),
-        requirement_id: selectedRequirement,
-        acceptances: criteriaList.map((crit) => ({
-          title: crit.title,
-          type: crit.type,
-        })),
-      });
     }
-  }, [uploadError]);
+  }, [uploadError, postError]);
+  useEffect(() => {
+    if (fileUploadStatus.some((file) => file.status == "done")) {
+      onSuccess();
+      // onClose();
+    }
+  }, [fileUploadStatus]);
   const handleSubmit = async () => {
     if (title.trim() === "") {
       toast.error("Vui lòng nhập tiêu đề công việc");
@@ -113,22 +113,48 @@ function CreateTaskForm({
     if (data.requirement_id == 0) delete data.requirement_id;
     if (data.module == "") delete data.module;
     if (data.acceptances?.length == 0) delete data.acceptances;
-    console.log(data);
-    const result = await uploadMultiFiles({
-      files,
-      uploadUrl: "/tasks",
-      meta: {
-        ...data,
-      },
-    });
+    // console.log(data);
+    // const result = await uploadMultiFiles({
+    //   files,
+    //   uploadUrl: "/tasks",
+    //   meta: {
+    //     ...data,
+    //   },
+    // });
     // const result = null;
-    if (result && result.code == 200) {
-      toast.success("Tạo công việc thành công");
-      onSuccess(); // gọi lại TaskList để reload
-      setTitle("");
-      setDescription("");
-      setDeadline("");
+    const result = await postData("/tasks", data);
+    if (result == null) return;
+    if (files.length > 0) {
+      await Promise.all(
+        files.map(async (file, index) => {
+          // Cập nhật trạng thái đang upload
+          setFileUploadStatus((prev) => {
+            const next = [...prev];
+            next[index].status = "uploading";
+            return next;
+          });
+
+          const res = await uploadChunkedFile(file, "/bugs/file", {
+            bug_id: result.id,
+          });
+
+          // Cập nhật trạng thái sau khi upload
+          setFileUploadStatus((prev) => {
+            const next = [...prev];
+            next[index].status = res && res.code == 200 ? "done" : "error";
+            return next;
+          });
+        })
+      );
     }
+    // if (result != null) {
+    //   toast.success("Tạo công việc thành công");
+    //   onSuccess(); // gọi lại TaskList để reload
+    //   setTitle("");
+    //   setDescription("");
+    //   setDeadline("");
+    // }
+    toast.success("Tạo công việc thành công");
   };
   const handleReset = () => {
     setTitle("");
@@ -281,31 +307,86 @@ function CreateTaskForm({
             )}
           </select>
         </fieldset>
-        <fieldset className="fieldset">
-          <legend className="fieldset-legend">Tệp đính kèm</legend>
-          <input
-            type="file"
-            className="file-input file-input-primary mt-4"
-            name="fileSend"
-            multiple
-            placeholder="Chọn tệp đính kèm"
-            onChange={(e) => {
-              const selected = e.target.files;
-              if (selected) {
-                setFile(Array.from(selected));
-              }
-            }}
-          />
-        </fieldset>
+        <div>
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">Tệp đính kèm</legend>
+            <input
+              type="file"
+              className="file-input file-input-primary mt-4"
+              name="fileSend"
+              multiple
+              placeholder="Chọn tệp đính kèm"
+              onChange={(e) => {
+                const selected = e.target.files;
+                if (selected) {
+                  const newFiles = Array.from(selected);
+
+                  // Thêm file mới vào danh sách cũ (tránh trùng tên)
+                  setFile((prev) => {
+                    const existingNames = new Set(prev.map((f) => f.name));
+                    const uniqueNewFiles = newFiles.filter(
+                      (f) => !existingNames.has(f.name)
+                    );
+                    return [...prev, ...uniqueNewFiles];
+                  });
+
+                  // Thêm trạng thái upload tương ứng
+                  setFileUploadStatus((prev) => {
+                    const existingNames = new Set(prev.map((f) => f.name));
+                    const newStatus = newFiles
+                      .filter((f) => !existingNames.has(f.name))
+                      .map((f) => ({
+                        name: f.name,
+                        status: "idle" as const,
+                      }));
+                    return [...prev, ...newStatus];
+                  });
+
+                  // Reset input để cho phép chọn lại cùng file (bypass browser caching)
+                  e.target.value = "";
+                }
+              }}
+            />
+          </fieldset>
+          {fileUploadStatus.length > 0 && (
+            <ul className="mt-2 space-y-1">
+              {fileUploadStatus.map((file, idx) => (
+                <li key={idx} className="text-sm flex items-center gap-2">
+                  <span>{file.name}</span>
+                  {file.status === "uploading" && (
+                    <span className="loading loading-spinner loading-xs text-info" />
+                  )}
+                  {file.status === "done" && (
+                    <span className="text-success">✓ Đã tải lên</span>
+                  )}
+                  {file.status === "error" && (
+                    <span className="text-error">✕ Lỗi</span>
+                  )}
+                  <button
+                    onClick={() => {
+                      setFile((prev) => prev.filter((_, i) => i !== idx));
+                      setFileUploadStatus((prev) =>
+                        prev.filter((_, i) => i !== idx)
+                      );
+                    }}
+                    className="btn btn-xs btn-error"
+                  >
+                    ✕
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
 
       <div className="flex justify-between md:col-span-2">
         <button
           className="btn btn-primary"
           onClick={handleSubmit}
-          disabled={isUploading}
+          disabled={isLoading}
         >
-          {isUploading ? "Đang tạo..." : "Tạo công việc"}
+          {isLoading ? "Đang tạo..." : "Tạo công việc"}
         </button>
         <button
           className="btn btn-outline btn-accent"

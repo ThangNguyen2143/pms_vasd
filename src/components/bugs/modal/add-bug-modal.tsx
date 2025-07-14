@@ -50,9 +50,17 @@ export default function AddBugModal({
   const [testcaseSelected, setTestcaseSelected] = useState("");
   const [taskSelected, setTaskSelected] = useState("");
   const [files, setFile] = useState<File[]>([]);
-  const { isUploading, uploadError, uploadMultiFiles } = useUploadFile();
+  const [fileUploadStatus, setFileUploadStatus] = useState<
+    { name: string; status: "idle" | "uploading" | "done" | "error" }[]
+  >([]);
 
-  // const { postData, isLoading, errorData } = useApi<"", DataCreate>();
+  // const { isUploading, uploadError, uploadMultiFiles } = useUploadFile();
+
+  const { uploadError, uploadChunkedFile } = useUploadFile();
+  const { postData, isLoading, errorData } = useApi<
+    { id: number },
+    DataCreate
+  >();
   const {
     data: severityList,
     getData: getSeverity,
@@ -74,9 +82,15 @@ export default function AddBugModal({
     getTask("/tasks/" + encodeBase64({ product_id }), "default");
   }, [product_id]);
   useEffect(() => {
-    // if (errorData) toast.error(errorData.message || errorData.title);
+    if (errorData) toast.error(errorData.message || errorData.title);
     if (uploadError) toast.error(uploadError);
-  }, [uploadError]);
+  }, [errorData, uploadError]);
+  useEffect(() => {
+    if (fileUploadStatus.some((file) => file.status == "done")) {
+      onCreated();
+      onClose();
+    }
+  }, [fileUploadStatus]);
   if (!severityList || !priorityList) {
     if (errorSeverity)
       toast.error(errorSeverity.message || errorSeverity.title);
@@ -119,21 +133,41 @@ export default function AddBugModal({
     if (!data.test_case_ref_id) delete data.test_case_ref_id;
     if (!data.task_id) delete data.task_id;
     if (data.log?.trim().length == 0) delete data.log;
-    // const re = await postData("/bugs", data);
-    const re = await uploadMultiFiles({
-      files,
-      uploadUrl: "/bugs",
-      meta: {
-        ...data,
-      },
-    });
-    if (re?.value != "") return;
-    else {
-      toast.success("Báo bug thành công");
-      onCreated();
-      onClose();
+    const re = await postData("/bugs", data);
+    if (re == null) return;
+    if (files.length > 0) {
+      await Promise.all(
+        files.map(async (file, index) => {
+          // Cập nhật trạng thái đang upload
+          setFileUploadStatus((prev) => {
+            const next = [...prev];
+            next[index].status = "uploading";
+            return next;
+          });
+
+          const res = await uploadChunkedFile(file, "/bugs/file", {
+            bug_id: re.id,
+          });
+
+          // Cập nhật trạng thái sau khi upload
+          setFileUploadStatus((prev) => {
+            const next = [...prev];
+            next[index].status = res && res.code == 200 ? "done" : "error";
+            return next;
+          });
+        })
+      );
     }
+    // const re = await uploadMultiFiles({
+    //   files,
+    //   uploadUrl: "/bugs",
+    //   meta: {
+    //     ...data,
+    //   },
+    // });
+    toast.success("Bug đã được lưu");
   };
+
   const options: OptionType[] =
     taskList?.map((task) => ({
       value: task.id.toString(),
@@ -280,11 +314,64 @@ export default function AddBugModal({
                 onChange={(e) => {
                   const selected = e.target.files;
                   if (selected) {
-                    setFile(Array.from(selected));
+                    const newFiles = Array.from(selected);
+
+                    // Thêm file mới vào danh sách cũ (tránh trùng tên)
+                    setFile((prev) => {
+                      const existingNames = new Set(prev.map((f) => f.name));
+                      const uniqueNewFiles = newFiles.filter(
+                        (f) => !existingNames.has(f.name)
+                      );
+                      return [...prev, ...uniqueNewFiles];
+                    });
+
+                    // Thêm trạng thái upload tương ứng
+                    setFileUploadStatus((prev) => {
+                      const existingNames = new Set(prev.map((f) => f.name));
+                      const newStatus = newFiles
+                        .filter((f) => !existingNames.has(f.name))
+                        .map((f) => ({
+                          name: f.name,
+                          status: "idle" as const,
+                        }));
+                      return [...prev, ...newStatus];
+                    });
+
+                    // Reset input để cho phép chọn lại cùng file (bypass browser caching)
+                    e.target.value = "";
                   }
                 }}
               />
             </fieldset>
+            {fileUploadStatus.length > 0 && (
+              <ul className="mt-2 space-y-1">
+                {fileUploadStatus.map((file, idx) => (
+                  <li key={idx} className="text-sm flex items-center gap-2">
+                    <span>{file.name}</span>
+                    {file.status === "uploading" && (
+                      <span className="loading loading-spinner loading-xs text-info" />
+                    )}
+                    {file.status === "done" && (
+                      <span className="text-success">✓ Đã tải lên</span>
+                    )}
+                    {file.status === "error" && (
+                      <span className="text-error">✕ Lỗi</span>
+                    )}
+                    <button
+                      onClick={() => {
+                        setFile((prev) => prev.filter((_, i) => i !== idx));
+                        setFileUploadStatus((prev) =>
+                          prev.filter((_, i) => i !== idx)
+                        );
+                      }}
+                      className="btn btn-xs btn-error"
+                    >
+                      ✕
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </div>
         <div className="modal-action">
@@ -294,9 +381,9 @@ export default function AddBugModal({
           <button
             className="btn btn-primary"
             onClick={handleSubmit}
-            disabled={isUploading}
+            disabled={isLoading}
           >
-            {isUploading ? (
+            {isLoading ? (
               <span className="loading loading-spinner loading-xs"></span>
             ) : (
               "Lưu"

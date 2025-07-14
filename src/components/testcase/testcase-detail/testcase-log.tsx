@@ -16,8 +16,11 @@ function TestcaseLog({ testLogs }: { testLogs: TestLog[] }) {
                 (a, b) =>
                   new Date(b.date).getTime() - new Date(a.date).getTime()
               )
-              .map((log: TestLog) => (
-                <li key={log.id + " " + log.date} className="flex items-start">
+              .map((log: TestLog, index) => (
+                <li
+                  key={log.id + " " + log.date + " " + index}
+                  className="flex items-start"
+                >
                   <span className="mr-2">🕓</span>
                   <div>
                     <strong>{format_date(log.date)}</strong> -{" "}

@@ -122,7 +122,7 @@ function MainWork() {
               search_string: finalString,
             })
         );
-      }, 3000);
+      }, 1000);
     }
   }, [searchString]);
   const handleDateChange = (dateInput: string, type: "from" | "to") => {

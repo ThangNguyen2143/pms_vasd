@@ -87,8 +87,12 @@ function CreateTestcaseForm({
 
   const [currentTag, setCurrentTag] = useState("");
   const [files, setFile] = useState<File[]>([]);
+  const [fileUploadStatus, setFileUploadStatus] = useState<
+    { name: string; status: "idle" | "uploading" | "done" | "error" }[]
+  >([]);
   const [openAddModule, setopenAddModule] = useState(false);
-  const { isUploading, uploadError, uploadMultiFiles } = useUploadFile();
+  const { uploadError, uploadChunkedFile } = useUploadFile();
+  const { isLoading, postData, errorData } = useApi<{ id: number }>();
   const [stateError, setStateError] = useState<{
     [key: string]: { message: string };
   }>();
@@ -116,8 +120,17 @@ function CreateTestcaseForm({
     }
     // if (errorGetTask && errorGetTask.code != 404)
     //   toast.error("Danh sách task:" + errorGetTask.message);
+    if (errorData) {
+      toast.error(errorData.message || errorData.title);
+    }
     if (uploadError) toast.error(uploadError);
   }, [errorLoadEnv, uploadError]);
+  useEffect(() => {
+    if (fileUploadStatus.some((st) => st.status == "done")) {
+      onSuccess();
+      resetForm();
+    }
+  }, []);
   const handleSubmit = async () => {
     const errors: { [key: string]: { message: string } } = {};
 
@@ -170,19 +183,41 @@ function CreateTestcaseForm({
       if (temp.note?.trim().length == 0) delete temp.note;
       return temp;
     });
-    // const result = await postData("/testcase", data);
-    const result = await uploadMultiFiles({
-      files,
-      uploadUrl: "/testcase",
-      meta: {
-        ...data,
-      },
-    });
-    if (result?.value == "") {
-      toast.success("Tạo testcase thành công");
-      onSuccess();
-      resetForm();
+    const result = await postData("/testcase", data);
+    // const result = await uploadMultiFiles({
+    //   files,
+    //   uploadUrl: "/testcase",
+    //   meta: {
+    //     ...data,
+    //   },
+    // });
+    if (result == null) {
+      return;
     }
+    if (files.length > 0) {
+      await Promise.all(
+        files.map(async (file, index) => {
+          // Cập nhật trạng thái đang upload
+          setFileUploadStatus((prev) => {
+            const next = [...prev];
+            next[index].status = "uploading";
+            return next;
+          });
+
+          const res = await uploadChunkedFile(file, "/bugs/file", {
+            bug_id: result.id,
+          });
+
+          // Cập nhật trạng thái sau khi upload
+          setFileUploadStatus((prev) => {
+            const next = [...prev];
+            next[index].status = res && res.code == 200 ? "done" : "error";
+            return next;
+          });
+        })
+      );
+    }
+    toast.success("Tạo testcase thành công");
   };
 
   const resetForm = () => {
@@ -488,6 +523,7 @@ function CreateTestcaseForm({
                 Thêm
               </button>
             </div>
+
             <div className="flex flex-wrap gap-2 mt-2">
               {formData.info.tags.map((tag) => (
                 <span key={tag} className="badge badge-primary">
@@ -499,22 +535,77 @@ function CreateTestcaseForm({
               ))}
             </div>
           </div>
-          <fieldset className="fieldset">
-            <legend className="fieldset-legend">Tệp đính kèm</legend>
-            <input
-              type="file"
-              className="file-input file-input-primary mt-4"
-              name="fileSend"
-              multiple
-              placeholder="Chọn tệp đính kèm"
-              onChange={(e) => {
-                const selected = e.target.files;
-                if (selected) {
-                  setFile(Array.from(selected));
-                }
-              }}
-            />
-          </fieldset>
+          <div className="flex gap-2">
+            <fieldset className="fieldset">
+              <legend className="fieldset-legend">Tệp đính kèm</legend>
+              <input
+                type="file"
+                className="file-input file-input-primary mt-4"
+                name="fileSend"
+                multiple
+                placeholder="Chọn tệp đính kèm"
+                onChange={(e) => {
+                  const selected = e.target.files;
+                  if (selected) {
+                    const newFiles = Array.from(selected);
+
+                    // Thêm file mới vào danh sách cũ (tránh trùng tên)
+                    setFile((prev) => {
+                      const existingNames = new Set(prev.map((f) => f.name));
+                      const uniqueNewFiles = newFiles.filter(
+                        (f) => !existingNames.has(f.name)
+                      );
+                      return [...prev, ...uniqueNewFiles];
+                    });
+
+                    // Thêm trạng thái upload tương ứng
+                    setFileUploadStatus((prev) => {
+                      const existingNames = new Set(prev.map((f) => f.name));
+                      const newStatus = newFiles
+                        .filter((f) => !existingNames.has(f.name))
+                        .map((f) => ({
+                          name: f.name,
+                          status: "idle" as const,
+                        }));
+                      return [...prev, ...newStatus];
+                    });
+
+                    // Reset input để cho phép chọn lại cùng file (bypass browser caching)
+                    e.target.value = "";
+                  }
+                }}
+              />
+            </fieldset>
+            {fileUploadStatus.length > 0 && (
+              <ul className="mt-4 space-y-1">
+                {fileUploadStatus.map((file, idx) => (
+                  <li key={idx} className="text-sm flex items-center gap-2">
+                    <span>{file.name}</span>
+                    {file.status === "uploading" && (
+                      <span className="loading loading-spinner loading-xs text-info" />
+                    )}
+                    {file.status === "done" && (
+                      <span className="text-success">✓ Đã tải lên</span>
+                    )}
+                    {file.status === "error" && (
+                      <span className="text-error">✕ Lỗi</span>
+                    )}
+                    <button
+                      onClick={() => {
+                        setFile((prev) => prev.filter((_, i) => i !== idx));
+                        setFileUploadStatus((prev) =>
+                          prev.filter((_, i) => i !== idx)
+                        );
+                      }}
+                      className="btn btn-xs btn-error"
+                    >
+                      ✕
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         </fieldset>
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Các bước thực hiện</legend>
@@ -673,9 +764,9 @@ function CreateTestcaseForm({
         <button
           className="btn btn-primary"
           onClick={handleSubmit}
-          disabled={isUploading}
+          disabled={isLoading}
         >
-          {isUploading ? (
+          {isLoading ? (
             <span className="loading loading-spinner"></span>
           ) : (
             "Tạo testcase"

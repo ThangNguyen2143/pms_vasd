@@ -152,7 +152,7 @@ function RequirementsClient() {
         setTimeout(() => {
           getRequiredList(endpoint, "reload");
           setloading(() => false);
-        }, 3000);
+        }, 500);
       } catch (error) {
         console.error("Error converting dates:", error);
       }

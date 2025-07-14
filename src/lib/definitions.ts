@@ -134,7 +134,7 @@ export const CreateProjectSchema = z.object({
   name: z.string().min(1, "Yêu cầu nhập tên dự án"), // tên project
   description: z.string().min(2, "Nhập mô tả cho dự án"), // mô tả project
   start_date: z.date(), //thời gian bắt đầu
-  end_date: z.date(), // thời gian kết thúc dự kiến
+  end_date: z.union([z.date(), z.string().datetime(), z.null()]).optional(), // thời gian kết thúc dự kiến
 });
 export type CreateProjectState =
   | {

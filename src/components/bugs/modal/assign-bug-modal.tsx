@@ -49,6 +49,14 @@ export default function AssignBugModal({
   }, [product_id]);
 
   const handleSubmit = async () => {
+    if (selectUser != 0) {
+      toast.warning("Vui lòng chọn người được giao");
+      return;
+    }
+    if (deadline == "" || deadline) {
+      toast.warning("Vui lòng chọn deadline");
+      return;
+    }
     const data: DataSend = {
       bug_id,
       assign_to: selectUser,

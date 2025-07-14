@@ -6,12 +6,13 @@ export async function HandleAddProject(
   state: CreateProjectState,
   formData: FormData
 ) {
+  const rawEndDate = formData.get("end_date") as string;
   // Validate form fields
   const validatedFields = CreateProjectSchema.safeParse({
     name: formData.get("name"),
     description: formData.get("description"),
     start_date: new Date(formData.get("start_date") as string),
-    end_date: new Date(formData.get("end_date") as string),
+    end_date: rawEndDate ? new Date(rawEndDate) : undefined,
     seft_code: formData.get("seft_code"),
   });
   // If any form fields are invalid, return early
