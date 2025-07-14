@@ -1,8 +1,28 @@
 import SafeHtmlViewer from "~/components/ui/safeHTMLviewer";
-import { TestcaseDetail } from "~/lib/types";
+import { StepResult, TestcaseDetail } from "~/lib/types";
 import { format_date } from "~/utils/fomat-date";
 
 function TestHistory({ testcase }: { testcase: TestcaseDetail }) {
+  let allRunsSorted: {
+    code: string;
+    run_at: string;
+    assign_name: string;
+    step_results: StepResult[];
+    result: boolean;
+    tester_note: string;
+  }[] = [];
+  if (testcase.testCaseAssigns.length > 0)
+    allRunsSorted = testcase.testCaseAssigns
+      .flatMap((assign) => {
+        return assign.testRunInfo.map((run) => ({
+          assign_code: assign.code,
+          assign_name: assign.assignInfo.assign_name,
+          ...run,
+        }));
+      })
+      .sort(
+        (a, b) => new Date(b.run_at).getTime() - new Date(a.run_at).getTime()
+      );
   return (
     <div className="bg-base-200 shadow p-4 rounded-lg">
       <h2 className="text-xl font-semibold mb-4 border-l-4 border-green-500 pl-3">
@@ -22,38 +42,36 @@ function TestHistory({ testcase }: { testcase: TestcaseDetail }) {
               </tr>
             </thead>
             <tbody>
-              {testcase.testCaseAssigns.flatMap((assign) =>
-                assign.testRunInfo.map((run) => (
-                  <tr key={run.code}>
-                    <td>{format_date(run.run_at)}</td>
-                    <td>{assign.assignInfo.assign_name}</td>
-                    <td>
-                      <div className="text-sm space-y-1">
-                        {run.step_results?.map((step) => (
-                          <div key={step.code}>
-                            <div>
-                              <span className="text-gray-500">
-                                Bước {step.step_index}:
-                              </span>
-                              🔹 <strong>{step.step_name}</strong>:{" "}
-                              {step.result ? "✅" : "❌"}
-                            </div>
-                            {step.note && (
-                              <div className="text-gray-500">
-                                Ghi chú: {step.note}
-                              </div>
-                            )}
+              {allRunsSorted.map((run) => (
+                <tr key={run.code}>
+                  <td>{format_date(run.run_at)}</td>
+                  <td>{run.assign_name}</td>
+                  <td>
+                    <div className="text-sm space-y-1">
+                      {run.step_results?.map((step) => (
+                        <div key={step.code}>
+                          <div>
+                            <span className="text-gray-500">
+                              Bước {step.step_index}:
+                            </span>
+                            🔹 <strong>{step.step_name}</strong>:{" "}
+                            {step.result ? "✅" : "❌"}
                           </div>
-                        ))}
-                      </div>
-                    </td>
-                    <td>{run.result ? "✅ Pass" : "❌ Fail"}</td>
-                    <td>
-                      <SafeHtmlViewer html={run.tester_note || "-"} />
-                    </td>
-                  </tr>
-                ))
-              )}
+                          {step.note && (
+                            <div className="text-gray-500">
+                              Ghi chú: {step.note}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </td>
+                  <td>{run.result ? "✅ Pass" : "❌ Fail"}</td>
+                  <td>
+                    <SafeHtmlViewer html={run.tester_note || "-"} />
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>

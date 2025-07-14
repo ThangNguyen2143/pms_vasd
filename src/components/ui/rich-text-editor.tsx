@@ -17,7 +17,7 @@ export default function RichTextEditor({
   ...props
 }: RichTextEditorProps) {
   return (
-    <div className={clsx("w-full", className)}>
+    <div className={clsx("w-full ", className)}>
       <div className="rounded-box border border-base-300">
         <ClientEditor {...props} />
       </div>

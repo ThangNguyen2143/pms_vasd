@@ -24,6 +24,8 @@ import UpdateStepTestModal from "~/components/testcase/modals/update-step-test";
 import TestDependComp from "~/components/testcase/testcase-detail/test-depend";
 import TestHistory from "~/components/testcase/testcase-detail/test-history";
 import CopyTestcaseModal from "~/components/testcase/modals/copy-testcase-modal";
+import { useRouter } from "next/navigation";
+import UpdateDeadlineTesterModal from "~/components/testcase/modals/update-deadline-test";
 type InfoTestcaseDetail = {
   name: string;
   description: string;
@@ -48,6 +50,7 @@ export default function TestcaseDetailClient({
 }: {
   testcase_id: number;
 }) {
+  const route = useRouter();
   const {
     getData,
     data: testcase,
@@ -65,8 +68,13 @@ export default function TestcaseDetailClient({
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showUpdateStep, setShowUpdateStep] = useState(false);
   const [showCopyModal, setShowCopyModal] = useState(false);
+  const [showUpdateDeadlineModal, setShowUpdateDeadlineModal] = useState<{
+    code: string;
+    deadline: string;
+  }>();
   const [openAddTest, setOpenAddTest] = useState<string>();
   const { data: moduleList, getData: getModules } = useApi<ProductModule[]>();
+  const { removeData: deleteTest, errorData: errorDel } = useApi();
   useEffect(() => {
     if (testcase)
       getModules(
@@ -76,12 +84,19 @@ export default function TestcaseDetailClient({
       );
   }, [testcase]);
   useEffect(() => {
+    if (errorDel) {
+      toast.error(errorDel.message || errorDel.title);
+    }
+  }, [errorDel]);
+  useEffect(() => {
     getEnv("/system/config/eyJ0eXBlIjoidGVzdF9lbnZpcm9ubWVudCJ9");
   }, []);
   useEffect(() => {
     if (errorLoadEnv) toast.error(errorLoadEnv.message || errorLoadEnv.title);
-    if (errorPost) toast.error(errorPost.message || errorPost.title);
-    console.log(errorPost);
+    if (errorPost) {
+      toast.error(errorPost.message || errorPost.title);
+      console.log(errorPost);
+    }
   }, [errorLoadEnv, errorPost]);
   useEffect(() => {
     fetchTestcase();
@@ -170,16 +185,32 @@ export default function TestcaseDetailClient({
       toast.error("Cập nhật thất bại");
     }
   };
-
+  const handleDeleteTest = async () => {
+    if (confirm("Bạn có chắc chắn muốn xóa testcase này?")) {
+      const re = await deleteTest("/testcase/" + encodeBase64({ testcase_id }));
+      if (re != null) {
+        toast.success("Xóa testcase thành công");
+        route.back();
+      }
+    }
+  };
   if (loading) return <div>Loading...</div>;
   if (!testcase) return <div>Testcase not found</div>;
   return (
     <div className="mx-auto  p-6 rounded-lg shadow-sm">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">📋 Chi tiết Test Case</h1>
-        <button className="btn btn-dash" onClick={() => setShowCopyModal(true)}>
-          Copy testcase
-        </button>
+        <div className="flex gap2">
+          <button
+            className="btn btn-dash"
+            onClick={() => setShowCopyModal(true)}
+          >
+            Copy testcase
+          </button>
+          <button className="btn btn-error ml-2" onClick={handleDeleteTest}>
+            Xóa testcase
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -236,6 +267,9 @@ export default function TestcaseDetailClient({
           testcase_id={testcase_id}
           openAddTest={(code) => setOpenAddTest(code)}
           openAssign={() => setShowAssignModal(true)}
+          openUpdateDeadline={(code, deadline) =>
+            setShowUpdateDeadlineModal({ code, deadline })
+          }
         />
         {/* Test History Section */}
 
@@ -266,6 +300,15 @@ export default function TestcaseDetailClient({
           onUpdate={fetchTestcase}
           steps={testcase.testSteps}
           testcase_id={testcase_id}
+        />
+      )}
+      {showUpdateDeadlineModal && (
+        <UpdateDeadlineTesterModal
+          assign_code={showUpdateDeadlineModal.code}
+          deadline_current={showUpdateDeadlineModal.deadline}
+          testcase_id={testcase_id}
+          onClose={() => setShowUpdateDeadlineModal(undefined)}
+          onUpdate={fetchTestcase}
         />
       )}
       <UpdateStepTestModal

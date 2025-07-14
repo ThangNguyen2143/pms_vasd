@@ -76,7 +76,7 @@ export type TestRunInfo = {
   tester_note: string;
   step_results: StepResult[];
 };
-type StepResult = {
+export type StepResult = {
   code: string;
   step_index: number;
   step_name: string;

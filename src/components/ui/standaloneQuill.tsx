@@ -152,6 +152,7 @@ export default function StandaloneQuill({
       background: "#ffffdd",
     });
     editor.insertText(mentionStartIndex + name.length + 1, " ");
+    editor.format("bold", false);
     editor.setSelection(mentionStartIndex + name.length + 1);
     setShowSuggest(false);
     setMentionStartIndex(null);

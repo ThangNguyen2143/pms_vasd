@@ -41,7 +41,7 @@ export default function AddRequirementModal({
 }: AddRequirementProps) {
   const [productSelect, setproductSelect] = useState("");
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [description, setDescription] = useState("<p><br/></p>");
   const [typeSelected, setTypeSelected] = useState("");
   const [dateReceive, setDateReceive] = useState("");
   const [tags, setTags] = useState<string[]>([]);
@@ -188,7 +188,7 @@ export default function AddRequirementModal({
     <div className="modal modal-open">
       <div className="modal-box w-11/12 max-w-7xl max-h-11/12 h-full">
         <h3 className="font-bold text-lg mb-2">Tạo yêu cầu mới</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 px-4 text-lg">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 px-4">
           <label className="floating-label">
             <span>Phần mềm</span>
             <select
@@ -232,14 +232,14 @@ export default function AddRequirementModal({
               onChange={(e) => setTitle(e.target.value)}
             />
           </label>
-          <label className="floating-label sm:col-span-2">
-            <span>Mô tả</span>
+          <fieldset className="fieldset sm:col-span-2">
+            <legend className="fieldset-legend">Mô tả</legend>
             <RichTextEditor
               placeholder="Mô tả"
               value={description}
               onChange={setDescription}
             />
-          </label>
+          </fieldset>
 
           <label className="floating-label">
             <span>Ngày ghi nhận</span>

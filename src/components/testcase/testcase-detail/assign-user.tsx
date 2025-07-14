@@ -1,10 +1,19 @@
 "use client";
 import clsx from "clsx";
-import { CirclePlay, FileBadge, Plus, SquareCheckBig } from "lucide-react";
+import {
+  CirclePlay,
+  FileBadge,
+  Pencil,
+  Plus,
+  SquareCheckBig,
+  X,
+} from "lucide-react";
 import { useEffect } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
+import { encodeBase64 } from "~/lib/services";
 import { TestAssign } from "~/lib/types";
+import { format_date } from "~/utils/fomat-date";
 
 function AssignedUser({
   assignTo,
@@ -12,17 +21,20 @@ function AssignedUser({
   onUpdate,
   openAddTest,
   openAssign,
+  openUpdateDeadline,
 }: {
   assignTo: TestAssign[];
   testcase_id: number;
   onUpdate: () => Promise<void>;
   openAddTest: (code: string) => void;
+  openUpdateDeadline: (code: string, deadline_current: string) => void;
   openAssign: () => void;
 }) {
   const { putData, errorData } = useApi<
     "",
     { testcase_id: number; assign_code: string; status: string }
   >();
+  const { removeData, errorData: errorRemove } = useApi();
   const handleSubmit = async (assign_code: string, status: string) => {
     const re = await putData("/testcase/testing/status", {
       testcase_id,
@@ -34,9 +46,21 @@ function AssignedUser({
       toast.success("Xử lý thành công");
     }
   };
+  const handleDeleteTester = async (code: string) => {
+    const re = await removeData(
+      `/testcase/assign/${encodeBase64({
+        test_id: testcase_id,
+        assign_code: code,
+      })}`
+    );
+    if (re == null) return;
+    toast.success("Xử lý thành công");
+    await onUpdate();
+  };
   useEffect(() => {
-    if (errorData) toast.error(errorData.message);
-  }, [errorData]);
+    if (errorData) toast.error(errorData.message || errorData.title);
+    if (errorRemove) toast.error(errorRemove.message || errorRemove.title);
+  }, [errorData, errorRemove]);
   return (
     <div className="bg-base-200 rounded-lg p-4">
       <div className="flex justify-between">
@@ -61,7 +85,7 @@ function AssignedUser({
                 <strong>{assignInfo.assign_name}</strong>{" "}
                 <span className="badge badge-info">{status}</span>
               </p>
-              <p>Ngày giao: {assignInfo.assigned_at}</p>
+              <p>Ngày giao: {format_date(assignInfo.assigned_at)}</p>
               <p>
                 Deadline:{" "}
                 <span
@@ -69,15 +93,28 @@ function AssignedUser({
                     assignInfo.is_late ? "badge badge-error" : ""
                   )}
                 >
-                  {assignInfo.dead_line}
+                  {format_date(assignInfo.dead_line)}
                 </span>
+                <button
+                  className="btn btn-circle tooltip"
+                  data-tip="Chỉnh deadline"
+                  onClick={() => {
+                    openUpdateDeadline(code, assignInfo.dead_line);
+                  }}
+                >
+                  <Pencil />
+                </button>
               </p>
               {assignInfo.start_at ? (
-                <p>Bắt đầu: {assignInfo.start_at}</p>
+                <p>Bắt đầu: {format_date(assignInfo.start_at)}</p>
               ) : (
                 <p>Người dùng chưa bắt đầu</p>
               )}
-              {assignInfo.end_at ? <p>Kết thúc: {assignInfo.end_at}</p> : ""}
+              {assignInfo.end_at ? (
+                <p>Kết thúc: {format_date(assignInfo.end_at)}</p>
+              ) : (
+                ""
+              )}
               <div className="flex justify-end gap-2">
                 <div className="join">
                   {status == "ASSIGNED" && (
@@ -107,6 +144,13 @@ function AssignedUser({
                       <SquareCheckBig />
                     </button>
                   )}
+                  <button
+                    className="btn btn-outline btn-error tooltip join-item"
+                    data-tip="Xóa tester"
+                    onClick={() => handleDeleteTester(code)}
+                  >
+                    <X />
+                  </button>
                 </div>
               </div>
             </div>
