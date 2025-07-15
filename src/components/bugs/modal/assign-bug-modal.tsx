@@ -55,7 +55,7 @@ export default function AssignBugModal({
       toast.warning("Vui lòng chọn người được giao");
       return;
     }
-    if (deadline == "" || deadline) {
+    if (deadline == "") {
       toast.warning("Vui lòng chọn deadline");
       return;
     }
