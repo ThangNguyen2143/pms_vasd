@@ -6,6 +6,8 @@ import { TestStep } from "~/lib/types";
 import { useUser } from "~/providers/user-context";
 import RichTextEditor from "~/components/ui/rich-text-editor";
 import SafeHtmlViewer from "~/components/ui/safeHTMLviewer";
+import { format_date, toISOString } from "~/utils/fomat-date";
+import DateTimePicker from "~/components/ui/date-time-picker";
 
 interface AddTestRunModalProps {
   steps: TestStep[];
@@ -25,7 +27,7 @@ export default function AddTestRunModal({
   const { user } = useUser();
   const { putData, isLoading, errorData } = useApi();
   const [formData, setFormData] = useState({
-    run_at: new Date().toISOString().slice(0, 16),
+    run_at: format_date(new Date()),
     tester_note: "",
     step_results: steps.map((step) => ({
       code: step.code,
@@ -46,7 +48,7 @@ export default function AddTestRunModal({
       const payload = {
         testcase_id,
         assign_code,
-        run_at: formData.run_at,
+        run_at: toISOString(formData.run_at),
         result: totalResult,
         tester_note: formData.tester_note,
         step_result: formData.step_results.map((step) => ({
@@ -89,19 +91,16 @@ export default function AddTestRunModal({
       <div className="modal-box max-w-5xl w-full">
         <h2 className="text-xl font-bold mb-4">Thêm lần test mới</h2>
         <form onSubmit={handleSubmit}>
+          {/* Sửa thẻ */}
           <div className="space-y-4">
             {/* Thông tin chung */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block mb-1">Thời gian thực hiện</label>
-                <input
-                  type="datetime-local"
+                <DateTimePicker
                   className="input input-bordered w-full"
                   value={formData.run_at}
-                  onChange={(e) =>
-                    setFormData({ ...formData, run_at: e.target.value })
-                  }
-                  required
+                  onChange={(e) => setFormData({ ...formData, run_at: e })}
                 />
               </div>
               <div className="flex items-center">

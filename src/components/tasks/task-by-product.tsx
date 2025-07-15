@@ -153,7 +153,7 @@ function TaskByProduct() {
           >
             ✕
           </button>
-          <h3 className="text-lg">Thêm task</h3>
+          <h3 className="text-lg font-bold">Thêm task</h3>
           <CreateTaskForm
             product_id={selectProduct}
             modules={modules || []}

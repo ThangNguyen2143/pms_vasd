@@ -1,4 +1,4 @@
-import clsx from "clsx";
+"use client";
 import {
   CheckCircle,
   EqualApproximately,
@@ -12,7 +12,7 @@ import SafeHtmlViewer from "~/components/ui/safeHTMLviewer";
 import { useApi } from "~/hooks/use-api";
 import { ProductModule, TestcaseDetail } from "~/lib/types";
 import { format_date } from "~/utils/fomat-date";
-import { status_with_color } from "~/utils/status-with-color";
+import { status_with_color_badge } from "~/utils/status-with-color";
 
 function TestcaseInfo({
   testcase,
@@ -135,12 +135,7 @@ function TestcaseInfo({
       <div className="space-y-3">
         <p>
           <strong>Tên:</strong> {testcase.name}{" "}
-          <span
-            className={clsx(
-              "badge badge-soft",
-              `badge-${status_with_color(testcase.status)}`
-            )}
-          >
+          <span className={status_with_color_badge[testcase.status]}>
             {testcase.status}
           </span>
         </p>

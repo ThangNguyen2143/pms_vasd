@@ -1,6 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
+import Cookies from "js-cookie";
 import DateTimePicker from "~/components/ui/date-time-picker";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
@@ -33,6 +34,7 @@ export default function AssignBugModal({
   onUpdate: () => Promise<void>;
   onClose: () => void;
 }) {
+  const isDark = Cookies.get("theme") == "night";
   const [selectUser, setSelectUser] = useState(0);
   const [deadline, setDeadline] = useState("");
   const { postData, isLoading, errorData } = useApi<ResponseNotify, DataSend>();
@@ -49,7 +51,7 @@ export default function AssignBugModal({
   }, [product_id]);
 
   const handleSubmit = async () => {
-    if (selectUser != 0) {
+    if (selectUser == 0) {
       toast.warning("Vui lòng chọn người được giao");
       return;
     }
@@ -132,6 +134,35 @@ export default function AssignBugModal({
           <legend className="fieldset-legend">Người thực hiện</legend>
           <Select
             className="w-full"
+            styles={{
+              control: (styles) => ({
+                ...styles,
+                backgroundColor: isDark ? "#0f172a" : "white",
+              }),
+              option: (styles, { isFocused, isSelected }) => {
+                let backgroundColor = isDark ? "#1e293b" : "#ffffff";
+                let color = isDark ? "#f1f5f9" : "#111827";
+
+                if (isSelected) {
+                  backgroundColor = isDark ? "#2563eb" : "#3b82f6"; // blue-600 | blue-500
+                  color = "#ffffff";
+                } else if (isFocused) {
+                  backgroundColor = isDark ? "#334155" : "#e5e7eb"; // slate-700 | gray-200
+                }
+
+                return {
+                  ...styles,
+                  backgroundColor,
+                  color,
+                  cursor: "pointer",
+                };
+              },
+              menuList: (styles) => ({
+                ...styles,
+                maxHeight: "200px", // 👈 Chiều cao tối đa của menu
+                overflowY: "auto", // 👈 Hiển thị scroll khi vượt giới hạn
+              }),
+            }}
             placeholder="Chọn người thực hiện"
             value={options.find((opt) => opt.value === selectUser) || null}
             onChange={(selected) => setSelectUser(selected?.value ?? 0)}

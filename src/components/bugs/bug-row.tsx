@@ -1,9 +1,8 @@
-import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { encodeBase64 } from "~/lib/services";
 import { BugDto } from "~/lib/types";
 import { format_date } from "~/utils/fomat-date";
-import { status_with_color } from "~/utils/status-with-color";
+import { status_with_color_badge } from "~/utils/status-with-color";
 
 interface BugRowProps {
   bug: BugDto;
@@ -35,9 +34,7 @@ export default function BugRow({
         {bug.dead_line ? format_date(bug.dead_line) : "-"}
       </td>
       <td className="px-4 py-2">
-        <span
-          className={clsx("badge", `badge-${status_with_color(bug.status)}`)}
-        >
+        <span className={status_with_color_badge[bug.status]}>
           {bug.status}
         </span>
       </td>

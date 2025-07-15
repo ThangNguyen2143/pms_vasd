@@ -5,8 +5,7 @@ import { ProjectDetailDto, ProjectStatus } from "~/lib/types";
 import UpdateInfoProjectModal from "./modals/update-info-modal";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
-import clsx from "clsx";
-import { status_with_color } from "~/utils/status-with-color";
+import { status_with_color_badge } from "~/utils/status-with-color";
 import { format_date } from "~/utils/fomat-date";
 
 export default function ProjectInfo({
@@ -74,12 +73,7 @@ export default function ProjectInfo({
           </p>
           <p>
             <span className="font-bold">Trạng thái:</span>
-            <span
-              className={clsx(
-                "badge",
-                `badge-${status_with_color(info.status)}`
-              )}
-            >
+            <span className={status_with_color_badge[info.status]}>
               {statusList?.find((st) => st.code == info.status)?.display}
             </span>
           </p>

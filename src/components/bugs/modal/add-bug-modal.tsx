@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import Cookies from "js-cookie";
 import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
 import { useUploadFile } from "~/hooks/use-upload-file";
@@ -20,7 +21,7 @@ interface AddBugProps {
   product_id: string;
 
   onClose: () => void;
-  onCreated: () => void;
+  onCreated: () => Promise<void>;
 }
 
 interface DataCreate {
@@ -56,6 +57,7 @@ export default function AddBugModal({
 
   // const { isUploading, uploadError, uploadMultiFiles } = useUploadFile();
 
+  const isDark = Cookies.get("theme") == "night";
   const { uploadError, uploadChunkedFile } = useUploadFile();
   const { postData, isLoading, errorData } = useApi<
     { id: number },
@@ -157,6 +159,9 @@ export default function AddBugModal({
           });
         })
       );
+    } else {
+      onCreated();
+      onClose();
     }
     // const re = await uploadMultiFiles({
     //   files,
@@ -259,6 +264,35 @@ export default function AddBugModal({
             <legend className="fieldset-legend">Task liên quan</legend>
             <Select
               className="w-full"
+              styles={{
+                control: (styles) => ({
+                  ...styles,
+                  backgroundColor: isDark ? "#0f172a" : "white",
+                }),
+                option: (styles, { isFocused, isSelected }) => {
+                  let backgroundColor = isDark ? "#1e293b" : "#ffffff";
+                  let color = isDark ? "#f1f5f9" : "#111827";
+
+                  if (isSelected) {
+                    backgroundColor = isDark ? "#2563eb" : "#3b82f6"; // blue-600 | blue-500
+                    color = "#ffffff";
+                  } else if (isFocused) {
+                    backgroundColor = isDark ? "#334155" : "#e5e7eb"; // slate-700 | gray-200
+                  }
+
+                  return {
+                    ...styles,
+                    backgroundColor,
+                    color,
+                    cursor: "pointer",
+                  };
+                },
+                menuList: (styles) => ({
+                  ...styles,
+                  maxHeight: "200px", // 👈 Chiều cao tối đa của menu
+                  overflowY: "auto", // 👈 Hiển thị scroll khi vượt giới hạn
+                }),
+              }}
               placeholder="Chọn task liên kết"
               value={options.find((opt) => opt.value === taskSelected) || null}
               onChange={(selected) => setTaskSelected(selected?.value ?? "")}

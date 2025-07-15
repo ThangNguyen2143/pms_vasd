@@ -1,3 +1,5 @@
+"use client";
+import { useEffect } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
@@ -14,11 +16,16 @@ function ConfirmDeleteAssign({
   onUpdate: () => Promise<void>;
 }) {
   const { removeData, errorData, isLoading } = useApi<"">();
+  useEffect(() => {
+    if (errorData) {
+      toast.error(errorData.message || errorData.title);
+    }
+  }, [errorData]);
   const handlerRemove = async () => {
-    await removeData(
+    const re = await removeData(
       "/tasks/assign/" + encodeBase64({ task_id, user_id: member })
     );
-    if (errorData) toast.error(errorData.message || errorData.title);
+    if (re == null) return;
     else {
       await onUpdate();
       toast.success("Đã xóa thành viên khỏi công việc");

@@ -16,7 +16,7 @@ import UpdateInfoTaskModal from "~/components/tasks/modals/update-info-task-btn"
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { Comment, DataRating, Task, WorkStatus } from "~/lib/types";
-import { status_with_color } from "~/utils/status-with-color";
+import { status_with_color_badge } from "~/utils/status-with-color";
 import TaskLinks from "~/components/tasks/task-detail/task-link";
 import CriteriaTask from "~/components/tasks/task-detail/criterial-task";
 import AddCriterialModal from "~/components/tasks/modals/add-criterial-modal";
@@ -139,8 +139,8 @@ export default function TaskDetailClient({ task_id }: { task_id: number }) {
           <div>
             <span
               className={clsx(
-                "badge text-sm px-4 py-2 rounded-full",
-                `badge-${status_with_color(task.status)}`
+                "text-sm px-4 py-2 rounded-full",
+                `${status_with_color_badge[task.status]}`
               )}
             >
               {taskStatus

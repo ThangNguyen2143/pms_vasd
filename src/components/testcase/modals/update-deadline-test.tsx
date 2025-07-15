@@ -69,6 +69,7 @@ function UpdateDeadlineTesterModal({
         .catch((e) => toast.error(e));
     toast.success("Xử lý thành công");
     await onUpdate();
+    onClose();
   };
   return (
     <div className="modal modal-open">

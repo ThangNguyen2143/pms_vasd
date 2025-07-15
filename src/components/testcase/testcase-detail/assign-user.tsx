@@ -118,13 +118,22 @@ function AssignedUser({
               <div className="flex justify-end gap-2">
                 <div className="join">
                   {status == "ASSIGNED" && (
-                    <button
-                      className="btn btn-primary btn-outline join-item tooltip"
-                      onClick={() => handleSubmit(code, "START")}
-                      data-tip={"Bắt đầu"}
-                    >
-                      <CirclePlay />
-                    </button>
+                    <>
+                      <button
+                        className="btn btn-primary btn-outline join-item tooltip"
+                        onClick={() => handleSubmit(code, "START")}
+                        data-tip={"Bắt đầu"}
+                      >
+                        <CirclePlay />
+                      </button>
+                      <button
+                        className="btn btn-outline btn-error tooltip join-item"
+                        data-tip="Xóa tester"
+                        onClick={() => handleDeleteTester(code)}
+                      >
+                        <X />
+                      </button>
+                    </>
                   )}
                   {status == "INPROGRESS" && (
                     <button
@@ -144,13 +153,6 @@ function AssignedUser({
                       <SquareCheckBig />
                     </button>
                   )}
-                  <button
-                    className="btn btn-outline btn-error tooltip join-item"
-                    data-tip="Xóa tester"
-                    onClick={() => handleDeleteTester(code)}
-                  >
-                    <X />
-                  </button>
                 </div>
               </div>
             </div>

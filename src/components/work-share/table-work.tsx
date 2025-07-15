@@ -9,7 +9,7 @@ import {
 // import UpdateWork from "./update-work";
 // import UpdateDeadline from "./update-deadline";
 import clsx from "clsx";
-import { status_with_color } from "~/utils/status-with-color";
+import { status_with_color_badge } from "~/utils/status-with-color";
 import { format_date } from "~/utils/fomat-date";
 import { format } from "date-fns";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -229,8 +229,8 @@ function TableWork({
                   <td className="max-w-36">
                     <span
                       className={clsx(
-                        "tooltip badge",
-                        "badge-" + status_with_color(item.status)
+                        "tooltip",
+                        status_with_color_badge[item.status]
                       )}
                       data-tip={
                         statusList?.find(

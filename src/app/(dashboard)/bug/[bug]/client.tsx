@@ -12,8 +12,6 @@ import AssignBug from "~/components/bugs/bugdetail/assign-bug";
 import ReTestList from "~/components/bugs/bugdetail/retest-bug";
 import BugLogs from "~/components/bugs/bugdetail/bug-log";
 import AddFileAttachmentModal from "~/components/bugs/modal/add-file-attachment";
-// import clsx from "clsx";
-// import { status_with_color } from "~/utils/status-with-color";
 import AssignBugModal from "~/components/bugs/modal/assign-bug-modal";
 import ReTestBugAssignModal from "~/components/bugs/modal/re-test-assign";
 import LinkTaskOrTestToBugModal from "~/components/bugs/modal/ref-update-modal";

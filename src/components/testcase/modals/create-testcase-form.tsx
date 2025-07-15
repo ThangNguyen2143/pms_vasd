@@ -127,6 +127,7 @@ function CreateTestcaseForm({
   }, [errorLoadEnv, uploadError]);
   useEffect(() => {
     if (fileUploadStatus.some((st) => st.status == "done")) {
+      toast.success("Tạo testcase thành công");
       onSuccess();
       resetForm();
     }
@@ -216,8 +217,11 @@ function CreateTestcaseForm({
           });
         })
       );
+    } else {
+      toast.success("Tạo testcase thành công");
+      onSuccess();
+      resetForm();
     }
-    toast.success("Tạo testcase thành công");
   };
 
   const resetForm = () => {

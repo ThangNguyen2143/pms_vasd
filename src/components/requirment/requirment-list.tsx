@@ -7,7 +7,7 @@ import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { RequirementDto, RequirementStatus, UserDto } from "~/lib/types";
 import { format_date } from "~/utils/fomat-date";
-import { status_with_color } from "~/utils/status-with-color";
+import { status_with_color_badge } from "~/utils/status-with-color";
 
 function ContructionTable({ children }: { children: ReactNode }) {
   return (
@@ -165,8 +165,8 @@ function RequirementList({
                     <div className="grow">{required.title}</div>
                     <span
                       className={clsx(
-                        " badge text-xs",
-                        `badge-${status_with_color(required.status)}`
+                        "text-xs",
+                        status_with_color_badge[required.status]
                       )}
                     >
                       {required.status}

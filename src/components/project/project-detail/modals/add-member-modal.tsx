@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import Cookies from "js-cookie";
 import { useApi } from "~/hooks/use-api";
 import { ProjectMemberDto, ProjectRole, UserDto } from "~/lib/types";
 import Select from "react-select";
@@ -27,6 +28,7 @@ function AddMemberProjectModal({
   onClose: () => void;
   onUpdate: () => Promise<void>;
 }) {
+  const isDark = Cookies.get("theme") == "night";
   const [userSelected, setuserSelected] = useState<number>(0);
   const [roles, setroles] = useState<{ role_code: string }[]>([]);
   const { putData, errorData, isLoading } = useApi<"", AddMemberToProject>();
@@ -71,6 +73,35 @@ function AddMemberProjectModal({
           <legend className="fieldset-legend">Tên thành viên</legend>
           <Select
             className="w-full"
+            styles={{
+              control: (styles) => ({
+                ...styles,
+                backgroundColor: isDark ? "#0f172a" : "white",
+              }),
+              option: (styles, { isFocused, isSelected }) => {
+                let backgroundColor = isDark ? "#1e293b" : "#ffffff";
+                let color = isDark ? "#f1f5f9" : "#111827";
+
+                if (isSelected) {
+                  backgroundColor = isDark ? "#2563eb" : "#3b82f6"; // blue-600 | blue-500
+                  color = "#ffffff";
+                } else if (isFocused) {
+                  backgroundColor = isDark ? "#334155" : "#e5e7eb"; // slate-700 | gray-200
+                }
+
+                return {
+                  ...styles,
+                  backgroundColor,
+                  color,
+                  cursor: "pointer",
+                };
+              },
+              menuList: (styles) => ({
+                ...styles,
+                maxHeight: "200px", // 👈 Chiều cao tối đa của menu
+                overflowY: "auto", // 👈 Hiển thị scroll khi vượt giới hạn
+              }),
+            }}
             placeholder="Chọn thành viên"
             value={options.find((emp) => emp.value === userSelected) || null}
             onChange={(selected) => setuserSelected(selected?.value ?? 0)}

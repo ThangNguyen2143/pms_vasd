@@ -4,7 +4,7 @@ import { useApi } from "~/hooks/use-api";
 import { WorkStatus } from "~/lib/types";
 import ErrorMessage from "../ui/error-message";
 import clsx from "clsx";
-import { status_with_color } from "~/utils/status-with-color";
+import { status_color_btn } from "~/utils/status-with-color";
 interface DataPut {
   work_id: number;
   status: string;
@@ -49,9 +49,11 @@ function EditStatusModal({
           role="button"
           className={clsx(
             "btn m-1",
-            `btn-${status_with_color(
-              statusList.find((st) => st.display == display)?.code || ""
-            )}`
+            `btn-${
+              status_color_btn[
+                statusList.find((st) => st.display == display)?.code || ""
+              ]
+            }`
           )}
         >
           {isUpdating ? "Đang cập nhật..." : display}

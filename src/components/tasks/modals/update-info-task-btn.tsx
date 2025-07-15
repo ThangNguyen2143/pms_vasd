@@ -6,6 +6,7 @@ import DateTimePicker from "~/components/ui/date-time-picker";
 import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
 import { DataRating, Task } from "~/lib/types";
+import { format_date, toISOString } from "~/utils/fomat-date";
 
 interface DataSend {
   task_id: number;
@@ -33,7 +34,9 @@ export default function UpdateInfoTaskModal({
 }) {
   const [title, setTitle] = useState<string>(task_info.title);
   const [description, setDescription] = useState<string>(task_info.description);
-  const [deadline, setDeadline] = useState<string>(task_info.dead_line);
+  const [deadline, setDeadline] = useState<string>(
+    format_date(task_info.dead_line)
+  );
   const [criteriaList, setCriteriaList] = useState<Criteria[]>(
     critList.length > 0
       ? critList.map((item) => ({
@@ -58,7 +61,7 @@ export default function UpdateInfoTaskModal({
       task_id: task_info.task_id,
       title,
       description,
-      dead_line: deadline,
+      dead_line: toISOString(deadline),
       acceptances: criteriaList.map((criteria) => ({
         title: criteria.title,
         type: criteria.type,

@@ -1,10 +1,9 @@
 "use client";
-import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { encodeBase64 } from "~/lib/services";
 import { ProductModule, UserDto, WorkStatus } from "~/lib/types";
 import { TestcaseDto } from "~/lib/types/testcase";
-import { status_with_color } from "~/utils/status-with-color";
+import { status_with_color_badge } from "~/utils/status-with-color";
 
 interface TestRowProps {
   testcase: TestcaseDto;
@@ -42,12 +41,7 @@ function TestRow({ testcase, users, statusList, moduleList }: TestRowProps) {
       <td className="px-4 py-2">{testcase.time_start}</td>
       <td className="px-4 py-2">{testcase.time_end}</td>
       <td className="px-4 py-2 truncate max-w-72">
-        <span
-          className={clsx(
-            " badge",
-            `badge-${status_with_color(testcase.status)}`
-          )}
-        >
+        <span className={status_with_color_badge[testcase.status]}>
           {statusDisplay || "Không rõ"}
         </span>
       </td>

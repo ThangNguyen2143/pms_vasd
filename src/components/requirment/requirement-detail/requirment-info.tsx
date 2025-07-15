@@ -2,8 +2,10 @@
 "use client";
 import React, { useEffect } from "react";
 import { Pencil } from "lucide-react";
-import clsx from "clsx";
-import { status_with_color } from "~/utils/status-with-color";
+import {
+  status_color_btn,
+  status_with_color_badge,
+} from "~/utils/status-with-color";
 import { useApi } from "~/hooks/use-api";
 import { RequirementStatus } from "~/lib/types";
 import { toast } from "sonner";
@@ -75,7 +77,7 @@ export default function RequirementInfo({
       <div className="join">
         {allowStatus &&
           allowStatus.map((st) => {
-            const color = status_with_color(st);
+            const color = status_color_btn[st];
             return (
               <button
                 key={st}
@@ -118,9 +120,7 @@ export default function RequirementInfo({
       <div className="space-y-2">
         <p>
           <span className="font-bold">Tiêu đề:</span> {info.title}{" "}
-          <span
-            className={clsx("badge", `badge-${status_with_color(info.status)}`)}
-          >
+          <span className={status_with_color_badge[info.status]}>
             {info.status}
           </span>
         </p>

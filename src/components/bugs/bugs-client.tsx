@@ -117,8 +117,8 @@ function BugsClient() {
         <AddBugModal
           product_id={selectProduct}
           onClose={() => setShowModal(false)}
-          onCreated={() => {
-            getBugList(endpoint(selectProduct), "reload");
+          onCreated={async () => {
+            await getBugList(endpoint(selectProduct), "reload");
           }}
         />
       )}

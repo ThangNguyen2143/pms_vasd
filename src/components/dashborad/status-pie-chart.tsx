@@ -33,14 +33,19 @@ type ChartOptions = React.ComponentProps<typeof Pie>["options"] & {
 };
 
 const defaultColors = [
-  "#4ade80",
-  "#60a5fa",
-  "#facc15",
-  "#f87171",
-  "#a78bfa",
-  "#34d399",
-  "#fb923c",
-  "#818cf8",
+  "#4ade80", // green
+  "#60a5fa", // blue
+  "#facc15", // yellow
+  "#f87171", // red
+  "#a78bfa", // purple
+  "#34d399", // emerald
+  "#fb923c", // orange
+  "#818cf8", // indigo
+  "#ec4899", // pink
+  "#22d3ee", // cyan
+  "#f97316", // deep orange
+  "#10b981", // teal
+  "#eab308", // amber
 ];
 
 export default function StatusPieChart({
