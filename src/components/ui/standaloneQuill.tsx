@@ -70,24 +70,30 @@ export default function StandaloneQuill({
   useEffect(() => {
     if (!editor?.root) return;
 
-    const handlePaste = (e: ClipboardEvent) => {
-      const items = e.clipboardData?.items;
-      if (!items) return;
-      for (const item of items) {
-        if (item.type.startsWith("image")) {
-          const file = item.getAsFile();
-          if (file) {
-            const reader = new FileReader();
-            reader.onload = (evt) => {
-              const base64 = evt.target?.result;
-              const range = editor.getSelection(true);
-              editor.insertEmbed(range.index, "image", base64);
-            };
-            reader.readAsDataURL(file);
-          }
-        }
-      }
-    };
+    // const handlePaste = (e: ClipboardEvent) => {
+    //   const items = e.clipboardData?.items;
+    //   if (!items) return;
+    //   let hasImage = false;
+    //   for (const item of items) {
+    //     console.log("type:", item.type);
+    //     if (item.type.startsWith("image")) {
+    //       hasImage = true;
+    //       const file = item.getAsFile();
+    //       if (file) {
+    //         const reader = new FileReader();
+    //         reader.onload = (evt) => {
+    //           const base64 = evt.target?.result;
+    //           const range = editor.getSelection(true);
+    //           editor.insertEmbed(range.index, "image", base64);
+    //         };
+    //         reader.readAsDataURL(file);
+    //       }
+    //     }
+    //   }
+    //   if (hasImage) {
+    //     e.preventDefault(); // ✅ Chặn dán mặc định
+    //   }
+    // };
 
     const handleKeydown = (e: KeyboardEvent) => {
       if (e.key === "@") {
@@ -114,9 +120,9 @@ export default function StandaloneQuill({
         sel.index < mentionStartIndex - 1
       ) {
         setShowSuggest(false);
+        setMentionStartIndex(null);
         return;
       }
-
       const text = editor.getText(
         mentionStartIndex,
         sel.index - mentionStartIndex
@@ -130,12 +136,12 @@ export default function StandaloneQuill({
     };
 
     const el = editor.root;
-    el.addEventListener("paste", handlePaste);
+    // el.addEventListener("paste", handlePaste);
     el.addEventListener("keydown", handleKeydown);
     editor.on("text-change", handleTextChange);
 
     return () => {
-      el.removeEventListener("paste", handlePaste);
+      // el.removeEventListener("paste", handlePaste);
       el.removeEventListener("keydown", handleKeydown);
       editor.off("text-change", handleTextChange);
     };

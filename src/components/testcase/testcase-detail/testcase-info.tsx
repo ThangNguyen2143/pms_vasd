@@ -149,6 +149,10 @@ function TestcaseInfo({
             : testcase.module}
         </p>
         <p>
+          <strong>Task:</strong>
+          {testcase.task.name}
+        </p>
+        <p>
           <strong>Tags:</strong>
           {testcase.tags.map((tag) => (
             <span key={tag} className="badge badge-primary ml-2">

@@ -2,10 +2,13 @@
 import { Plus, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
+import Select from "react-select";
+import Cookies from "js-cookie";
 import DateTimePicker from "~/components/ui/date-time-picker";
 import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
-import { DataRating, Task } from "~/lib/types";
+import { encodeBase64 } from "~/lib/services";
+import { DataRating, ProductModule, Task } from "~/lib/types";
 import { format_date, toISOString } from "~/utils/fomat-date";
 
 interface DataSend {
@@ -13,6 +16,8 @@ interface DataSend {
   title: string;
   description: string;
   dead_line: string;
+  module: string;
+  acceptances?: { title: string; type: string }[];
 }
 interface Criteria {
   id: string;
@@ -32,11 +37,13 @@ export default function UpdateInfoTaskModal({
   onUpdate: () => Promise<void>;
   onClose: () => void;
 }) {
+  const isDark = Cookies.get("theme") == "night";
   const [title, setTitle] = useState<string>(task_info.title);
   const [description, setDescription] = useState<string>(task_info.description);
   const [deadline, setDeadline] = useState<string>(
     format_date(task_info.dead_line)
   );
+  const [selectModule, setSelectModule] = useState(task_info.module || "");
   const [criteriaList, setCriteriaList] = useState<Criteria[]>(
     critList.length > 0
       ? critList.map((item) => ({
@@ -53,20 +60,39 @@ export default function UpdateInfoTaskModal({
         ]
   );
   const { putData, errorData, isLoading } = useApi<string, DataSend>();
+  const { data: moduleList, getData: getModules } = useApi<ProductModule[]>();
   useEffect(() => {
-    if (errorData) toast.error(errorData.message);
+    getModules(
+      "/product/" +
+        encodeBase64({ type: "module", product_id: task_info.product_id }),
+      "default"
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [task_info.product_id]);
+  useEffect(() => {
+    if (errorData) {
+      toast.error(errorData.message);
+    }
   }, [errorData]);
   const handleSubmit = async () => {
-    const data = {
+    const data: DataSend = {
       task_id: task_info.task_id,
       title,
       description,
+      module: selectModule,
       dead_line: toISOString(deadline),
       acceptances: criteriaList.map((criteria) => ({
         title: criteria.title,
         type: criteria.type,
       })),
     };
+    if (
+      data.acceptances &&
+      (data.acceptances.length == 0 ||
+        (data.acceptances.length == 1 && data.acceptances[0].title == ""))
+    )
+      delete data.acceptances;
+    console.log(data);
     const re = await putData("/tasks", data);
     if (re == null) return;
     else {
@@ -97,6 +123,13 @@ export default function UpdateInfoTaskModal({
       )
     );
   };
+  const optionsModule =
+    moduleList?.map((mo) => {
+      return {
+        value: mo.id,
+        label: mo.display,
+      };
+    }) ?? [];
   return (
     <div className="modal modal-open">
       <div className="modal-box max-w-4xl w-full">
@@ -126,6 +159,48 @@ export default function UpdateInfoTaskModal({
               value={deadline}
               onChange={setDeadline}
               className="input-neutral w-full"
+            />
+          </fieldset>
+          <fieldset>
+            <legend>Module</legend>
+            <Select
+              className="join-item w-full"
+              styles={{
+                control: (styles) => ({
+                  ...styles,
+                  backgroundColor: isDark ? "#0f172a" : "white",
+                }),
+                option: (styles, { isFocused, isSelected }) => {
+                  let backgroundColor = isDark ? "#1e293b" : "#ffffff";
+                  let color = isDark ? "#f1f5f9" : "#111827";
+
+                  if (isSelected) {
+                    backgroundColor = isDark ? "#2563eb" : "#3b82f6"; // blue-600 | blue-500
+                    color = "#ffffff";
+                  } else if (isFocused) {
+                    backgroundColor = isDark ? "#334155" : "#e5e7eb"; // slate-700 | gray-200
+                  }
+
+                  return {
+                    ...styles,
+                    backgroundColor,
+                    color,
+                    cursor: "pointer",
+                  };
+                },
+                menuList: (styles) => ({
+                  ...styles,
+                  maxHeight: "200px", // 👈 Chiều cao tối đa của menu
+                  overflowY: "auto", // 👈 Hiển thị scroll khi vượt giới hạn
+                }),
+              }}
+              isClearable
+              value={
+                optionsModule.find((opt) => opt.value === selectModule) || null
+              }
+              onChange={(selected) => setSelectModule(selected?.value ?? "")}
+              options={optionsModule}
+              placeholder="Chọn module"
             />
           </fieldset>
         </div>

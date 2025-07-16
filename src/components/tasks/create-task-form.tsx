@@ -84,16 +84,13 @@ function CreateTaskForm({
     }
   }, [fileUploadStatus]);
   const handleSubmit = async () => {
+    console.log(deadline);
     if (title.trim() === "") {
       toast.error("Vui lòng nhập tiêu đề công việc");
       return;
     }
     if (description.trim() === "") {
       toast.error("Vui lòng nhập mô tả công việc");
-      return;
-    }
-    if (deadline.trim() === "") {
-      toast.error("Vui lòng chọn deadline");
       return;
     }
     if (criteriaList.some((crit) => crit.title.trim() === "")) {
@@ -372,7 +369,7 @@ function CreateTaskForm({
                 setSelectedRequirement(selected?.value ?? 0)
               }
               options={optionReq}
-              placeholder="Chọn module"
+              placeholder="Chọn yêu cầu"
             />
           </fieldset>
           <div>

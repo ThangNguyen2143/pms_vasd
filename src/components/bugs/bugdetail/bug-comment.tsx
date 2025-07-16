@@ -180,7 +180,6 @@ export default function BugComments({
               value={newComment}
               className="join-item resize-none not-last:focus-visible:outline-none focus-visible:border-none focus-visible:ring-0"
               onChange={(e) => {
-                console.log(newComment);
                 setNewComment(e);
               }}
               placeholder="Nhập bình luận..."
