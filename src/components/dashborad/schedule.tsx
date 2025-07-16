@@ -29,7 +29,6 @@ function ScheduleDashboard() {
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentMonth, currentYear]);
-  console.log(data);
   // Tạo mảng các ngày trong tuần
   const weekdays = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
 

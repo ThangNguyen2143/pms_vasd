@@ -4,7 +4,6 @@ import Select from "react-select";
 import Cookies from "js-cookie";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
-import { UserDto } from "~/lib/types";
 import { toast } from "sonner";
 function AddScheduleModal({
   month,
@@ -18,11 +17,12 @@ function AddScheduleModal({
   onUpdate: () => Promise<void>;
 }) {
   const isDark = Cookies.get("theme") == "night";
-  const { data: users, getData: getUser } = useApi<UserDto[]>();
+  const { data: users, getData: getUser } =
+    useApi<{ user_id: number; user_name: string }[]>();
   const { postData, errorData: errorPost } = useApi<string>();
   const [userSelect, setUserSelect] = useState<{ user_id: number }[]>([]);
   useEffect(() => {
-    const endpointUser = "/user/" + encodeBase64({ type: "all" });
+    const endpointUser = "/schedule/" + encodeBase64({ type: "user_list" });
     getUser(endpointUser);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -47,13 +47,13 @@ function AddScheduleModal({
   const options =
     users?.map((us) => {
       return {
-        value: us.userid,
-        label: us.userData.display_name,
+        value: us.user_id,
+        label: us.user_name,
       };
     }) ?? [];
   return (
     <div className="modal modal-open">
-      <div className="modal-box h-fit">
+      <div className="modal-box h-96">
         <h2 className="text-xl font-bold">
           Phân công trực tháng {month}/{year}
         </h2>

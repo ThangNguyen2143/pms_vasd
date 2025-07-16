@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import Select from "react-select";
 import Cookies from "js-cookie";
 import { useApi } from "~/hooks/use-api";
-import { UserDto } from "~/lib/types";
 import { encodeBase64 } from "~/lib/services";
 import { toast } from "sonner";
 function UpdateScheduleModal({
@@ -23,12 +22,13 @@ function UpdateScheduleModal({
 }) {
   const date = day + "/" + month + "/" + year;
   const isDark = Cookies.get("theme") == "night";
-  const { data: users, getData: getUser } = useApi<UserDto[]>();
+  const { data: users, getData: getUser } =
+    useApi<{ user_id: number; user_name: string }[]>();
   const { putData, errorData: errorPost } = useApi<string>();
   const [note, setNote] = useState("");
   const [userSelect, setUserSelect] = useState(0);
   useEffect(() => {
-    const endpointUser = "/user/" + encodeBase64({ type: "all" });
+    const endpointUser = "/schedule/" + encodeBase64({ type: "user_list" });
     getUser(endpointUser);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -59,8 +59,8 @@ function UpdateScheduleModal({
   const options =
     users?.map((us) => {
       return {
-        value: us.userid,
-        label: us.userData.display_name,
+        value: us.user_id,
+        label: us.user_name,
       };
     }) ?? [];
   return (
