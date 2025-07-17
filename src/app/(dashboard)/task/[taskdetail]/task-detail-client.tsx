@@ -185,10 +185,12 @@ export default function TaskDetailClient({ task_id }: { task_id: number }) {
         <div className="space-y-6">
           <TaskLinks
             task_id={task_id}
+            requirementTasks={task.requirementTasks}
             onLinkRequirement={() => setShowLinkModal(true)}
           />
           <Attachments
             attachments={task.taskFiles || []}
+            task_id={task_id}
             onUpdate={reloadTaskData}
             uploadFile={() => setShowAddFileAtachmentModal(true)}
           />

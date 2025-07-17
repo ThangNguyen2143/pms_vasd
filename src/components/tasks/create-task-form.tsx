@@ -80,11 +80,11 @@ function CreateTaskForm({
   useEffect(() => {
     if (fileUploadStatus.some((file) => file.status == "done")) {
       onSuccess();
+      handleReset();
       // onClose();
     }
   }, [fileUploadStatus]);
   const handleSubmit = async () => {
-    console.log(deadline);
     if (title.trim() === "") {
       toast.error("Vui lòng nhập tiêu đề công việc");
       return;
@@ -112,7 +112,6 @@ function CreateTaskForm({
     if (data.requirement_id == 0) delete data.requirement_id;
     if (data.module == "") delete data.module;
     if (data.acceptances?.length == 0) delete data.acceptances;
-    // console.log(data);
     // const result = await uploadMultiFiles({
     //   files,
     //   uploadUrl: "/tasks",
@@ -155,6 +154,7 @@ function CreateTaskForm({
     // }
     else {
       onSuccess();
+      handleReset();
     }
     toast.success("Tạo công việc thành công");
   };
@@ -162,6 +162,16 @@ function CreateTaskForm({
     setTitle("");
     setDescription("");
     setDeadline("");
+    setCriteriaList([
+      {
+        id: Date.now().toString(),
+        title: "",
+        type: "",
+      },
+    ]);
+    setSelectModule("");
+    setSelectedRequirement(0);
+    setFile([]);
   };
   const addCriteria = () => {
     setCriteriaList([

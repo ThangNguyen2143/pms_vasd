@@ -13,10 +13,12 @@ import {
 
 export default function Attachments({
   attachments,
+  task_id,
   onUpdate, // hàm để reload lại danh sách file sau khi thêm/xóa
   uploadFile,
 }: {
   attachments: RequirementFile[];
+  task_id: number;
   onUpdate: () => Promise<void>; // hàm để reload lại danh sách file sau khi thêm/xóa
   uploadFile: () => void;
 }) {
@@ -26,7 +28,9 @@ export default function Attachments({
   const { removeData: removeFile, errorData: errorRemoveFile } = useApi();
   const handleRemoveFile = async (file_id: number) => {
     if (confirm("Bạn có chắc chắn muốn xóa tệp này?")) {
-      const res = await removeFile("/tasks/file/" + encodeBase64({ file_id }));
+      const res = await removeFile(
+        "/tasks/file/" + encodeBase64({ task_id, file_id })
+      );
       if (res == "") {
         toast.success("Đã xóa tệp thành công.");
         // reload files after removing

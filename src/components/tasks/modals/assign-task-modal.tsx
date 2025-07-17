@@ -61,7 +61,6 @@ export default function AssignUserModal({
       cur_deadLine: toISOString(deadline) || "",
     };
     const re = await putData("/tasks/assign", data);
-    console.log(data, re);
     if (!re) return;
     else {
       const email = re.contact.find((ct) => ct.code == "email")?.value;

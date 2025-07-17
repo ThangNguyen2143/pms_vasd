@@ -76,7 +76,6 @@ function TableStatist({
       if (hasProject) extra["project_id"] = filterParas["project_id"];
       if (hasProduct) extra["product_id"] = filterParas["product_id"];
       const res = await fetchData(config.statisticParas, extra);
-      console.log(res);
       if (res != null) setData(res);
       else setData([]);
       setLoading(false);

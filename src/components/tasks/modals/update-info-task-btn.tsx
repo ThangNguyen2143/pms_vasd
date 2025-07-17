@@ -92,7 +92,6 @@ export default function UpdateInfoTaskModal({
         (data.acceptances.length == 1 && data.acceptances[0].title == ""))
     )
       delete data.acceptances;
-    console.log(data);
     const re = await putData("/tasks", data);
     if (re == null) return;
     else {

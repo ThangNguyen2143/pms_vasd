@@ -24,7 +24,6 @@ function UpdateBugInProductModalConfirm({
   const handleUpdate = async () => {
     const re = await postData("/bugs/update", { bug_id: list });
     // const re = null;
-    console.log(re);
     if (re == null) return;
     toast.success(re || "Xử lý thành công");
     await onUpdate();

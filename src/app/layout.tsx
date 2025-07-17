@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.title}`,
     default: siteConfig.title,
   },
-  keywords: ["PMS", "PMS VASD", "VASD"],
+  keywords: ["PMS", "PMS VASD", "VASD", "Quản lý dự án"],
   description: siteConfig.description,
 };
 

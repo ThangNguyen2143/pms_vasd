@@ -23,7 +23,7 @@ export type Navigation = {
 
 export const siteConfig = {
   title: "PMS VASD",
-  description: "website quản lý dự án thuộc công ty VASD",
+  description: "website quản lý dự án công ty VASD",
 };
 export const setNavigation = (menu: MenuNav[]) => {
   return menu

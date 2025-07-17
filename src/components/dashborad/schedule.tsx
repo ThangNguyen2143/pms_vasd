@@ -30,7 +30,7 @@ function ScheduleDashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentMonth, currentYear]);
   // Tạo mảng các ngày trong tuần
-  const weekdays = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
+  const weekdays = ["CN", "T2", "T3", "T4", "T5", "T6", "T7"];
 
   // Lấy số ngày trong tháng
   const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
@@ -97,6 +97,32 @@ function ScheduleDashboard() {
       .padStart(2, "0")}-${day.toString().padStart(2, "0")}`;
     if (data) return data.find((event) => event.date === dateStr);
   };
+  function getColor(number: number): string {
+    const daisyColors = [
+      "bg-red-100 text-black",
+      "bg-amber-100 text-black",
+      "bg-orange-100 text-black",
+      "bg-yellow-100 text-black",
+      "bg-lime-100 text-black",
+      "bg-green-100 text-white",
+      "bg-emerald-100 text-white",
+      "bg-teal-100 text-black",
+      "bg-cyan-100 text-white",
+      "bg-sky-100 text-white",
+      "bg-slate-100 text-black",
+      "bg-blue-100 text-white",
+      "bg-indigo-100 text-white",
+      "bg-violet-100 text-white",
+      "bg-purple-100 text-white",
+      "bg-fuchsia-100 text-white",
+      "bg-pink-100 text-white",
+      "bg-rose-100 text-white",
+      "bg-gray-100 text-black",
+      "bg-zinc-100 text-black",
+    ];
+    return daisyColors[number % daisyColors.length];
+  }
+
   return (
     <div>
       <div className="relative card bg-base-100 shadow-xl p-4">
@@ -148,11 +174,14 @@ function ScheduleDashboard() {
 
           {/* Hiển thị các ngày trong tháng */}
           {days.map((day) => {
+            const date = new Date(currentYear, currentMonth, day);
             const isToday =
               day === new Date().getDate() &&
               currentMonth === new Date().getMonth() &&
               currentYear === new Date().getFullYear();
+            const isSunday = date.getDay() === 0;
             const dayEvents = getEventsForDay(day);
+            const color = getColor(dayEvents?.user_id || 0);
             return (
               <div
                 key={day}
@@ -162,9 +191,10 @@ function ScheduleDashboard() {
                     day,
                   })
                 }
-                className={
-                  "p-2 rounded-full transition-colors h-24 flex flex-col w-full"
-                }
+                className={clsx(
+                  "p-2 rounded-full transition-colors h-24 flex flex-col w-full",
+                  isSunday ? "text-red-500" : ""
+                )}
               >
                 <div className={clsx("border-b text-center p-2 mb-1")}>
                   <span
@@ -183,7 +213,9 @@ function ScheduleDashboard() {
                   //   {dayEvents.length > 1 && ` +${dayEvents.length - 1}`}
                   // </div>
                   <div
-                    className="gap-0.5 flex flex-col bg-primary text-primary-content text-xs rounded-lg p-1"
+                    className={clsx(
+                      `${color} gap-0.5 flex flex-col text-xs rounded-lg p-1`
+                    )}
                     key={dayEvents.user_id + "user"}
                   >
                     <span>{dayEvents.user_name}</span>

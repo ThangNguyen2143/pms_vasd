@@ -155,14 +155,6 @@ export default function TaskInfo({
           </span>{" "}
           {task.is_update ? "Đã cập nhật" : "Chưa cập nhật"}
         </p>
-        <p>
-          <span className="font-bold w-32 inline-block">Yêu cầu liên kết:</span>
-          {task.requirementTasks?.map((reqTask) => (
-            <span key={reqTask.requirement_id} className="ml-1">
-              [ID: {reqTask.requirement_id}] - {reqTask.requirement_title}
-            </span>
-          ))}
-        </p>
       </div>
     </div>
   );

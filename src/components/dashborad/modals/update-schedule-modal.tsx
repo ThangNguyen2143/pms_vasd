@@ -49,7 +49,6 @@ function UpdateScheduleModal({
       user_id: userSelect,
       note,
     };
-    console.log(data);
     const re = await putData("/schedule", data);
     if (re == null) return;
     await onUpdate();
