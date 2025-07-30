@@ -31,9 +31,13 @@ function UnapprovedList({ data }: { data: TaskUnAcceptance[] }) {
                   <div className="tooltip">
                     <div className="tooltip-content">
                       <ul className="list">
-                        {d.unapproved_criteria.map((un) => (
-                          <li key={un.code + "" + d.task_id}>{un.title}</li>
-                        ))}
+                        {d.unapproved_criteria ? (
+                          d.unapproved_criteria.map((un) => (
+                            <li key={un.code + "" + d.task_id}>{un.title}</li>
+                          ))
+                        ) : (
+                          <li>Chưa có đánh giá</li>
+                        )}
                       </ul>
                     </div>
                     <span>{d.unapproved_count}</span>

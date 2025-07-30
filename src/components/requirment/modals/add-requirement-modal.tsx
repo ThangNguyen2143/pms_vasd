@@ -8,7 +8,7 @@ import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
 import { useUploadFile } from "~/hooks/use-upload-file";
 import { ProductDto, RequirementType } from "~/lib/types";
-import { toISOString } from "~/utils/fomat-date";
+import { format_date, toISOString } from "~/utils/fomat-date";
 
 interface AddRequirementProps {
   product_list: ProductDto[];
@@ -25,7 +25,7 @@ interface DataCreate {
   type: string;
   date_receive: string;
   tags: string[];
-  request: {
+  request?: {
     location_id: number;
     requester: string;
     role: string;
@@ -43,14 +43,14 @@ export default function AddRequirementModal({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("<p><br/></p>");
   const [typeSelected, setTypeSelected] = useState("");
-  const [dateReceive, setDateReceive] = useState("");
+  const [dateReceive, setDateReceive] = useState(format_date(new Date()));
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState("");
   const [files, setFile] = useState<File[]>([]);
   const [fileUploadStatus, setFileUploadStatus] = useState<
     { name: string; status: "idle" | "uploading" | "done" | "error" }[]
   >([]);
-  const { uploadError, uploadChunkedFile } = useUploadFile();
+  const { uploadError, uploadChunkedFile } = useUploadFile("put");
 
   const [locationId, setLocationId] = useState<number | "">("");
   const [requester, setRequester] = useState("");
@@ -144,7 +144,7 @@ export default function AddRequirementModal({
         role,
       },
     };
-
+    if (data.request && data.request.location_id == 0) delete data.request;
     const re = await postData("/requirements", data);
     // if (re != "") return;
     // const re = await uploadMultiFiles({
@@ -180,6 +180,9 @@ export default function AddRequirementModal({
           });
         })
       );
+    } else {
+      await onCreated();
+      onClose();
     }
     toast.success("Tạo yêu cầu thành công");
   };

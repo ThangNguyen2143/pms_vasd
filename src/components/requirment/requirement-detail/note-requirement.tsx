@@ -15,12 +15,12 @@ import { sendEmail } from "~/utils/send-notify";
 
 export default function NoteRequirment({
   requirement_id,
-  project_id,
+  product_id,
   comments,
   onUpdate,
 }: {
   requirement_id: number;
-  project_id: number;
+  product_id: string;
   comments: RequirementNote[];
   onUpdate: () => Promise<void>;
 }) {
@@ -28,7 +28,7 @@ export default function NoteRequirment({
   const [newComment, setNewComment] = useState("");
   const { data: users, getData: getUser } = useApi<UserDto[]>();
   const { data: memberProject, getData: getUsers } =
-    useApi<{ id: number; display: string }[]>();
+    useApi<{ id: number; name: string }[]>();
   const { postData: postNote, errorData: errorNote } = useApi<
     "",
     {
@@ -40,7 +40,9 @@ export default function NoteRequirment({
     useApi<{ userid: number; display_name: string; contacts: Contact[] }[]>();
   useEffect(() => {
     getUser("/user/" + encodeBase64({ type: "all" }));
-    getUsers("/project/member/" + encodeBase64({ project_id }));
+    getUsers(
+      "/system/config/" + encodeBase64({ type: "project_member", product_id })
+    );
   }, []);
   useEffect(() => {
     if (errorNote) toast.error(errorNote.message);
@@ -55,7 +57,7 @@ export default function NoteRequirment({
       note: newComment,
     };
     const list = memberProject?.filter((mem) => {
-      return newComment.includes(mem.display);
+      return newComment.includes(mem.name);
     });
     const listContact = await getContact(
       "/user/contacts/" +
@@ -66,15 +68,16 @@ export default function NoteRequirment({
         const mail = us.contacts.filter((ct) => ct.code == "email");
         return mail[0].value;
       });
+      const message = newComment.replace(/<img[^>]*>/i, "<Hình ảnh>");
       const content = {
         id: requirement_id,
         name: `Bạn đã được ${user?.name} nhắc đến trong ghi nhận yêu cầu`,
-        message: `Nội dung comment: ${DOMPurify.sanitize(newComment)}`,
+        message: `Nội dung comment: ${DOMPurify.sanitize(message)}`,
       };
       const link =
         window.location.origin +
           "/requirement/" +
-          encodeBase64({ requirement_id, project_id }) || "https://pm.vasd.vn/";
+          encodeBase64({ requirement_id }) || "https://pm.vasd.vn/";
       if (email.length > 0)
         email.forEach((e) =>
           sendEmail(
@@ -82,7 +85,8 @@ export default function NoteRequirment({
             e,
             "Thông báo ghi chú mới",
             link,
-            "Ghi nhận yêu cầu"
+            "Ghi nhận yêu cầu",
+            user?.name
           )
             .then((mes) => {
               if (mes.message != "OK") toast(mes.message);
@@ -154,7 +158,7 @@ export default function NoteRequirment({
             className="join-item resize-none not-last:focus-visible:outline-none focus-visible:border-none focus-visible:ring-0"
             onChange={(e) => setNewComment(e)}
             placeholder="Nhập bình luận..."
-            suggestList={memberProject?.map((mem) => mem.display)}
+            suggestList={memberProject?.map((mem) => mem.name)}
           />
           <div className="join-item flex justify-end">
             <button
@@ -163,7 +167,9 @@ export default function NoteRequirment({
                 handleSubmit();
               }}
               disabled={
-                newComment.trim().length == 0 || newComment == "<p><br></p>"
+                newComment.trim().length == 0 ||
+                newComment == "<p><br></p>" ||
+                /^<p>\s*<\/p>$/.test(newComment)
               }
               aria-label="Gửi"
             >

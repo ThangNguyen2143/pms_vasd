@@ -20,8 +20,8 @@ function WarningDeadlineTab({ data }: { data: DeadlineWarning[] }) {
         </thead>
         <tbody>
           {data.length > 0 ? (
-            data.map((d) => (
-              <tr key={d.id + "" + d.user_id}>
+            data.map((d, i) => (
+              <tr key={d.id + "" + d.user_id + i}>
                 <td>{d.id}</td>
                 <td>{d.title}</td>
                 <td>{d.status}</td>

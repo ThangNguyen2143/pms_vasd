@@ -15,20 +15,15 @@ import OverviewRequirement from "~/components/requirment/overview-required-tab";
 import clsx from "clsx";
 import AddLocationModal from "~/components/requirment/modals/add-location-modal";
 import AddRequirementModal from "~/components/requirment/modals/add-requirement-modal";
-import { format_date, toISOString } from "~/utils/fomat-date";
-import { endOfDay, startOfDay, subDays } from "date-fns";
 // import { toast } from "sonner";
-import DateTimePicker from "~/components/ui/date-time-picker";
+// import DateTimePicker from "~/components/ui/date-time-picker";
 import RequirementList from "~/components/requirment/requirment-list";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
 const productCache: Record<number, ProductDto[]> = {};
 const locationCache: Record<number, ProjectLocation[]> = {}; //Để cache dữ liệu khoa phòng trong trường hợp có biểu đồ dùng khoa phòng
 function RequirementsClient() {
-  const router = useRouter();
-  const searchParams = useSearchParams();
   const [tabContent, setTabContent] = useState<string>("List");
   const [productSelect, setproductSelect] = useState<string>("");
   const [projectSelect, setprojectSelect] = useState<number>(0);
@@ -36,12 +31,13 @@ function RequirementsClient() {
   const [showAddRequirment, setShowAddRequirment] = useState(false);
   const [loading, setloading] = useState(false);
   const [searchString, setSearchString] = useState<string>("");
-  const [fromDate, setFromDate] = useState<string>(
-    format_date(startOfDay(subDays(new Date(), 7))) //Mặc định 1 tuần trước
-  );
-  const [toDate, settoDate] = useState<string>(
-    format_date(endOfDay(new Date()))
-  );
+  // const [fromDate, setFromDate] = useState<string>(
+  //   format_date(startOfDay(subDays(new Date(), 7))) //Mặc định 1 tuần trước
+  // );
+  // const [toDate, settoDate] = useState<string>(
+  //   format_date(endOfDay(new Date()))
+  // );
+
   const {
     data: requiredList,
     getData: getRequiredList,
@@ -125,18 +121,12 @@ function RequirementsClient() {
   }, [projectSelect]);
   useEffect(() => {
     if (projectSelect !== 0) {
-      let from: string = "";
-      let to: string = "";
       try {
-        from = toISOString(fromDate);
-        to = toISOString(toDate);
         let endpoint =
           "/requirements/" +
           encodeBase64({
             type: "project",
             project_id: projectSelect,
-            from,
-            to,
           });
         if (productSelect != "") {
           endpoint =
@@ -144,8 +134,6 @@ function RequirementsClient() {
             encodeBase64({
               type: "product",
               product_id: productSelect,
-              from,
-              to,
             });
         }
         setloading(() => true);
@@ -157,7 +145,7 @@ function RequirementsClient() {
         console.error("Error converting dates:", error);
       }
     }
-  }, [projectSelect, productSelect, fromDate, toDate]);
+  }, [projectSelect, productSelect]);
   useEffect(() => {
     if (searchString.trim() != "") {
       const finalString = searchString
@@ -179,26 +167,17 @@ function RequirementsClient() {
       }, 3000);
     }
   }, [searchString]);
-  useEffect(() => {
-    const toParam = searchParams.get("to");
-    const fromParam = searchParams.get("from");
-    if (toParam) settoDate(toParam);
-    if (fromParam) setFromDate(fromParam);
-  }, [searchParams]);
+
   const onLoadRequire = async () => {
-    const from = toISOString(fromDate);
-    const to = toISOString(toDate);
     let endpoint =
       "/requirements/" +
-      encodeBase64({ type: "project", project_id: projectSelect, from, to });
+      encodeBase64({ type: "project", project_id: projectSelect });
     if (productSelect != "") {
       endpoint =
         "/requirements/" +
         encodeBase64({
           type: "product",
           product_id: productSelect,
-          from,
-          to,
         });
     }
     setloading(() => true);
@@ -217,13 +196,7 @@ function RequirementsClient() {
       "/project/location/" + encodeBase64({ project_id: projectSelect })
     );
   };
-  const handleDateChange = (dateInput: string, type: "from" | "to") => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set(type, dateInput);
-    router.replace(`?${params.toString()}`);
-    if (type == "from") setFromDate(dateInput);
-    else settoDate(dateInput);
-  };
+
   return (
     <main className="flex flex-col gap-4 p-4 items-center">
       <div className="flex justify-between w-full">
@@ -298,22 +271,6 @@ function RequirementsClient() {
                       ))}
                     </select>
                   )}
-                  <div className="flex gap-2">
-                    <span className="label">Từ</span>
-                    <DateTimePicker
-                      value={fromDate}
-                      onChange={(e) => handleDateChange(e, "from")}
-                      className="w-full"
-                    />
-                  </div>
-                  <div className="flex gap-2">
-                    <span className="label">Đến</span>
-                    <DateTimePicker
-                      value={toDate}
-                      onChange={(e) => handleDateChange(e, "to")}
-                      className="w-full"
-                    />
-                  </div>
                 </div>
 
                 <div className="dropdown">

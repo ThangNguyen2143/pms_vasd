@@ -22,7 +22,7 @@ export type IncidentDetail = {
   created_at: string;
   reporter: string;
   handle: string;
-  time_end: string;
+  time_end?: string;
   status: string;
 };
 export type IncidentType = {

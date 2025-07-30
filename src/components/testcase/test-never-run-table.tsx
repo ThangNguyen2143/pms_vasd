@@ -19,7 +19,7 @@ function TableTestNeverRun({
   getModuleName: (id: string) => string | undefined;
 }) {
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-auto max-h-[400px]">
       <table className="table">
         <thead>
           <tr>
@@ -31,7 +31,7 @@ function TableTestNeverRun({
             <td></td>
           </tr>
         </thead>
-        <tbody>
+        <tbody className=" ">
           {data.map((d) => (
             <tr key={d.id}>
               <td>{d.id}</td>

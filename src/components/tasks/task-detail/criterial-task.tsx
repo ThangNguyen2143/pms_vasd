@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Pencil, Star, X, XCircle } from "lucide-react";
 import { useApi } from "~/hooks/use-api";
 import { format_date } from "~/utils/fomat-date";
@@ -40,13 +40,17 @@ export default function CriteriaTask({
     if (errorUpdate) toast.error(errorUpdate.message);
     if (errorDelete) toast.error(errorDelete.message);
   }, [errorUpdate, errorDelete]);
+  const propress = useRef<number>(0);
   useEffect(() => {
     if (!data) return;
 
     const initialStatus: Record<string, boolean> = {};
+    let total: number = 0;
     data.forEach((item) => {
       initialStatus[item.code] = item.is_accepted;
+      if (item.is_accepted && item.percent) total = total + item.percent;
     });
+    propress.current = total;
 
     setAcceptanceStatus(initialStatus);
   }, [data]);
@@ -106,6 +110,15 @@ export default function CriteriaTask({
           Thêm Đánh giá
         </button>
       </div>
+      <div className="flex gap-2 items-center">
+        <p>Tiến độ hoàn thành</p>
+        <progress
+          className="progress progress-secondary w-56"
+          value={propress.current}
+          max="100"
+        ></progress>
+        <span>{propress.current} %</span>
+      </div>
       {groupedData.length > 0 ? (
         groupedData.map((group) => (
           <div
@@ -132,7 +145,8 @@ export default function CriteriaTask({
                       {critTypes?.find((crit) => crit.code == content.type)
                         ?.display || content.type}
                     </span>
-                    {!showUpdateStatus[content.code] && (
+                    <span>{content.percent}%</span>
+                    {
                       <span
                         className={clsx(
                           "badge",
@@ -141,12 +155,9 @@ export default function CriteriaTask({
                       >
                         {content.is_accepted ? "Đạt" : "Không Đạt"}
                       </span>
-                    )}
+                    }
                     <div
-                      className={clsx(
-                        "join",
-                        showUpdateStatus[content.code] ? "col-span-2" : ""
-                      )}
+                      className={clsx("join flex justify-end", "col-span-4")}
                     >
                       <label className="join-item swap swap-rotate btn btn-ghost">
                         <input

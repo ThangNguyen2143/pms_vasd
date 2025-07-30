@@ -32,7 +32,7 @@ export default function BugLogs({ logs }: { logs: Log[] }) {
               <p>
                 <i>{format_date(log.date)}</i>
               </p>
-              <p>{formatContent(log.content)}</p>
+              <p className="wrap-break-word">{formatContent(log.content)}</p>
             </div>
           ))}
       </div>

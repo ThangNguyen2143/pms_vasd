@@ -52,6 +52,8 @@ function CommentTestcase({
     if (errorData) toast.error(errorData.message || errorData.title);
   }, [errorData]);
   const handleAddComment = async () => {
+    // Gửi chính cho người được nhắc đến, những người khác gửi dạng cc (trừ người comment)
+    // Nếu không có nhắc đến ai -> gửi đến toàn bộ những người có liên quan (trừ người comment)
     // API post comment here
     const data = {
       testcase_id,
@@ -64,6 +66,7 @@ function CommentTestcase({
       "/user/contacts/" +
         encodeBase64({ user_id: list?.map((l) => ({ id: l.id })) })
     );
+    const message = newComment.replace(/<img[^>]*>/i, "<Hình ảnh>");
     if (listContact && listContact.length > 0) {
       const email = listContact.map((us) => {
         const mail = us.contacts.filter((ct) => ct.code == "email");
@@ -72,7 +75,7 @@ function CommentTestcase({
       const content = {
         id: testcase_id,
         name: `Bạn đã được ${user?.name} nhắc đến trong testcase`,
-        message: `Nội dung comment: ${DOMPurify.sanitize(newComment)}`,
+        message: `Nội dung comment: ${DOMPurify.sanitize(message)}`,
       };
       const link =
         window.location.origin +
@@ -105,7 +108,7 @@ function CommentTestcase({
       const content = {
         id: re.content.testcase_id,
         name: re.content.testcase_name,
-        message: newComment,
+        message: DOMPurify.sanitize(message),
       };
       const link =
         window.location.origin +
@@ -194,7 +197,9 @@ function CommentTestcase({
                 className="btn btn-ghost btn-sm rounded-full"
                 onClick={handleAddComment}
                 disabled={
-                  newComment.trim().length == 0 || newComment == "<p><br></p>"
+                  newComment.trim().length == 0 ||
+                  newComment == "<p><br></p>" ||
+                  /^<p>\s*<\/p>$/.test(newComment)
                 }
                 aria-label="Gửi"
               >

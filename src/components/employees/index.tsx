@@ -2,7 +2,7 @@
 "use client";
 
 import { encodeBase64 } from "~/lib/services";
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import Emp_Table from "./emp_table";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
@@ -46,12 +46,14 @@ function EmployeeTab() {
             }}
           />
         </div>
-        <Emp_Table
-          empData={users || undefined}
-          feildTable={fieldTable}
-          roles={roleUser || []}
-          types={account_type || []}
-        />
+        <Suspense fallback={<div>Đang tải</div>}>
+          <Emp_Table
+            empData={users || undefined}
+            feildTable={fieldTable}
+            roles={roleUser || []}
+            types={account_type || []}
+          />
+        </Suspense>
       </div>
     </div>
   );

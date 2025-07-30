@@ -2,6 +2,7 @@ import { Incident } from "~/lib/types";
 import IncidentRow from "./incident-row";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import PagingComponent from "../ui/paging-table";
 interface IncidentListProps {
   product_id: string;
   incidentList?: Incident[];
@@ -27,7 +28,7 @@ function IncidentList({
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", page.toString());
-    router.replace(`?${params.toString()}`);
+    router.replace(`?${params.toString()}`, { scroll: false });
     setCurrentPage(page);
   };
 
@@ -77,23 +78,11 @@ function IncidentList({
           )}
         </tbody>
       </table>
-      <div className="flex justify-center">
-        {totalPages > 1 && (
-          <div className="join">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                onClick={() => handlePageChange(page)}
-                className={`join-item btn ${
-                  page === currentPage ? "btn-active" : ""
-                }`}
-              >
-                {page}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+      <PagingComponent
+        currentPage={currentPage}
+        handleChangePage={handlePageChange}
+        totalPages={totalPages}
+      />
     </div>
   );
 }

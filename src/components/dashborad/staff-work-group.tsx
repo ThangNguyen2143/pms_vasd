@@ -40,7 +40,6 @@ function WorkBox({
       (item) =>
         `/bug/${encodeBase64({
           bug_id: item.id,
-          product_id: item.product_id,
         })}`
     );
   else if (title.includes("Re-test"))
@@ -48,7 +47,6 @@ function WorkBox({
       (item) =>
         `/bug/${encodeBase64({
           bug_id: item.bug_id,
-          product_id: item.product_id,
         })}`
     );
   else if (title.includes("Testcase"))

@@ -4,6 +4,7 @@ import { TestcaseDto } from "~/lib/types/testcase";
 import TestRow from "./test-row";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import PagingComponent from "../ui/paging-table";
 
 interface TestListProps {
   product_id: string;
@@ -23,7 +24,9 @@ function TestList({
 }: TestListProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const fullTestList = testList ? [...testList] : [];
+  const fullTestList = testList
+    ? [...testList.sort((a, b) => b.id - a.id)]
+    : [];
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(fullTestList.length / 10);
   // ⬅️ Khi load lại, đọc từ URL
@@ -36,14 +39,13 @@ function TestList({
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", page.toString());
-    router.replace(`?${params.toString()}`);
+    router.replace(`?${params.toString()}`, { scroll: false });
     setCurrentPage(page);
   };
 
   // 🔄 Cắt dữ liệu theo trang
   const startIndex = (currentPage - 1) * 10;
   const currentTests = fullTestList.slice(startIndex, startIndex + 10);
-
   if (
     externalTestCreated &&
     !fullTestList.find((t) => t.id === externalTestCreated.id)
@@ -97,23 +99,11 @@ function TestList({
           )}
         </tbody>
       </table>
-      <div className="flex justify-center">
-        {totalPages > 1 && (
-          <div className="join">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                onClick={() => handlePageChange(page)}
-                className={`join-item btn ${
-                  page === currentPage ? "btn-active" : ""
-                }`}
-              >
-                {page}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+      <PagingComponent
+        currentPage={currentPage}
+        totalPages={totalPages}
+        handleChangePage={handlePageChange}
+      />
     </div>
   );
 }

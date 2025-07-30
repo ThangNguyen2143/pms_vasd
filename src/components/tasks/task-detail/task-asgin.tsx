@@ -1,24 +1,44 @@
 "use client";
 
-import { X } from "lucide-react";
-import { useState } from "react";
+import { CirclePlay, SquareCheckBig, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { UserAssignsTask } from "~/lib/types";
 import { format_date } from "~/utils/fomat-date";
 import ConfirmDeleteAssign from "../modals/confirm-delete-assign";
+import { useApi } from "~/hooks/use-api";
+import { toast } from "sonner";
 
 function TaskAssign({
   assignTo,
   onUpdate,
   task_id,
+  onSendNotify,
 }: {
   assignTo?: UserAssignsTask[];
   task_id: number;
-  onUpdate: (id: number) => Promise<void>;
+  onUpdate: () => Promise<void>;
+  onSendNotify: (id: number) => Promise<void>;
 }) {
   const [openConfirmRemove, setOpenConfirmRemove] = useState<number | null>(
     null
   );
-
+  const { putData, errorData } = useApi<
+    "",
+    { task_id: number; status: string }
+  >();
+  const handleSubmit = async (status: string) => {
+    const re = await putData("/tasks/status", {
+      task_id,
+      status,
+    });
+    if (re) {
+      await onUpdate();
+      toast.success(re);
+    }
+  };
+  useEffect(() => {
+    if (errorData) toast.error(errorData.message);
+  }, [errorData]);
   //
   return (
     <div className="bg-base-200 rounded-lg p-4">
@@ -47,12 +67,33 @@ function TaskAssign({
               ""
             )}
             <div className="flex justify-end">
-              <button
-                className="btn btn-sm join-item btn-error"
-                onClick={() => setOpenConfirmRemove(assignee.user_id)}
-              >
-                <X></X>
-              </button>
+              <div className="join justify-end">
+                {!assignee.date_start && (
+                  <button
+                    className="btn btn-primary btn-outline join-item btn-sm tooltip"
+                    onClick={() => handleSubmit("START")}
+                    data-tip={"Bắt đầu"}
+                  >
+                    <CirclePlay />
+                  </button>
+                )}
+                {assignee.date_start && !assignee.date_end && (
+                  <button
+                    className="btn btn-outline join-item btn-sm btn-success tooltip"
+                    onClick={() => handleSubmit("END")}
+                    data-tip={"Hoàn thành"}
+                  >
+                    <SquareCheckBig />
+                  </button>
+                )}
+                <button
+                  className="btn btn-sm join-item btn-error tooltip"
+                  data-tip="Xóa người được giao"
+                  onClick={() => setOpenConfirmRemove(assignee.user_id)}
+                >
+                  <X></X>
+                </button>
+              </div>
             </div>
           </div>
         ))
@@ -64,7 +105,7 @@ function TaskAssign({
           task_id={task_id}
           member={openConfirmRemove}
           onClose={() => setOpenConfirmRemove(null)}
-          onUpdate={() => onUpdate(openConfirmRemove)}
+          onUpdate={() => onSendNotify(openConfirmRemove)}
         />
       )}
     </div>

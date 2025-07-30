@@ -8,6 +8,9 @@ import { encodeBase64 } from "~/lib/services";
 import { RequirementDto, RequirementStatus, UserDto } from "~/lib/types";
 import { format_date } from "~/utils/fomat-date";
 import { status_with_color_badge } from "~/utils/status-with-color";
+import PagingComponent from "../ui/paging-table";
+import DateTimeRangePick from "../ui/date-time-range";
+import { endOfDay, format, parse, startOfDay } from "date-fns";
 
 function ContructionTable({ children }: { children: ReactNode }) {
   return (
@@ -43,6 +46,7 @@ function RequirementList({
   const searchParams = useSearchParams();
 
   const [filterStatus, setFilterStatus] = useState<string>("");
+  const [timeRangeFillter, settimeRangeFillter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
   const { data: statusList, getData: getStatus } =
@@ -53,15 +57,48 @@ function RequirementList({
     getStatus("/system/config/" + encodeBase64({ type: "requirement_status" }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
+  const handleDateChange = (dateInput: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (dateInput == "") {
+      params.delete("from");
+      params.delete("to");
+      router.replace(`?${params.toString()}`, { scroll: false });
+      settimeRangeFillter(dateInput);
+      console.log("Cleared");
+      return;
+    }
+    const rangeDate = dateInput
+      .split(" đến ")
+      .map((d) => parse(d, "dd/MM/yyyy", new Date()));
+    const fromDate = startOfDay(new Date(rangeDate[0])).toString();
+    const toDate = endOfDay(new Date(rangeDate[1])).toString();
+    params.set("from", fromDate);
+    params.set("to", toDate);
+    router.replace(`?${params.toString()}`, { scroll: false });
+    settimeRangeFillter(dateInput);
+  };
   // 📌 Lọc + sắp xếp
   const filteredRequiredList = useMemo(() => {
     if (!requiredList) return [];
-    const filtered = requiredList.filter((req) =>
-      filterStatus ? req.status === filterStatus : true
-    );
+    const filtered = requiredList
+      .filter((req) => {
+        if (timeRangeFillter != "") {
+          const rangeDate = timeRangeFillter
+            .split(" đến ")
+            .map((d) => parse(d, "dd/MM/yyyy", new Date()));
+          const fromDate = startOfDay(new Date(rangeDate[0])).getTime();
+          const toDate = endOfDay(new Date(rangeDate[1])).getTime();
+          const reqCreate = new Date(req.date_create).getTime();
+          return reqCreate > fromDate && reqCreate < toDate;
+        } else {
+          return true;
+        }
+      })
+      .filter((req) =>
+        filterStatus ? req.status === filterStatus : req.status != "CLOSED"
+      );
     return filtered.sort((a, b) => b.id - a.id);
-  }, [requiredList, filterStatus]);
+  }, [requiredList, filterStatus, timeRangeFillter]);
 
   // 📌 Tổng số trang
   const totalPages = Math.ceil(filteredRequiredList.length / 10);
@@ -74,8 +111,24 @@ function RequirementList({
 
   // ⬅️ Khi load lại, đọc từ URL
   useEffect(() => {
+    const toParam = searchParams.get("to");
+    const fromParam = searchParams.get("from");
     const statusParams = searchParams.get("status");
     const pageParam = Number(searchParams.get("page")) || 1;
+    if (fromParam && toParam) {
+      try {
+        const hasFormat =
+          format(new Date(fromParam), "dd/MM/yyyy") +
+          " đến " +
+          format(new Date(toParam), "dd/MM/yyyy");
+        console.log("Read from url");
+        settimeRangeFillter(hasFormat);
+      } catch {
+        settimeRangeFillter(""); // fallback nếu lỗi
+      }
+    } else {
+      settimeRangeFillter(""); // ✅ Quan trọng: xóa filter nếu thiếu param
+    }
     if (pageParam >= 1 && pageParam <= totalPages) {
       setCurrentPage(pageParam);
     }
@@ -98,17 +151,17 @@ function RequirementList({
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", page.toString());
-    router.replace(`?${params.toString()}`);
+    router.replace(`?${params.toString()}`, { scroll: false });
     setCurrentPage(page);
   };
   const handleStatusFill = (status: string) => {
     const params = new URLSearchParams(searchParams.toString());
     if (status != "") {
       params.set("status", status);
-      router.replace(`?${params.toString()}`);
+      router.replace(`?${params.toString()}`, { scroll: false });
     } else {
       params.delete("status");
-      router.replace(`?${params.toString()}`);
+      router.replace(`?${params.toString()}`, { scroll: false });
     }
     setFilterStatus(status);
   };
@@ -134,7 +187,7 @@ function RequirementList({
   };
   return (
     <div className="flex flex-col">
-      <div className="m-4">
+      <div className="flex m-4">
         <label className="select">
           <span className="label">Trạng thái</span>
           <select
@@ -149,6 +202,21 @@ function RequirementList({
             ))}
           </select>
         </label>
+        <div className="flex gap-2 justify-center ml-2">
+          <DateTimeRangePick
+            value={timeRangeFillter}
+            onChange={handleDateChange}
+          />
+          {timeRangeFillter != "" && (
+            <button
+              className="btn tooltip btn-ghost tooltip-right"
+              data-tip="Bỏ chọn"
+              onClick={() => handleDateChange("")}
+            >
+              X
+            </button>
+          )}
+        </div>
       </div>
       <div className="overflow-x-auto">
         <ContructionTable>
@@ -206,25 +274,11 @@ function RequirementList({
             </tr>
           )}
         </ContructionTable>
-        <div className="flex justify-center">
-          {totalPages > 1 && (
-            <div className="join">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                (page) => (
-                  <button
-                    key={page}
-                    onClick={() => handlePageChange(page)}
-                    className={`join-item btn ${
-                      page === currentPage ? "btn-active" : ""
-                    }`}
-                  >
-                    {page}
-                  </button>
-                )
-              )}
-            </div>
-          )}
-        </div>
+        <PagingComponent
+          currentPage={currentPage}
+          totalPages={totalPages}
+          handleChangePage={handlePageChange}
+        />
       </div>
     </div>
   );

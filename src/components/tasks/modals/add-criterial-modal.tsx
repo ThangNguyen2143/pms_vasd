@@ -9,6 +9,7 @@ interface Criteria {
   id: string;
   title: string;
   type: string;
+  percent: number;
 }
 function AddCriterialModal({
   task_id,
@@ -24,6 +25,7 @@ function AddCriterialModal({
       id: Date.now().toString(),
       title: "",
       type: "",
+      percent: 100,
     },
   ]);
   const { data: criteriaType, getData: getCriterial } =
@@ -37,12 +39,18 @@ function AddCriterialModal({
     if (errorData) toast.error(errorData.message);
   }, [errorData]);
   const addCriteria = () => {
+    const totalPercent = criteriaList.reduce(
+      (sum, item) => sum + Number(item.percent || 0),
+      0
+    );
+    const remaining = Math.max(0, 100 - totalPercent);
     setCriteriaList([
       ...criteriaList,
       {
         id: Date.now().toString(),
         title: "",
         type: "",
+        percent: remaining,
       },
     ]);
   };
@@ -63,11 +71,20 @@ function AddCriterialModal({
       toast.warning("Bạn chưa có tiêu chí nào");
       return;
     }
+    const totalPercent = criteriaList.reduce(
+      (sum, item) => sum + Number(item.percent || 0),
+      0
+    );
+    if (totalPercent > 100) {
+      toast.error("Tổng tỉ lệ hoàn thành lớn hơn 100%");
+      return;
+    }
     const data = {
       task_id,
       acceptances: criteriaList.map((crit) => ({
         type: crit.type,
         title: crit.title,
+        percent: crit.percent,
       })),
     };
     const re = await postData("/tasks/acceptance", data);
@@ -118,7 +135,21 @@ function AddCriterialModal({
                       </option>
                     ))}
                 </select>
-
+                <label
+                  className="tooltip tooltip-top join-item input"
+                  data-tip="Tỉ lệ hoàn thành (%)"
+                >
+                  <input
+                    type="number"
+                    max={100}
+                    min={0}
+                    value={criteria.percent}
+                    onChange={(e) =>
+                      updateCriteria(criteria.id, "percent", e.target.value)
+                    }
+                  />
+                  <span className="label">%</span>
+                </label>
                 <button
                   type="button"
                   onClick={() => removeCriteria(criteria.id)}

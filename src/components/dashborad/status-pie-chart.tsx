@@ -63,7 +63,9 @@ export default function StatusPieChart({
     );
   }
 
-  const labels = Object.keys(data).filter((key) => key !== "total");
+  const labels = Object.keys(data).filter(
+    (key) => key !== "total" && key !== "overdue" && key !== "wait_update"
+  );
   const translatedLabels = labels.map((label) => labelMap[label] || label);
   const values = labels.map((key) => data[key]);
 
@@ -139,11 +141,25 @@ export default function StatusPieChart({
   };
   return (
     <div className="bg-base-200 p-4 rounded-lg shadow text-center w-full md:w-64">
-      <h3 className="font-bold text-lg text-primary mb-4">{title}</h3>
+      <h3 className="font-bold text-lg text-white mb-4 bg-blue-900 rounded-2xl">
+        {title}
+      </h3>
       <p className="font-bold text-md  mb-4">
         Tổng: <i> {data.total}</i>
       </p>
       <Pie data={pieData} options={options} />
+      <div className="flex flex-col mt-2">
+        {data.overdue > 0 && (
+          <p>
+            Quá hạn: <i>{data.overdue}</i>
+          </p>
+        )}
+        {data.wait_update > 0 && (
+          <p>
+            Chờ cập nhật: <i>{data.wait_update}</i>
+          </p>
+        )}
+      </div>
     </div>
   );
 }

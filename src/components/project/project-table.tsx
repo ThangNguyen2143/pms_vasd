@@ -54,7 +54,7 @@ function ProjectTable() {
                   <td>{item.name}</td>
                   <td className="max-w-64 truncate">{item.description}</td>
                   <td>{format_date(item.start_date)}</td>
-                  <td>{format_date(item.end_date)}</td>
+                  <td>{item.end_date ? format_date(item.end_date) : "-"}</td>
                   <td>
                     {statusList
                       ? statusList.find((st) => st.code == item.status)?.display

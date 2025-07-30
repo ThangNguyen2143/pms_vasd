@@ -29,6 +29,7 @@ export default function AddTestRunModal({
   const [formData, setFormData] = useState({
     run_at: format_date(new Date()),
     tester_note: "",
+    log: "",
     step_results: steps.map((step) => ({
       code: step.code,
       result: "true",
@@ -45,10 +46,20 @@ export default function AddTestRunModal({
       const totalResult = formData.step_results.every(
         (step) => step.result === "true"
       );
+      if (!totalResult) {
+        if (
+          formData.tester_note == "<p><br></p>" &&
+          formData.log.trim() == ""
+        ) {
+          toast.warning("Bắt buộc có log hoặc ghi chú nếu không đạt!!");
+          return;
+        }
+      }
       const payload = {
         testcase_id,
         assign_code,
         run_at: toISOString(formData.run_at),
+        log: formData.log,
         result: totalResult,
         tester_note: formData.tester_note,
         step_result: formData.step_results.map((step) => ({
@@ -180,6 +191,17 @@ export default function AddTestRunModal({
                 onChange={(e) => setFormData({ ...formData, tester_note: e })}
                 placeholder="Nhập ghi chú về lần test này..."
               />
+            </div>
+            <div>
+              <label className="bloc mb-1">Log lỗi (nếu có)</label>
+              <textarea
+                name="Log test"
+                className="textarea w-full"
+                value={formData.log}
+                onChange={(e) =>
+                  setFormData({ ...formData, log: e.target.value })
+                }
+              ></textarea>
             </div>
           </div>
 

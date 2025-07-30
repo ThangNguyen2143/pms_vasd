@@ -23,7 +23,7 @@ interface DataCreate {
   occurred_at: string;
   reporter: string;
   handle: string;
-  time_end: string;
+  time_end?: string;
 }
 
 export default function AddIncidentModal({
@@ -70,7 +70,6 @@ export default function AddIncidentModal({
       !typeSelected ||
       !reporter ||
       !handle ||
-      !timeEnd ||
       !occurredAt
     ) {
       toast.warning("Vui lòng điền đầy đủ thông tin.");
@@ -87,6 +86,7 @@ export default function AddIncidentModal({
       reporter,
       time_end: toISOString(timeEnd),
     };
+    if (data.time_end?.trim() == "") delete data.time_end;
     const re = await postData("/incident", data);
 
     if (re != "") return;

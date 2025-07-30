@@ -17,7 +17,6 @@ export default function BugLinks({
   testcase_name: string | null;
 }) {
   const [showTaskModal, setshowTaskModal] = useState(false);
-
   return (
     <div className="bg-base-200 p-4 rounded-lg">
       <h3 className="text-lg font-semibold text-primary mb-2">🔗 Liên kết</h3>

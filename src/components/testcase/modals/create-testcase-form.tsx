@@ -205,8 +205,8 @@ function CreateTestcaseForm({
             return next;
           });
 
-          const res = await uploadChunkedFile(file, "/bugs/file", {
-            bug_id: result.id,
+          const res = await uploadChunkedFile(file, "/testcase/file", {
+            testcase_id: result.id,
           });
 
           // Cập nhật trạng thái sau khi upload
@@ -346,7 +346,9 @@ function CreateTestcaseForm({
             Thông tin Testcase
           </legend>
           <fieldset className="fieldset">
-            <legend className="fieldset-legend">Tên testcase</legend>
+            <legend className="fieldset-legend">
+              Tên testcase <span className="text-red-500">*</span>
+            </legend>
             <input
               className="input w-full"
               type="text"
@@ -369,7 +371,9 @@ function CreateTestcaseForm({
           </fieldset>
 
           <fieldset className="fieldset">
-            <legend className="fieldset-legend">Kết quả mong đợi</legend>
+            <legend className="fieldset-legend">
+              Kết quả mong đợi<span className="text-red-500">*</span>
+            </legend>
             <RichTextEditor
               placeholder="Kết quả mong đợi"
               value={formData.info.result_expect}
@@ -399,7 +403,9 @@ function CreateTestcaseForm({
             /> */}
           </fieldset>
           <fieldset className="fieldset md:col-span-2">
-            <legend className="fieldset-legend">Mô tả</legend>
+            <legend className="fieldset-legend">
+              Mô tả<span className="text-red-500">*</span>
+            </legend>
             <RichTextEditor
               placeholder="Mô tả testcase"
               value={formData.info.description}
@@ -430,7 +436,9 @@ function CreateTestcaseForm({
             />
           </fieldset>
           <fieldset className="fieldset">
-            <legend className="fieldset-legend">Môi trường</legend>
+            <legend className="fieldset-legend">
+              Môi trường<span className="text-red-500">*</span>
+            </legend>
             <select
               className="select select-bordered w-full"
               value={formData.info.environment}
@@ -471,7 +479,9 @@ function CreateTestcaseForm({
             </select>
           </fieldset>
           <fieldset className="fieldset">
-            <legend className="fieldset-legend">Module</legend>
+            <legend className="fieldset-legend">
+              Module<span className="text-red-500">*</span>
+            </legend>
             <div className="join">
               <select
                 className="select join-item w-full"
@@ -619,12 +629,46 @@ function CreateTestcaseForm({
               key={"step" + step.id}
               className="border p-4 rounded-lg relative"
             >
+              {/* Có nút để thêm bước trước bước hiện tại nếu bước hiện tại > 2*/}
+              {index > 0 && (
+                <button
+                  className="btn btn-xs btn-secondary absolute -top-3 left-1/2 -translate-x-1/2 z-10"
+                  type="button"
+                  onClick={() => {
+                    const newStep = {
+                      id: crypto.randomUUID(),
+                      step: index + 1,
+                      name: "",
+                      description: "",
+                      expected_result: "",
+                      input_data: "",
+                      output_data: "",
+                      note: "",
+                    };
+                    setFormData((prev) => {
+                      const steps = [...prev.steps];
+                      steps.splice(index, 0, newStep);
+                      // Re-number steps
+                      const renumbered = steps.map((s, idx) => ({
+                        ...s,
+                        step: idx + 1,
+                      }));
+                      return { ...prev, steps: renumbered };
+                    });
+                  }}
+                  title="Thêm bước trước bước này"
+                >
+                  + Thêm bước trước
+                </button>
+              )}
               <div className="absolute top-2 right-2 text-sm font-bold">
                 Bước {step.step}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
-                  <label className="label">Tên bước</label>
+                  <label className="label">
+                    Tên bước<span className="text-red-500">*</span>
+                  </label>
                   <input
                     className="input input-bordered w-full"
                     type="text"
@@ -647,7 +691,9 @@ function CreateTestcaseForm({
                   )}
                 </div>
                 <div>
-                  <label className="label">Kết quả mong đợi</label>
+                  <label className="label">
+                    Kết quả mong đợi<span className="text-red-500">*</span>
+                  </label>
                   <input
                     type="text"
                     className="input input-bordered w-full"
@@ -690,7 +736,9 @@ function CreateTestcaseForm({
                 </div>
 
                 <div className="col-span-2 row-span-2 flex flex-col">
-                  <label className="label">Mô tả</label>
+                  <label className="label">
+                    Mô tả<span className="text-red-500">*</span>
+                  </label>
                   <RichTextEditor
                     value={step.description}
                     onChange={(e) => {

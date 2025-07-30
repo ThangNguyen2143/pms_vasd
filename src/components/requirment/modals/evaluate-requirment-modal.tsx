@@ -47,6 +47,13 @@ export default function EvaluateRequirementModal({
       [code]: value,
     }));
   };
+  const handleRemoveRating = (code: string) => {
+    setSelectedValues((prev) => {
+      const newState = { ...prev };
+      delete newState[code];
+      return newState;
+    });
+  };
   const sendIt = async () => {
     const dataaa = {
       requirement_id,
@@ -123,32 +130,47 @@ export default function EvaluateRequirementModal({
                     <div className="join-item collapse bg-base-100 border border-base-300">
                       <input type="checkbox" name="criteria" />
                       <div className="collapse-title font-semibold">
-                        {crit.title}
+                        <span> {crit.title} </span>{" "}
                       </div>
                       <div className="collapse-content text-sm">
                         {crit.description}
                       </div>
                     </div>
-                    <div className="rating rating-sm join-item items-center">
-                      {crit.scale?.map((rate) => {
-                        return (
-                          <input
-                            type="radio"
-                            name={"scale" + i}
-                            className="mask mask-star"
-                            value={rate.code}
-                            aria-label={rate.display}
-                            key={rate.code + "rating" + i}
-                            onChange={() => {
-                              handleRadioChange(crit.code, rate.code);
-                              setMissingCriteria((prev) =>
-                                prev.filter((id) => id !== crit.code)
-                              );
-                            }}
-                            checked={selectedValues[crit.code] === rate.code}
-                          />
-                        );
-                      })}
+                    <div className="join-item flex flex-col">
+                      <div className="rating rating-sm items-center">
+                        {crit.scale?.map((rate) => {
+                          return (
+                            <input
+                              type="checkbox"
+                              name={"scale" + i}
+                              className="mask mask-star"
+                              value={rate.code}
+                              aria-label={rate.display}
+                              key={rate.code + "rating" + i}
+                              onChange={(e) => {
+                                if (!e.target.checked) {
+                                  handleRemoveRating(crit.code);
+                                  return;
+                                }
+                                handleRadioChange(crit.code, rate.code);
+                                setMissingCriteria((prev) =>
+                                  prev.filter((id) => id !== crit.code)
+                                );
+                              }}
+                              checked={selectedValues[crit.code] === rate.code}
+                            />
+                          );
+                        })}
+                      </div>
+                      {/* <div className="flex justify-end">
+                        <button
+                          className="btn btn-ghost tooltip tooltip-left"
+                          data-tip="Bỏ đánh giá"
+                          onClick={() => handleRemoveRating(crit.code)}
+                        >
+                          <X></X>
+                        </button>
+                      </div> */}
                     </div>
                   </div>
                 </fieldset>

@@ -36,12 +36,8 @@ interface DataRating {
 export default function RequirementDetailClient({
   requirement_id,
   typeList,
-  project_id,
-  locations,
 }: {
   requirement_id: number;
-  project_id: number;
-  locations: ProjectLocation[];
   typeList?: RequirementType[];
 }) {
   const endpoint = "/requirements/detail/" + encodeBase64({ requirement_id });
@@ -51,13 +47,19 @@ export default function RequirementDetailClient({
   const [showAddAttachmentModal, setShowAddAttachmentModal] = useState(false);
   const [showEvaluateModal, setShowEvaluateModal] = useState(false);
   const { data: RatingData, getData } = useApi<DataRating[]>();
+  const { data: locations, getData: getLocation } = useApi<ProjectLocation[]>();
   const reloadAssessment = async () => {
     await getData(
       "/requirements/assessment/" + encodeBase64({ requirement_id }),
       "reload"
     );
   };
-
+  const reloadLocation = async () => {
+    await getLocation(
+      "/project/location/" +
+        encodeBase64({ project_id: requirement?.project_id })
+    );
+  };
   const {
     data: requirement,
     getData: getRequirement,
@@ -79,6 +81,9 @@ export default function RequirementDetailClient({
       "reload"
     );
   };
+  useEffect(() => {
+    reloadLocation();
+  }, [requirement]);
   useEffect(() => {
     getRequirement(endpoint, "default");
     getNote(
@@ -130,7 +135,7 @@ export default function RequirementDetailClient({
           />
           <NoteRequirment
             comments={note_requirment || []}
-            project_id={project_id}
+            product_id={requirement.product_id}
             onUpdate={updateNote}
             requirement_id={requirement_id}
           />
@@ -139,9 +144,9 @@ export default function RequirementDetailClient({
           <RequesterInfo
             requester={requirement.requesters}
             location={
-              locations.find(
+              locations?.find(
                 (local) => local.id == requirement.requesters.location_id
-              )?.name
+              )?.name ?? undefined
             }
             onEdit={() => setShowEditRequesterModal(true)}
           />
@@ -165,10 +170,10 @@ export default function RequirementDetailClient({
         )}
         {showEditRequesterModal && (
           <EditRequesterModal
-            project_id={locations[0].project_id || 0}
+            project_id={locations ? locations[0].project_id ?? 0 : 0}
             requiredInfor={requirement}
             onUpdate={updateRequirement}
-            location={locations}
+            location={locations ?? []}
             onClose={() => setShowEditRequesterModal(false)}
           />
         )}

@@ -65,6 +65,7 @@ function TaskComments({
       "/user/contacts/" +
         encodeBase64({ user_id: list?.map((l) => ({ id: l.id })) })
     );
+    const message = newComment.replace(/<img[^>]*>/i, "<Hình ảnh>");
     if (listContact && listContact.length > 0) {
       const email = listContact.map((us) => {
         const mail = us.contacts.filter((ct) => ct.code == "email");
@@ -73,7 +74,7 @@ function TaskComments({
       const content = {
         id: task.id,
         name: `Bạn đã được ${user?.name} nhắc đến trong task`,
-        message: `Nội dung comment: ${DOMPurify.sanitize(newComment)}`,
+        message: `Nội dung comment: ${DOMPurify.sanitize(message)}`,
       };
       const link =
         window.location.origin +
@@ -96,7 +97,7 @@ function TaskComments({
       const content = {
         id: task.task_id,
         name: task.title,
-        message: newComment,
+        message: DOMPurify.sanitize(message),
       };
       const link =
         window.location.origin +
@@ -106,7 +107,14 @@ function TaskComments({
           }) || "https://pm.vasd.vn/";
       if (email.length > 0)
         email.forEach((e) =>
-          sendEmail(content, e, "Thông báo comment mới", link, "task")
+          sendEmail(
+            content,
+            e,
+            "Thông báo comment mới",
+            link,
+            "task",
+            user?.name
+          )
             .then((mes) => {
               if (mes.message != "OK") toast(mes.message);
             })
@@ -179,7 +187,8 @@ function TaskComments({
                 disabled={
                   isLoading ||
                   newComment.trim().length == 0 ||
-                  newComment == "<p><br></p>"
+                  newComment == "<p><br></p>" ||
+                  /^<p>\s*<\/p>$/.test(newComment)
                 }
               >
                 {isLoading ? (

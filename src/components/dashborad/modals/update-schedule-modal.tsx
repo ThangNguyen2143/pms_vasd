@@ -1,10 +1,9 @@
 "use client";
 import { useEffect, useState } from "react";
-import Select from "react-select";
-import Cookies from "js-cookie";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { toast } from "sonner";
+import SelectInput from "~/components/ui/selectOptions";
 function UpdateScheduleModal({
   day,
   month,
@@ -21,7 +20,6 @@ function UpdateScheduleModal({
   onUpdate: () => Promise<void>;
 }) {
   const date = day + "/" + month + "/" + year;
-  const isDark = Cookies.get("theme") == "night";
   const { data: users, getData: getUser } =
     useApi<{ user_id: number; user_name: string }[]>();
   const { putData, errorData: errorPost } = useApi<string>();
@@ -58,7 +56,7 @@ function UpdateScheduleModal({
   const options =
     users?.map((us) => {
       return {
-        value: us.user_id,
+        value: us.user_id.toString(),
         label: us.user_name,
       };
     }) ?? [];
@@ -73,42 +71,16 @@ function UpdateScheduleModal({
           </label>
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Đổi thành</legend>
-            <Select
-              className="w-full"
-              styles={{
-                control: (styles) => ({
-                  ...styles,
-                  backgroundColor: isDark ? "#0f172a" : "white",
-                }),
-                option: (styles, { isFocused, isSelected }) => {
-                  let backgroundColor = isDark ? "#1e293b" : "#ffffff";
-                  let color = isDark ? "#f1f5f9" : "#111827";
 
-                  if (isSelected) {
-                    backgroundColor = isDark ? "#2563eb" : "#3b82f6"; // blue-600 | blue-500
-                    color = "#ffffff";
-                  } else if (isFocused) {
-                    backgroundColor = isDark ? "#334155" : "#e5e7eb"; // slate-700 | gray-200
-                  }
-
-                  return {
-                    ...styles,
-                    backgroundColor,
-                    color,
-                    cursor: "pointer",
-                  };
-                },
-                menuList: (styles) => ({
-                  ...styles,
-                  maxHeight: "200px", // 👈 Chiều cao tối đa của menu
-                  overflowY: "auto", // 👈 Hiển thị scroll khi vượt giới hạn
-                }),
-              }}
+            <SelectInput
               placeholder="Chọn người phân công"
               //   value={options.find((opt) => opt.value === taskSelected) || null}
-              onChange={(selected) => setUserSelect(selected?.value ?? 0)}
+              setValue={(selected) =>
+                setUserSelect(
+                  typeof selected == "string" ? Number(selected) : 0
+                )
+              }
               options={options}
-              isClearable
             />
           </fieldset>
           <label className="input w-full">

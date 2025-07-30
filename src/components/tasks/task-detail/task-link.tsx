@@ -5,6 +5,7 @@ import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import InforBugRefModal from "../modals/infor-bug-ref-modal";
 import { RequirementTask } from "~/lib/types";
+import InforReqRefModal from "../modals/infor-req-ref-modal";
 
 export default function TaskLinks({
   task_id,
@@ -16,6 +17,7 @@ export default function TaskLinks({
   onLinkRequirement: () => void;
 }) {
   const [showBugModal, setshowBugModal] = useState<number>();
+  const [showRequireModal, setShowRequireModal] = useState<number>();
   const { data: bugList, getData } = useApi<
     {
       id: number;
@@ -49,9 +51,19 @@ export default function TaskLinks({
 
         {requirementTasks && requirementTasks.length > 0 ? (
           requirementTasks.map((reqTask) => (
-            <span key={reqTask.requirement_id} className="ml-1">
-              [ID: {reqTask.requirement_id}] - {reqTask.requirement_title}
-            </span>
+            <div key={reqTask.requirement_id}>
+              <div className="flex ml-1">
+                <p className="truncate max-w-56">
+                  [ID: {reqTask.requirement_id}] - {reqTask.requirement_title}
+                </p>
+                <span
+                  onClick={() => setShowRequireModal(reqTask.requirement_id)}
+                  className="badge badge-info badge-outline"
+                >
+                  <BadgeInfo />
+                </span>
+              </div>
+            </div>
           ))
         ) : (
           <span className="italic text-gray-500">Chưa liên kết</span>
@@ -83,6 +95,12 @@ export default function TaskLinks({
         <InforBugRefModal
           bug_id={showBugModal}
           onClose={() => setshowBugModal(undefined)}
+        />
+      )}
+      {showRequireModal && (
+        <InforReqRefModal
+          req_id={showRequireModal}
+          onClose={() => setShowRequireModal(undefined)}
         />
       )}
     </div>

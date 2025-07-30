@@ -1,8 +1,10 @@
 "use client";
 import React, { useState } from "react";
 import { toast } from "sonner";
+import DateTimePicker from "~/components/ui/date-time-picker";
 import { useApi } from "~/hooks/use-api";
 import { ProjectDetailDto } from "~/lib/types";
+import { format_date, toISOString } from "~/utils/fomat-date";
 
 interface DataUpdateInfoProject {
   id: number;
@@ -10,7 +12,7 @@ interface DataUpdateInfoProject {
   name: string;
   description: string;
   start_date: string;
-  end_date: string;
+  end_date?: string;
 }
 
 function UpdateInfoProjectModal({
@@ -23,25 +25,24 @@ function UpdateInfoProjectModal({
   const [seftCode, setSeftCode] = useState<string>(info.seft_code || "");
   const [name, setName] = useState<string>(info.name);
   const [description, setDescription] = useState<string>(info.description);
-  const [dateStart, setDateStart] = useState<string>(info.start_date);
-  const [dateEnd, setDateEnd] = useState<string>(info.end_date);
+  const [dateStart, setDateStart] = useState<string>(
+    format_date(info.start_date)
+  );
+  const [dateEnd, setDateEnd] = useState<string>(
+    info.end_date ? format_date(info.end_date) : ""
+  );
   const { putData, errorData, isLoading } = useApi<"", DataUpdateInfoProject>();
 
   const handlerUpdateInfoProject = async () => {
-    const start_date = new Date(dateStart);
-    const end_date = new Date(dateEnd);
-    if (start_date > end_date) {
-      toast.warning("Ngày kết thúc không lớn hơn ngày bắt đầu");
-      return;
-    }
     const dataSend = {
       id: info.id,
       seft_code: seftCode,
       name,
       description,
-      start_date: dateStart,
-      end_date: dateEnd,
+      start_date: toISOString(dateStart),
+      end_date: dateEnd == "" ? undefined : toISOString(dateEnd),
     };
+    if (!dataSend.end_date) delete dataSend.end_date;
     const res = await putData("/project", dataSend);
     if (res == "") {
       toast.success("Cập nhật thông tin thành công");
@@ -93,25 +94,11 @@ function UpdateInfoProjectModal({
         </fieldset>
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Bắt đầu</legend>
-          <input
-            type="date"
-            className="input w-full validator"
-            value={dateStart}
-            required
-            onChange={(e) => setDateStart(e.target.value)}
-          />
-          <p className="validator-hint">Vui lòng chọn ngày bắt đầu</p>
+          <DateTimePicker value={dateStart} onChange={(e) => setDateStart(e)} />
         </fieldset>
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Kết thúc</legend>
-          <input
-            type="date"
-            className="input w-full validator"
-            value={dateEnd}
-            required
-            onChange={(e) => setDateEnd(e.target.value)}
-          />
-          <p className="validator-hint">Vui lòng chọn ngày kết thúc</p>
+          <DateTimePicker value={dateEnd} onChange={(e) => setDateEnd(e)} />
         </fieldset>
         <div className="modal-action">
           <button className="btn btn-ghost" onClick={onClose}>

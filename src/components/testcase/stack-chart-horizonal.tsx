@@ -43,7 +43,7 @@ function StackBarChartHorizonal({
     const datasets = type.map((key) => ({
       label: key,
       data: dataMap[key],
-      backgroundColor: key == "testcase_created" ? "#0d1ae6" : "#49f304",
+      backgroundColor: key == "testcase_created" ? "#10b981" : "#49f304",
     }));
     return { labels, datasets };
   }, [data, type]);

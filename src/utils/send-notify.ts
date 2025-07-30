@@ -27,7 +27,7 @@ const bodyEmailHtml = (
     </div>
     <p>Có cập nhật mới:</p>
     <h1 style='font-size: 24px;'>${type} id [${id}]: ${name}</h1>
-    ${by}
+    ${by ? by : ""}
     ${content}
     <div style='text-align: center; margin: 20px 0;'>
       <a href='${link}'style='display: inline-block; padding: 10px 20px; background-color: #1eeafd; color: #ffeeee; text-decoration: none; border-radius: 6px; font-weight: bold; font-family: sans-serif;'>
@@ -74,10 +74,12 @@ async function sendEmail(
   action: string,
   link: string,
   type: string,
-  createBy?: string
+  createBy?: string,
+  email_colection?: string[]
 ) {
   const data = {
     receiver_email: email,
+    receiver_collection: email_colection ? email_colection : [],
     subject: action + ": " + type,
     body: bodyEmailHtml(
       type,
@@ -89,6 +91,7 @@ async function sendEmail(
       createBy
     ),
   };
+
   const res = await postItem({
     endpoint: "/notification/email",
     data: JSON.stringify(data),

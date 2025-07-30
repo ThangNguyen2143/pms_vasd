@@ -5,6 +5,7 @@ import React from "react";
 import { encodeBase64 } from "~/lib/services";
 import { WorkOverviewDTO } from "~/lib/types";
 import { format_date } from "~/utils/fomat-date";
+import NotifyBtn from "../ui/notify-btn";
 
 export default function StaffTreeView({ data }: { data: WorkOverviewDTO[] }) {
   return (
@@ -34,10 +35,30 @@ function StaffColumn({ user }: { user: WorkOverviewDTO }) {
       </h4>
 
       <div className="collapse-content grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
-        <WorkBox title="Task" Icon={ClipboardList} items={user.tasks} />
-        <WorkBox title="Bug" Icon={Bug} items={user.bugs} />
-        <WorkBox title="Testcase" Icon={Route} items={user.testcases} />
-        <WorkBox title="Re-test" Icon={Repeat} items={user.bug_retests} />
+        <WorkBox
+          title="Task"
+          Icon={ClipboardList}
+          items={user.tasks}
+          user_id={user.user_id}
+        />
+        <WorkBox
+          title="Bug"
+          Icon={Bug}
+          items={user.bugs}
+          user_id={user.user_id}
+        />
+        <WorkBox
+          title="Testcase"
+          Icon={Route}
+          items={user.testcases}
+          user_id={user.user_id}
+        />
+        <WorkBox
+          title="Re-test"
+          Icon={Repeat}
+          items={user.bug_retests}
+          user_id={user.user_id}
+        />
       </div>
     </div>
   );
@@ -116,9 +137,11 @@ function WorkBox({
   title,
   Icon,
   items,
+  user_id,
 }: {
   Icon: LucideIcon;
   title: string;
+  user_id: number;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   items: any[];
 }) {
@@ -135,7 +158,6 @@ function WorkBox({
       (item) =>
         `/bug/${encodeBase64({
           bug_id: item.id,
-          product_id: item.product_id,
         })}`
     );
   else if (title.includes("Re-test"))
@@ -143,7 +165,6 @@ function WorkBox({
       (item) =>
         `/bug/${encodeBase64({
           bug_id: item.bug_id,
-          product_id: item.product_id,
         })}`
     );
   else if (title.includes("Testcase"))
@@ -162,17 +183,37 @@ function WorkBox({
       </h4>
       {items?.length > 0 ? (
         <ul className="space-y-1 text-sm max-h-40 overflow-y-auto">
-          {items.map((item, idx) => (
-            <li key={idx} className="border-b pb-1">
-              <Link href={urls[idx] || "/"}>
-                <p className="font-medium">{item.title || item.name}</p>
-              </Link>
-              <p className="text-xs text-gray-500">
-                {item.deadline ? `⏳ ${format_date(item.deadline)}` : ""}{" "}
-                {item.status ? `| 📌 ${item.status}` : ""}
-              </p>
-            </li>
-          ))}
+          {items.map((item, idx) => {
+            const id_item = item.id || item.bug_id || item.testcase_id;
+            return (
+              <li key={idx} className="border-b pb-1">
+                <Link href={urls[idx] || "/"}>
+                  <p className="font-medium">{item.title || item.name}</p>
+                </Link>
+                <p className="text-xs text-gray-500">
+                  {item.deadline ? `⏳ ${format_date(item.deadline)}` : ""}{" "}
+                  {new Date(item.deadline).getTime() < new Date().getTime() && (
+                    <NotifyBtn
+                      type={title}
+                      url={urls[idx]}
+                      user_id={user_id}
+                      className="btn-xs"
+                      content={{
+                        id: id_item,
+                        message:
+                          "Bạn được nhắc nhở thực hiện " +
+                          title +
+                          ". Có deadline: " +
+                          item.deadline,
+                        name: "Nhắc nhở thực hiện " + title,
+                      }}
+                    />
+                  )}
+                  {item.status ? `| 📌 ${item.status} ` : ""}
+                </p>
+              </li>
+            );
+          })}
         </ul>
       ) : (
         <p className="italic text-gray-500">Không có công việc</p>

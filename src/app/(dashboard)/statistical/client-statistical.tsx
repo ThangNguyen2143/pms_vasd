@@ -7,6 +7,7 @@ import {
   ChartNoAxesCombined,
   ClipboardPen,
   File,
+  FileUser,
   Globe,
   Hourglass,
   TestTube,
@@ -174,7 +175,9 @@ function ClientStatisticalPage() {
       case "sta_0006":
         icon = <ChartNoAxesCombined />;
         break;
-
+      case "sta_0007":
+        icon = <FileUser />;
+        break;
       default:
         icon = <Globe />; // Default icon if no match
     }

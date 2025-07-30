@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import Cookies from "js-cookie";
 import DateTimePicker from "~/components/ui/date-time-picker";
 import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
@@ -9,7 +8,8 @@ import { encodeBase64 } from "~/lib/services";
 import { Contact, ProjectMember } from "~/lib/types";
 import { toISOString } from "~/utils/fomat-date";
 import { sendEmail } from "~/utils/send-notify";
-import Select from "react-select";
+import SelectInput from "~/components/ui/selectOptions";
+import { useUser } from "~/providers/user-context";
 interface ResponseNotify {
   action: string;
   content: {
@@ -32,22 +32,19 @@ export default function AssignTestcaseModal({
   onClose: () => void;
   onUpdate: () => Promise<void>;
 }) {
-  const isDark = Cookies.get("theme") == "night";
+  const user = useUser();
   const [assignData, setAssignData] = useState<{
     test_id: number;
-    assign_to: number;
+    assign_to: number[];
     dead_line: string;
     note: string;
   }>({
     test_id,
-    assign_to: 0,
+    assign_to: [],
     dead_line: "",
     note: "",
   });
-  const { postData, isLoading, errorData } = useApi<
-    ResponseNotify,
-    typeof assignData
-  >();
+  const { postData, isLoading, errorData } = useApi<ResponseNotify>();
   const { data: users, getData: getUsers } = useApi<ProjectMember[]>();
   useEffect(() => {
     getUsers(
@@ -57,7 +54,7 @@ export default function AssignTestcaseModal({
   }, [product_id]);
 
   const handleSubmit = async () => {
-    if (!assignData.assign_to) {
+    if (!assignData.assign_to || assignData.assign_to.length == 0) {
       toast.error("Vui lòng chọn người nhận");
       return;
     }
@@ -65,12 +62,17 @@ export default function AssignTestcaseModal({
       toast.error("Vui lòng chọn deadline");
       return;
     }
-    const re = await postData("/testcase/assign", {
-      ...assignData,
-      dead_line: toISOString(assignData.dead_line),
+    const createData = assignData.assign_to.map((us) => {
+      return postData("/testcase/assign", {
+        ...assignData,
+        assign_to: us,
+        dead_line: toISOString(assignData.dead_line),
+      });
     });
-    if (!re) return;
-    else {
+    const result = await Promise.all(createData);
+    if (result.some((re) => re == null)) return;
+    result.forEach((re) => {
+      if (re == null) return;
       const email = re.contact.find((ct) => ct.code == "email")?.value;
       // const tele = re.contact.find((ct) => ct.code == "telegram")?.value;
       const content = {
@@ -83,7 +85,14 @@ export default function AssignTestcaseModal({
           "/test_case/" +
           encodeBase64({ testcase_id: test_id }) || "https://pm.vasd.vn/";
       if (email)
-        sendEmail(content, email, "Thông báo", link, "testcase")
+        sendEmail(
+          content,
+          email,
+          "Thông báo",
+          link,
+          "testcase",
+          user.user?.name
+        )
           .then((mes) => {
             if (mes.message != "OK") toast(mes.message);
           })
@@ -95,11 +104,10 @@ export default function AssignTestcaseModal({
       //       toast.success(re.message);
       //     })
       //     .catch((err) => toast.error(err));
-
-      await onUpdate();
-      toast.success("Giao việc thành công");
-      onClose();
-    }
+    });
+    await onUpdate();
+    toast.success("Giao việc thành công");
+    onClose();
   };
   useEffect(() => {
     if (errorData) {
@@ -111,7 +119,7 @@ export default function AssignTestcaseModal({
   if (!isOpen) return null;
   const options =
     users?.map((user) => ({
-      value: user.id,
+      value: user.id.toString(),
       label: user.name,
     })) ?? [];
   return (
@@ -122,55 +130,24 @@ export default function AssignTestcaseModal({
           <div className="space-y-4">
             <div>
               <label className="block mb-1">Người nhận</label>
-              <Select
-                className="w-full"
-                styles={{
-                  control: (styles) => ({
-                    ...styles,
-                    backgroundColor: isDark ? "#0f172a" : "white",
-                  }),
-                  option: (styles, { isFocused, isSelected }) => {
-                    let backgroundColor = isDark ? "#1e293b" : "#ffffff";
-                    let color = isDark ? "#f1f5f9" : "#111827";
-
-                    if (isSelected) {
-                      backgroundColor = isDark ? "#2563eb" : "#3b82f6"; // blue-600 | blue-500
-                      color = "#ffffff";
-                    } else if (isFocused) {
-                      backgroundColor = isDark ? "#334155" : "#e5e7eb"; // slate-700 | gray-200
-                    }
-
-                    return {
-                      ...styles,
-                      backgroundColor,
-                      color,
-                      cursor: "pointer",
-                    };
-                  },
-                  menuList: (styles) => ({
-                    ...styles,
-                    maxHeight: "200px", // 👈 Chiều cao tối đa của menu
-                    overflowY: "auto", // 👈 Hiển thị scroll khi vượt giới hạn
-                  }),
-                }}
+              <SelectInput
                 placeholder="Chọn người thực hiện"
-                value={
-                  options.find((opt) => opt.value === assignData.assign_to) ||
-                  null
-                }
-                onChange={(selected) =>
+                isMulti
+                options={options}
+                setValue={(selected) => {
                   setAssignData({
                     ...assignData,
-                    assign_to: selected?.value ?? 0,
-                  })
-                }
-                options={options}
-                isClearable
+                    assign_to: Array.isArray(selected)
+                      ? selected.map((v) => Number(v))
+                      : [],
+                  });
+                }}
               />
             </div>
             <div>
               <label className="block mb-1">Deadline</label>
               <DateTimePicker
+                minDate={new Date()}
                 value={assignData.dead_line}
                 onChange={(e) => setAssignData({ ...assignData, dead_line: e })}
                 className="input-neutral w-full"

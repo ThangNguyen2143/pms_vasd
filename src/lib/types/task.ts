@@ -59,6 +59,7 @@ export interface DataRating {
   createdBy_name: string;
   is_accepted: boolean;
   created_at: string;
+  percent?: number;
 }
 
 export type DeadlineWarning = {

@@ -17,7 +17,7 @@ import {
 // import { useUser } from "~/providers/user-context";
 import OverviewWork from "./orverview-work";
 import { format_date, toISOString } from "~/utils/fomat-date";
-import { endOfDay, startOfDay, subDays } from "date-fns";
+import { endOfDay } from "date-fns";
 import DateTimePicker from "../ui/date-time-picker";
 import AddRequirementModal from "../requirment/modals/add-requirement-modal";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -42,21 +42,23 @@ function MainWork() {
   const { data: typeWorkList, getData: getTypeWork } =
     useApi<RequirementType[]>();
   const [fromDate, setFromDate] = useState<string>(
-    format_date(startOfDay(subDays(new Date(), 7))) //Mặc định 1 tuần trước
+    ""
+    // format_date(startOfDay(subDays(new Date(), 7))) //Mặc định 1 tuần trước
   );
   const [toDate, settoDate] = useState<string>(
     format_date(endOfDay(new Date()))
   );
+  const [requireList, setRequireList] = useState<RequirementDto[]>();
   const {
     data: workList,
     getData: getWorkList,
     errorData: errorWorkList,
     isLoading: loadingWork,
   } = useApi<RequirementDto[]>();
-  const fetchData = async (from: string, to: string) => {
+  const fetchData = async () => {
     const endpointWork =
       "/requirements/" +
-      encodeBase64({ type: "project", project_id: projectSelected, from, to });
+      encodeBase64({ type: "project", project_id: projectSelected });
     await getWorkList(endpointWork);
   };
   const { data: productList, getData: getProducts } = useApi<ProductDto[]>();
@@ -80,6 +82,23 @@ function MainWork() {
     };
     fetchData();
   }, []);
+  useEffect(() => {
+    if (workList) {
+      const filtered = workList.filter((req) => {
+        if (fromDate != "" && toDate != "") {
+          const from = new Date(toISOString(fromDate)).getTime();
+          const to = new Date(toISOString(toDate)).getTime();
+          const reqCreate = new Date(req.date_create).getTime();
+          return reqCreate > from && reqCreate < to;
+        } else {
+          return true;
+        }
+      });
+      setRequireList(filtered);
+    } else {
+      setRequireList([]);
+    }
+  }, [workList, fromDate, toDate]);
   // Lưu mỗi khi projectSelected thay đổi
   useEffect(() => {
     if (projectSelected !== 0) {
@@ -95,12 +114,13 @@ function MainWork() {
   }, [projectSelected]);
   useEffect(() => {
     if (projectSelected != 0) {
-      fetchData(toISOString(fromDate), toISOString(toDate));
+      fetchData();
     }
-  }, [projectSelected, fromDate, toDate]);
+  }, [projectSelected]);
   useEffect(() => {
     const toParam = searchParams.get("to");
     const fromParam = searchParams.get("from");
+
     if (toParam) settoDate(toParam);
     if (fromParam) setFromDate(fromParam);
   }, [searchParams]);
@@ -128,7 +148,7 @@ function MainWork() {
   const handleDateChange = (dateInput: string, type: "from" | "to") => {
     const params = new URLSearchParams(searchParams.toString());
     params.set(type, dateInput);
-    router.replace(`?${params.toString()}`);
+    router.replace(`?${params.toString()}`, { scroll: false });
     if (type == "from") setFromDate(dateInput);
     else settoDate(dateInput);
   };
@@ -257,7 +277,7 @@ function MainWork() {
             />
             <div className="tab-content">
               <TableWork
-                workList={workList || []}
+                workList={requireList || []}
                 priorityList={priorityList || undefined}
                 statusList={statusList || undefined}
                 typeList={typeWorkList || undefined}
@@ -279,7 +299,7 @@ function MainWork() {
           locationList={locations || []}
           onClose={() => setShowAddRequirment(false)}
           onCreated={async () => {
-            await fetchData(fromDate, toDate);
+            await fetchData();
           }}
         />
       )}

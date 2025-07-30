@@ -6,20 +6,14 @@ import { status_with_color_badge } from "~/utils/status-with-color";
 
 interface BugRowProps {
   bug: BugDto;
-  product_id: string;
   isSelected?: boolean;
   setSelect?: (id: number, isSelected: boolean) => void;
 }
 
-export default function BugRow({
-  bug,
-  product_id,
-  isSelected,
-  setSelect,
-}: BugRowProps) {
+export default function BugRow({ bug, isSelected, setSelect }: BugRowProps) {
   const router = useRouter();
   const handleClickRow = (bug: BugDto) => {
-    router.push("/bug/" + encodeBase64({ bug_id: bug.bug_id, product_id }));
+    router.push("/bug/" + encodeBase64({ bug_id: bug.bug_id }));
   };
   return (
     <tr
@@ -39,10 +33,10 @@ export default function BugRow({
         </span>
       </td>
       <td className="py-2 px-4">
-        {bug.is_update ? (
+        {bug.is_update == true ? (
           <input
             type="checkbox"
-            defaultChecked
+            checked
             disabled
             className="checkbox checkbox-success"
           />

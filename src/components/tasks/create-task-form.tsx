@@ -9,22 +9,23 @@ import RichTextEditor from "../ui/rich-text-editor";
 import DateTimePicker from "../ui/date-time-picker";
 import { ProductModule } from "~/lib/types";
 import { useUploadFile } from "~/hooks/use-upload-file";
-import Select from "react-select";
-import Cookies from "js-cookie";
-import { toISOString } from "~/utils/fomat-date";
+import { format_date, toISOString } from "~/utils/fomat-date";
+import SelectInput from "../ui/selectOptions";
+import { addHours } from "date-fns";
 interface Criteria {
   id: string;
   title: string;
   type: string;
+  percent: number;
 }
 interface DataPost {
   product_id: string;
   title: string;
   description: string;
-  dead_line: string;
+  dead_line?: string;
   module?: string;
-  requirement_id?: number;
-  acceptances?: { title: string; type: string }[];
+  requirement?: { id: number }[];
+  acceptances?: { title: string; type: string; percent: number }[];
 }
 function CreateTaskForm({
   product_id,
@@ -39,16 +40,18 @@ function CreateTaskForm({
 }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [deadline, setDeadline] = useState("");
+  const [deadline, setDeadline] = useState(
+    format_date(addHours(new Date(), 3))
+  );
   const [criteriaList, setCriteriaList] = useState<Criteria[]>([
     {
       id: Date.now().toString(),
       title: "",
       type: "",
+      percent: 100,
     },
   ]);
-  const isDark = Cookies.get("theme") == "night";
-  const [selectedRequirement, setSelectedRequirement] = useState<number>(0);
+  const [selectedRequirement, setSelectedRequirement] = useState<number[]>([]);
   const [selectModule, setSelectModule] = useState<string>("");
   const [files, setFile] = useState<File[]>([]);
   const [fileUploadStatus, setFileUploadStatus] = useState<
@@ -72,7 +75,7 @@ function CreateTaskForm({
     getRequiredList("/requirements/list/" + encodeBase64({ product_id }));
   }, [product_id]);
   useEffect(() => {
-    if (postError) toast.error(postError.message);
+    if (postError) toast.error(postError.message || postError.title);
     if (uploadError) {
       toast.error(uploadError);
     }
@@ -93,8 +96,24 @@ function CreateTaskForm({
       toast.error("Vui lòng nhập mô tả công việc");
       return;
     }
+    if (deadline == "") {
+      toast.error("Vui lòng chọn deadline (chưa chọn ngày)");
+      return;
+    }
     if (criteriaList.some((crit) => crit.title.trim() === "")) {
       toast.error("Vui lòng nhập tiêu chí chấp thuận");
+      return;
+    }
+    const totalPercent = criteriaList.reduce(
+      (sum, item) => sum + Number(item.percent || 0),
+      0
+    );
+    if (totalPercent > 100) {
+      toast.error("Tổng tỉ lệ hoàn thành lớn hơn 100%");
+      return;
+    }
+    if (selectModule == "") {
+      toast.error("Vui lòng chọn module");
       return;
     }
     const data: DataPost = {
@@ -103,14 +122,17 @@ function CreateTaskForm({
       description,
       module: selectModule,
       dead_line: toISOString(deadline),
-      requirement_id: selectedRequirement,
+      requirement: [...selectedRequirement?.map((reqs) => ({ id: reqs }))],
       acceptances: criteriaList.map((crit) => ({
         title: crit.title,
         type: crit.type,
+        percent: crit.percent,
       })),
     };
-    if (data.requirement_id == 0) delete data.requirement_id;
+    if (data.requirement && data.requirement.length == 0)
+      delete data.requirement;
     if (data.module == "") delete data.module;
+    if (data.dead_line == "") delete data.dead_line;
     if (data.acceptances?.length == 0) delete data.acceptances;
     // const result = await uploadMultiFiles({
     //   files,
@@ -119,7 +141,6 @@ function CreateTaskForm({
     //     ...data,
     //   },
     // });
-    // const result = null;
     const result = await postData("/tasks", data);
     if (result == null) return;
     if (files.length > 0) {
@@ -132,8 +153,8 @@ function CreateTaskForm({
             return next;
           });
 
-          const res = await uploadChunkedFile(file, "/bugs/file", {
-            bug_id: result.id,
+          const res = await uploadChunkedFile(file, "/tasks/file", {
+            task_id: result.id,
           });
 
           // Cập nhật trạng thái sau khi upload
@@ -167,19 +188,26 @@ function CreateTaskForm({
         id: Date.now().toString(),
         title: "",
         type: "",
+        percent: 100,
       },
     ]);
     setSelectModule("");
-    setSelectedRequirement(0);
+    setSelectedRequirement([]);
     setFile([]);
   };
   const addCriteria = () => {
+    const totalPercent = criteriaList.reduce(
+      (sum, item) => sum + Number(item.percent || 0),
+      0
+    );
+    const remaining = Math.max(0, 100 - totalPercent);
     setCriteriaList([
       ...criteriaList,
       {
         id: Date.now().toString(),
         title: "",
         type: "",
+        percent: remaining,
       },
     ]);
   };
@@ -204,11 +232,11 @@ function CreateTaskForm({
     requireds
       ?.sort((a, b) => a.id - b.id)
       .map((req) => ({
-        value: req.id,
+        value: req.id.toString(),
         label: req.title,
       })) ?? [];
   return (
-    <div className="overflow-auto">
+    <div>
       <div className="h-[550px] grid grid-cols-1 md:grid-cols-2 gap-2 p-4  overflow-y-auto border rounded-lg shadow border-current">
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Tiêu đề</legend>
@@ -223,6 +251,7 @@ function CreateTaskForm({
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Deadline</legend>
           <DateTimePicker
+            minDate={new Date()}
             value={deadline}
             onChange={setDeadline}
             className="input-neutral w-full"
@@ -277,11 +306,27 @@ function CreateTaskForm({
                       </option>
                     ))}
                 </select>
+                <label
+                  className="tooltip tooltip-top join-item input"
+                  data-tip="Tỉ lệ hoàn thành (%)"
+                >
+                  <input
+                    type="number"
+                    max={100}
+                    min={0}
+                    value={criteria.percent}
+                    onChange={(e) =>
+                      updateCriteria(criteria.id, "percent", e.target.value)
+                    }
+                  />
+                  <span className="label">%</span>
+                </label>
 
                 <button
                   type="button"
                   onClick={() => removeCriteria(criteria.id)}
-                  className="btn btn-error   join-item "
+                  className="btn btn-error join-item"
+                  disabled={criteriaList.length <= 1}
                 >
                   <X size={16} />
                 </button>
@@ -293,44 +338,14 @@ function CreateTaskForm({
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Module</legend>
             <div className="join w-full">
-              <Select
-                className="join-item w-full"
-                styles={{
-                  control: (styles) => ({
-                    ...styles,
-                    backgroundColor: isDark ? "#0f172a" : "white",
-                  }),
-                  option: (styles, { isFocused, isSelected }) => {
-                    let backgroundColor = isDark ? "#1e293b" : "#ffffff";
-                    let color = isDark ? "#f1f5f9" : "#111827";
-
-                    if (isSelected) {
-                      backgroundColor = isDark ? "#2563eb" : "#3b82f6"; // blue-600 | blue-500
-                      color = "#ffffff";
-                    } else if (isFocused) {
-                      backgroundColor = isDark ? "#334155" : "#e5e7eb"; // slate-700 | gray-200
-                    }
-
-                    return {
-                      ...styles,
-                      backgroundColor,
-                      color,
-                      cursor: "pointer",
-                    };
-                  },
-                  menuList: (styles) => ({
-                    ...styles,
-                    maxHeight: "200px", // 👈 Chiều cao tối đa của menu
-                    overflowY: "auto", // 👈 Hiển thị scroll khi vượt giới hạn
-                  }),
-                }}
-                isClearable
-                value={
-                  options.find((opt) => opt.value === selectModule) || null
-                }
-                onChange={(selected) => setSelectModule(selected?.value ?? "")}
+              <SelectInput
                 options={options}
+                classNames="join-item"
                 placeholder="Chọn module"
+                setValue={(e) =>
+                  setSelectModule(typeof e === "string" ? e : "")
+                }
+                singleValue={selectModule}
               />
               <button className="btn join-item" onClick={onAddModule}>
                 Thêm
@@ -339,47 +354,15 @@ function CreateTaskForm({
           </fieldset>
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Liên kết yêu cầu</legend>
-            <Select
-              className="w-full"
-              styles={{
-                control: (styles) => ({
-                  ...styles,
-                  backgroundColor: isDark ? "#0f172a" : "white",
-                }),
-                option: (styles, { isFocused, isSelected }) => {
-                  let backgroundColor = isDark ? "#1e293b" : "#ffffff";
-                  let color = isDark ? "#f1f5f9" : "#111827";
-
-                  if (isSelected) {
-                    backgroundColor = isDark ? "#2563eb" : "#3b82f6"; // blue-600 | blue-500
-                    color = "#ffffff";
-                  } else if (isFocused) {
-                    backgroundColor = isDark ? "#334155" : "#e5e7eb"; // slate-700 | gray-200
-                  }
-
-                  return {
-                    ...styles,
-                    backgroundColor,
-                    color,
-                    cursor: "pointer",
-                  };
-                },
-                menuList: (styles) => ({
-                  ...styles,
-                  maxHeight: "100px", // 👈 Chiều cao tối đa của menu
-                  overflowY: "auto", // 👈 Hiển thị scroll khi vượt giới hạn
-                }),
-              }}
-              isClearable
-              value={
-                optionReq.find((opt) => opt.value === selectedRequirement) ||
-                null
-              }
-              onChange={(selected) =>
-                setSelectedRequirement(selected?.value ?? 0)
-              }
+            <SelectInput
               options={optionReq}
+              isMulti
               placeholder="Chọn yêu cầu"
+              setValue={(e) =>
+                setSelectedRequirement(
+                  Array.isArray(e) ? e.map((v) => Number(v)) : []
+                )
+              }
             />
           </fieldset>
           <div>

@@ -95,7 +95,7 @@ export default function OverviewWork({
       {
         label: "Số lượng",
         data: statusCounts,
-        backgroundColor: "rgba(54, 162, 235, 0.6)",
+        backgroundColor: "#ff6e00",
       },
     ],
   };
@@ -108,8 +108,8 @@ export default function OverviewWork({
         data: priorityCounts,
         backgroundColor: [
           "#FF6384",
-          "#FFCE56",
           "#36A2EB",
+          "#FFCE56",
           "#4BC0C0",
           "#9966FF",
         ],

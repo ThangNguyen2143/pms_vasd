@@ -2,6 +2,7 @@ import { ProductModule, TaskDTO, WorkStatus } from "~/lib/types";
 import TaskRow from "./task-row";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import PagingComponent from "../ui/paging-table";
 interface TaskListProps {
   product_id: string;
   modules: ProductModule[];
@@ -20,7 +21,9 @@ function TaskList({
   const searchParams = useSearchParams();
   const [selectTask, setSelectTask] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const fullTaskList = taskList ? [...taskList] : [];
+  const fullTaskList = taskList
+    ? [...taskList.sort((a, b) => b.id - a.id)]
+    : [];
   const totalPages = Math.ceil(fullTaskList.length / 10);
   // ⬅️ Khi load lại, đọc từ URL
   useEffect(() => {
@@ -32,7 +35,7 @@ function TaskList({
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", page.toString());
-    router.replace(`?${params.toString()}`);
+    router.replace(`?${params.toString()}`, { scroll: false });
     setCurrentPage(page);
   };
 
@@ -129,23 +132,11 @@ function TaskList({
           </tr>
         </tfoot>
       </table>
-      <div className="flex justify-center">
-        {totalPages > 1 && (
-          <div className="join">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                onClick={() => handlePageChange(page)}
-                className={`join-item btn ${
-                  page === currentPage ? "btn-active" : ""
-                }`}
-              >
-                {page}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+      <PagingComponent
+        currentPage={currentPage}
+        totalPages={totalPages}
+        handleChangePage={handlePageChange}
+      />
     </div>
   );
 }

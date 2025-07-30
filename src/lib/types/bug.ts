@@ -13,6 +13,7 @@ export type BugDto = {
 export type BugDetail = {
   id: number;
   title: string;
+  product_id: string;
   description: string;
   priority: string;
   severity: string;
@@ -51,6 +52,7 @@ export type BugAssign = {
 export type BugStatus = {
   code: string;
   description: string;
+  allowed_transitions: string[];
 };
 export type BugSeverity = {
   code: string;

@@ -32,7 +32,6 @@ export async function getItem<T>({
       token: session.token,
     },
   });
-
   try {
     const response = (await result.json()) as DataResponse<T>;
     return response;
@@ -132,6 +131,17 @@ export async function deleteItem({ endpoint }: { endpoint: string }) {
       token: session?.token || "",
     },
   });
-
-  return await result.json();
+  try {
+    return await result.json();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (e: any) {
+    const res: DataResponse<""> = {
+      code: Number(result.status),
+      hint: e.toString(),
+      message: result.statusText,
+      status: "failed",
+      value: "",
+    };
+    return res;
+  }
 }

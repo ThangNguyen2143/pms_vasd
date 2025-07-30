@@ -11,6 +11,7 @@ import { RequirementStatus } from "~/lib/types";
 import { toast } from "sonner";
 import { format_date } from "~/utils/fomat-date";
 import SafeHtmlViewer from "~/components/ui/safeHTMLviewer";
+import clsx from "clsx";
 
 export default function RequirementInfo({
   info,
@@ -78,10 +79,14 @@ export default function RequirementInfo({
         {allowStatus &&
           allowStatus.map((st) => {
             const color = status_color_btn[st];
+            const isOutline = st == "DELAY" || st == "CONFLICT";
             return (
               <button
                 key={st}
-                className={`btn btn-sm btn-${color} join-item tooltip`}
+                className={clsx(
+                  `btn btn-sm btn-${color} join-item tooltip`,
+                  isOutline ? "btn-outline" : ""
+                )}
                 data-tip={list.find((s) => st == s.code)?.description}
                 onClick={() => handlerUpdateStatus(st)}
               >
@@ -95,11 +100,8 @@ export default function RequirementInfo({
   if (errorStatus) toast.error(errorStatus.message);
   return (
     <div className="bg-base-200 p-4 rounded-lg">
-      <div className="flex flex-col justify-between mb-2 xl:flex-row">
-        <h3 className="text-lg font-semibold text-primary">
-          📌 Thông tin yêu cầu
-        </h3>
-        <div className="flex flex-col xl:flex-row">
+      <div className="flex flex-col mb-2">
+        <div className="flex flex-col xl:flex-row justify-end">
           <button
             className="btn btn-sm btn-ghost tooltip"
             data-tip="Chỉnh sửa"

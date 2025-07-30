@@ -3,8 +3,8 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import Cookies from "js-cookie";
 import RichTextEditor from "~/components/ui/rich-text-editor";
+import SelectInput from "~/components/ui/selectOptions";
 import { useApi } from "~/hooks/use-api";
 import { useUploadFile } from "~/hooks/use-upload-file";
 import { encodeBase64 } from "~/lib/services";
@@ -15,7 +15,6 @@ import {
   TaskDTO,
   TestcaseDto,
 } from "~/lib/types";
-import Select from "react-select";
 
 interface AddBugProps {
   product_id: string;
@@ -31,7 +30,7 @@ interface DataCreate {
   priority: string;
   severity: string;
   log?: string;
-  test_case_ref_id?: number;
+  testcase_id?: number;
   task_id?: number;
   tags: string[];
 }
@@ -55,9 +54,6 @@ export default function AddBugModal({
     { name: string; status: "idle" | "uploading" | "done" | "error" }[]
   >([]);
 
-  // const { isUploading, uploadError, uploadMultiFiles } = useUploadFile();
-
-  const isDark = Cookies.get("theme") == "night";
   const { uploadError, uploadChunkedFile } = useUploadFile();
   const { postData, isLoading, errorData } = useApi<
     { id: number },
@@ -115,10 +111,21 @@ export default function AddBugModal({
   const handleRemoveTag = (tag: string) => {
     setTags(tags.filter((t) => t !== tag));
   };
-
   const handleSubmit = async () => {
-    if (!title || !description || !severitySelect || !prioritySelected) {
-      toast.warning("Vui lòng điền đầy đủ thông tin.");
+    if (!title) {
+      toast.warning("Vui lòng nhập tiêu đề");
+      return;
+    }
+    if (!description || description == "<p><br></p>") {
+      toast.warning("Vui lòng nhập mô tả");
+      return;
+    }
+    if (!prioritySelected) {
+      toast.warning("Vui lòng chọn mức độ ưu tiên");
+      return;
+    }
+    if (!severitySelect) {
+      toast.warning("Vui lòng chọn mức độ nghiêm trọng");
       return;
     }
     const data: DataCreate = {
@@ -129,10 +136,10 @@ export default function AddBugModal({
       tags,
       log: logBug,
       severity: severitySelect,
-      test_case_ref_id: Number(testcaseSelected),
+      testcase_id: Number(testcaseSelected),
       task_id: Number(taskSelected),
     };
-    if (!data.test_case_ref_id) delete data.test_case_ref_id;
+    if (!data.testcase_id) delete data.testcase_id;
     if (!data.task_id) delete data.task_id;
     if (data.log?.trim().length == 0) delete data.log;
     const re = await postData("/bugs", data);
@@ -177,6 +184,11 @@ export default function AddBugModal({
     taskList?.map((task) => ({
       value: task.id.toString(),
       label: task.title,
+    })) ?? [];
+  const optionsTest =
+    testcaseList?.map((testcase) => ({
+      value: testcase.id.toString(),
+      label: testcase.name,
     })) ?? [];
   return (
     <div className="modal modal-open ">
@@ -247,57 +259,25 @@ export default function AddBugModal({
           </label>
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Test case liên quan</legend>
-            <select
-              className="select select-neutral"
-              value={testcaseSelected}
-              onChange={(e) => setTestcaseSelected(e.target.value)}
-            >
-              <option value="">Chọn test case liên kết</option>
-              {testcaseList?.map((testcase) => (
-                <option key={testcase.id} value={testcase.id}>
-                  {testcase.name}
-                </option>
-              ))}
-            </select>
+            <SelectInput
+              placeholder="Chọn testcase liên kết"
+              setValue={(selected) =>
+                setTestcaseSelected(
+                  typeof selected === "string" ? selected : ""
+                )
+              }
+              options={optionsTest}
+            />
           </fieldset>
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Task liên quan</legend>
-            <Select
-              className="w-full"
-              styles={{
-                control: (styles) => ({
-                  ...styles,
-                  backgroundColor: isDark ? "#0f172a" : "white",
-                }),
-                option: (styles, { isFocused, isSelected }) => {
-                  let backgroundColor = isDark ? "#1e293b" : "#ffffff";
-                  let color = isDark ? "#f1f5f9" : "#111827";
 
-                  if (isSelected) {
-                    backgroundColor = isDark ? "#2563eb" : "#3b82f6"; // blue-600 | blue-500
-                    color = "#ffffff";
-                  } else if (isFocused) {
-                    backgroundColor = isDark ? "#334155" : "#e5e7eb"; // slate-700 | gray-200
-                  }
-
-                  return {
-                    ...styles,
-                    backgroundColor,
-                    color,
-                    cursor: "pointer",
-                  };
-                },
-                menuList: (styles) => ({
-                  ...styles,
-                  maxHeight: "200px", // 👈 Chiều cao tối đa của menu
-                  overflowY: "auto", // 👈 Hiển thị scroll khi vượt giới hạn
-                }),
-              }}
+            <SelectInput
               placeholder="Chọn task liên kết"
-              value={options.find((opt) => opt.value === taskSelected) || null}
-              onChange={(selected) => setTaskSelected(selected?.value ?? "")}
+              setValue={(selected) =>
+                setTaskSelected(typeof selected === "string" ? selected : "")
+              }
               options={options}
-              isClearable
             />
           </fieldset>
           <div>

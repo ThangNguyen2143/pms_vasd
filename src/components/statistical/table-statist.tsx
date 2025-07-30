@@ -2,12 +2,14 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import { useEffect, useState } from "react";
-import { Config, ProjectMember, StatistPara } from "~/lib/types";
+import { Config, ProjectMember, StatistPara, UserDto } from "~/lib/types";
 import DateTimePicker from "../ui/date-time-picker";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { format_date } from "~/utils/fomat-date";
 import { endOfDay, startOfDay, subDays } from "date-fns";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 function TableStatist({
   config,
@@ -34,6 +36,9 @@ function TableStatist({
   );
   const hasProject = config.statisticParas.some(
     (p) => p.field == "project_id" && p.type === "int"
+  );
+  const hasUser = config.statisticParas.some(
+    (p) => p.field == "user_id" && p.type === "int"
   );
   useEffect(() => {
     if (hasFrom && !filterParas["from"]) {
@@ -64,7 +69,8 @@ function TableStatist({
       getData("/system/config/" + encodeBase64({ type: "project" }));
     if (hasProduct)
       getData("/system/config/" + encodeBase64({ type: "product" }));
-  }, [hasProject, hasProduct]);
+    if (hasUser) getData("/user/" + encodeBase64({ type: "all" }));
+  }, [hasProject, hasProduct, hasUser]);
   useEffect(() => {
     if (!config) return;
     const loadData = async () => {
@@ -75,6 +81,7 @@ function TableStatist({
       if (hasTo) extra["to"] = filterParas["to"];
       if (hasProject) extra["project_id"] = filterParas["project_id"];
       if (hasProduct) extra["product_id"] = filterParas["product_id"];
+      if (hasUser) extra["user_id"] = filterParas["user_id"];
       const res = await fetchData(config.statisticParas, extra);
       if (res != null) setData(res);
       else setData([]);
@@ -86,7 +93,7 @@ function TableStatist({
   return (
     <div className="my-6 p-4 mx-2 rounded-lg bg-base-100 shadow-md">
       <h2 className="text-xl font-bold mb-4">{config.name}</h2>
-      {(hasFrom || hasTo || hasProject || hasProduct) && (
+      {(hasFrom || hasTo || hasProject || hasProduct || hasUser) && (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 mb-4">
           {hasFrom && (
             <div>
@@ -188,18 +195,54 @@ function TableStatist({
               </label>
             </div>
           )}
+          {hasUser && (
+            <div>
+              <label className="label">
+                <span>Chọn người dùng</span>
+                <select
+                  value={filterParas["user_id"] || 0}
+                  className="select w-full"
+                  onChange={(e) =>
+                    setFilterParas((prev) => ({
+                      ...prev,
+                      user_id: Number(e.target.value),
+                    }))
+                  }
+                >
+                  <option value={0} disabled>
+                    Chọn người dùng
+                  </option>
+                  {dataSystem &&
+                  dataSystem.some((t) => typeof t.userid == "number") ? (
+                    dataSystem.map((user: UserDto) => {
+                      return (
+                        <option
+                          key={"userWork" + user.userid}
+                          value={user.userid}
+                        >
+                          {user.userData.display_name}
+                        </option>
+                      );
+                    })
+                  ) : (
+                    <option>Lỗi tải dữ liệu</option>
+                  )}
+                </select>
+              </label>
+            </div>
+          )}
         </div>
       )}
       {loading ? (
         <p>Đang tải dữ liệu...</p>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="overflow-auto max-h-[600px]">
           <table className="table table-zebra w-full">
             <thead>
               <tr>
-                {config.statisticColumns.map((col) => (
-                  <th key={col.code}>{col.display}</th>
-                ))}
+                {config.statisticColumns.map((col) => {
+                  return <th key={col.code}>{col.display}</th>;
+                })}
               </tr>
             </thead>
             <tbody>
@@ -208,8 +251,46 @@ function TableStatist({
                   <tr key={idx}>
                     {config.statisticColumns.map((col) => {
                       let display = row[col.code];
+                      if (display == null) {
+                        return <td key={col.code}>-</td>;
+                      }
+
                       if (!isNaN(Number(display)) && !/^-?\d+$/.test(display))
                         display = Number(display).toFixed(2);
+                      if (
+                        col.code == "isDone" &&
+                        typeof row[col.code] === "boolean"
+                      ) {
+                        return (
+                          <td key={col.code}>
+                            {row[col.code]
+                              ? "Đã hoàn thành"
+                              : "Chưa hoàn thành"}
+                          </td>
+                        );
+                      }
+                      if (
+                        col.code == "name" &&
+                        config.statisticColumns.some((r) => r.code == "id")
+                      ) {
+                        const link =
+                          row["type"] == "Task"
+                            ? `/task/${encodeBase64({ task_id: row["id"] })}`
+                            : row["type"] == "Testcase"
+                            ? `/test_case/${encodeBase64({
+                                testcase_id: row["id"],
+                              })}`
+                            : `/bug/${encodeBase64({ bug_id: row["id"] })}`;
+                        return (
+                          <td key={col.code} className="flex">
+                            {display}{" "}
+                            <Link href={link}>
+                              <ArrowRight />
+                            </Link>
+                          </td>
+                        );
+                      }
+
                       return <td key={col.code}>{display ?? "-"}</td>;
                     })}
                   </tr>

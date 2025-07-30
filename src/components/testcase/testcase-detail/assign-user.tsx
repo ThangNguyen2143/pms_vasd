@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useEffect } from "react";
 import { toast } from "sonner";
+import NotifyBtn from "~/components/ui/notify-btn";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { TestAssign } from "~/lib/types";
@@ -57,6 +58,7 @@ function AssignedUser({
     toast.success("Xử lý thành công");
     await onUpdate();
   };
+  const url = window.location.pathname;
   useEffect(() => {
     if (errorData) toast.error(errorData.message || errorData.title);
     if (errorRemove) toast.error(errorRemove.message || errorRemove.title);
@@ -115,7 +117,22 @@ function AssignedUser({
               ) : (
                 ""
               )}
-              <div className="flex justify-end gap-2">
+              <div className="flex justify-between gap-2">
+                <div>
+                  {(status == "INPROGRESS" || status == "ASSIGNED") && (
+                    <NotifyBtn
+                      type="Testcase"
+                      url={url}
+                      content={{
+                        id: testcase_id,
+                        name: "Nhắc nhở thực hiện testcase",
+                        message: "Bạn được nhắc nhở hoàn thành testcase",
+                      }}
+                      user_id={assignInfo.assign_to}
+                    ></NotifyBtn>
+                  )}
+                </div>
+
                 <div className="join">
                   {status == "ASSIGNED" && (
                     <>

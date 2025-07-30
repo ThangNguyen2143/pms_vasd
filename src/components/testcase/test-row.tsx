@@ -21,7 +21,6 @@ function TestRow({ testcase, users, statusList, moduleList }: TestRowProps) {
   const handleClickRow = (testcase: TestcaseDto) => {
     router.push("/test_case/" + encodeBase64({ testcase_id: testcase.id }));
   };
-  console.log("testcase", testcase);
   return (
     <tr
       className="hover:bg-base-300 dark:hover:bg-gray-700"

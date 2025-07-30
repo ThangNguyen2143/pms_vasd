@@ -1,6 +1,6 @@
 export const status_with_color_badge: Record<string, string> = {
   // ✅ Đã xử lý xong
-  PROCESSED: "badge badge-success",
+  PROCESSED: "badge badge-success badge-outline",
   CLOSED: "badge badge-success",
   DONE: "badge badge-success",
   COMPLETED: "badge badge-success",
@@ -35,8 +35,8 @@ export const status_with_color_badge: Record<string, string> = {
   CONFIRMED: "badge badge-info",
 
   // 🚫 Huỷ bỏ hoặc không cần xử lý nữa
-  CANCELED: "badge badge-neutral",
-  READY: "badge badge-neutral",
+  CANCELED: "badge badge-neutral badge-dashed",
+  READY: "badge badge-neutral badge-outline",
   RESOLVED: "badge badge-neutral",
 
   // ⏸️ Tạm hoãn

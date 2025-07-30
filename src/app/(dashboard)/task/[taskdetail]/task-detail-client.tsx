@@ -21,10 +21,12 @@ import TaskLinks from "~/components/tasks/task-detail/task-link";
 import CriteriaTask from "~/components/tasks/task-detail/criterial-task";
 import AddCriterialModal from "~/components/tasks/modals/add-criterial-modal";
 import { sendEmail } from "~/utils/send-notify";
+import EditDeadlineModal from "~/components/tasks/modals/edit-deadline-modal";
 
 export default function TaskDetailClient({ task_id }: { task_id: number }) {
   const route = useRouter();
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [showEditDeadline, setShowEditDeadline] = useState(false);
   const [showLinkModal, setShowLinkModal] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [showEvaluate, setShowEvaluate] = useState(false);
@@ -162,6 +164,7 @@ export default function TaskDetailClient({ task_id }: { task_id: number }) {
         <div className="md:col-span-2 space-y-6">
           <TaskInfo
             task={task}
+            onEditDeadline={() => setShowEditDeadline(true)}
             onEdit={() => setShowUpdateModal(true)}
             onUpdate={reloadTaskData}
             onAssign={() => setShowAssignModal(true)}
@@ -197,7 +200,8 @@ export default function TaskDetailClient({ task_id }: { task_id: number }) {
           <TaskAssign
             assignTo={task.userAssigns}
             task_id={task_id}
-            onUpdate={sendNotification}
+            onUpdate={reloadTaskData}
+            onSendNotify={sendNotification}
           />
           <Logs logs={task.taskLogs || []} />
         </div>
@@ -246,6 +250,16 @@ export default function TaskDetailClient({ task_id }: { task_id: number }) {
           task_id={task.task_id}
           onClose={() => setShowEvaluate(false)}
           onUpdate={reloadCrit}
+        />
+      )}
+      {showEditDeadline && (
+        <EditDeadlineModal
+          deadline_task={task.dead_line}
+          onClose={() => setShowEditDeadline(false)}
+          onUpdate={reloadTaskData}
+          product_id={task.product_id}
+          task_id={task.task_id}
+          title={task.title}
         />
       )}
     </div>

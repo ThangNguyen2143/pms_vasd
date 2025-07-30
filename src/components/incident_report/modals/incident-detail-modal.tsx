@@ -7,6 +7,7 @@ import { Pencil, ShieldCheck } from "lucide-react";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { useEffect } from "react";
+import { format_date } from "~/utils/fomat-date";
 
 interface IncidentDetailProrps {
   incident?: IncidentDetail;
@@ -109,9 +110,12 @@ function IncidentDetailModal({
           </p>
           <p>Người ghi nhận: {incident.receiver_name}</p>
           <p>Người báo cáo: {incident.reporter}</p>
-          <p>Thời gian ghi nhận: {incident.created_at}</p>
-          <p>Thời gian xảy ra: {incident.occurred_at}</p>
-          <p>Thời gian kết thúc: {incident.time_end}</p>
+          <p>Thời gian ghi nhận: {format_date(incident.created_at)}</p>
+          <p>Thời gian xảy ra: {format_date(incident.occurred_at)}</p>
+          <p>
+            Thời gian kết thúc:{" "}
+            {incident.time_end ? format_date(incident.time_end) : "-"}
+          </p>
         </div>
         {incident.status == "NEW" && (
           <div className="modal-action">

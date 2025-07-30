@@ -1,14 +1,14 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
-import Cookies from "js-cookie";
 import DateTimePicker from "~/components/ui/date-time-picker";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { Contact, ProjectMember } from "~/lib/types";
 import { sendEmail } from "~/utils/send-notify";
-import Select from "react-select";
 import { format_date, toISOString } from "~/utils/fomat-date";
+import SelectInput from "~/components/ui/selectOptions";
+import { useUser } from "~/providers/user-context";
 interface ResponseNotify {
   action: string;
   content: {
@@ -36,7 +36,7 @@ export default function AssignUserModal({
   onUpdate: () => Promise<void>;
   onClose: () => void;
 }) {
-  const isDark = Cookies.get("theme") == "night";
+  const user = useUser().user;
   const [selectUser, setSelectUser] = useState(0);
   const [deadline, setDeadline] = useState(format_date(deadline_task) || "");
   const { putData, isLoading, errorData } = useApi<ResponseNotify, DataSend>();
@@ -74,7 +74,7 @@ export default function AssignUserModal({
         window.location.origin + "/task/" + encodeBase64({ task_id }) ||
         "https://pm.vasd.vn/";
       if (email)
-        sendEmail(content, email, "Thông báo task", link, "Task")
+        sendEmail(content, email, "Thông báo task", link, "Task", user?.name)
           .then((mes) => {
             if (mes.message != "OK") toast(mes.message);
           })
@@ -105,7 +105,7 @@ export default function AssignUserModal({
   }, [errorData]);
   const options =
     users?.map((user) => ({
-      value: user.id,
+      value: user.id.toString(),
       label: user.name,
     })) ?? [];
   return (
@@ -114,47 +114,19 @@ export default function AssignUserModal({
         <h3 className="font-bold text-lg">Giao việc</h3>
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Người thực hiện</legend>
-          <Select
-            className="w-full"
-            styles={{
-              control: (styles) => ({
-                ...styles,
-                backgroundColor: isDark ? "#0f172a" : "white",
-              }),
-              option: (styles, { isFocused, isSelected }) => {
-                let backgroundColor = isDark ? "#1e293b" : "#ffffff";
-                let color = isDark ? "#f1f5f9" : "#111827";
 
-                if (isSelected) {
-                  backgroundColor = isDark ? "#2563eb" : "#3b82f6"; // blue-600 | blue-500
-                  color = "#ffffff";
-                } else if (isFocused) {
-                  backgroundColor = isDark ? "#334155" : "#e5e7eb"; // slate-700 | gray-200
-                }
-
-                return {
-                  ...styles,
-                  backgroundColor,
-                  color,
-                  cursor: "pointer",
-                };
-              },
-              menuList: (styles) => ({
-                ...styles,
-                maxHeight: "200px", // 👈 Chiều cao tối đa của menu
-                overflowY: "auto", // 👈 Hiển thị scroll khi vượt giới hạn
-              }),
-            }}
+          <SelectInput
             placeholder="Chọn người thực hiện"
-            value={options.find((opt) => opt.value === selectUser) || null}
-            onChange={(selected) => setSelectUser(selected?.value ?? 0)}
+            setValue={(selected) =>
+              setSelectUser(typeof selected === "string" ? Number(selected) : 0)
+            }
             options={options}
-            isClearable
           />
         </fieldset>
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Deadline</legend>
           <DateTimePicker
+            minDate={new Date()}
             value={deadline}
             onChange={setDeadline}
             className="input-neutral w-full"

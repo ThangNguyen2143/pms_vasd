@@ -10,8 +10,11 @@ import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import UpdateInProductModalConfirm from "./modals/update-in-product-modal";
 import AddModuleProductModal from "./modals/add-module-product-modal";
+import DateTimeRangePick from "../ui/date-time-range";
+import { endOfDay, parse, startOfDay } from "date-fns";
 function TaskByProduct() {
   const [selectProduct, setSelectProduct] = useState<string>("");
+  const [timeRangeFillter, settimeRangeFillter] = useState("");
   const [showUpdateInProduct, setShowUpdateInProduct] = useState<number[]>([]);
   const [showModal, setShowModal] = useState(false);
   const [findTask, setFindTask] = useState("");
@@ -22,6 +25,8 @@ function TaskByProduct() {
   const { getData: getModule, data: modules } = useApi<ProductModule[]>();
   const endpoint = (product_id: string) =>
     "/tasks/" + encodeBase64({ product_id });
+  // const endpointTaskComplete = (product_id: string) =>
+  //   "/tasks/overview/" + encodeBase64({ type: "task_done", product_id });
   const endpointStatus = "/system/config/eyJ0eXBlIjoidGFza19zdGF0dXMifQ==";
   const {
     data: tasks,
@@ -29,6 +34,12 @@ function TaskByProduct() {
     isLoading,
     errorData,
   } = useApi<TaskDTO[]>();
+  // const {
+  //   data: tasksComplete,
+  //   getData: getTaskComplete,
+  //   isLoading: loadingTaskComplete,
+  //   errorData: errorGetTask,
+  // } = useApi<TaskDTO[]>();
   const { data: statusList, getData: getStatus } = useApi<WorkStatus[]>();
   useEffect(() => {
     getStatus(endpointStatus);
@@ -40,26 +51,47 @@ function TaskByProduct() {
         "/product/" +
           encodeBase64({ type: "module", product_id: selectProduct })
       );
+      // getTaskComplete(endpointTaskComplete(selectProduct), "reload");
+      // setSwapListCompete(false);
     }
   }, [selectProduct]);
-  useEffect(() => {
-    if (tasks) {
-      setTaskList(tasks);
-    } else setTaskList([]);
-  }, [tasks]);
+  // useEffect(() => {
+  //   if (tasks) {
+  //     setTaskList(tasks);
+  //   } else
+  // }, [tasks]);
+
   useEffect(() => {
     if (tasks) {
       const filteredTasks = tasks
-        .filter((task) => (filterStatus ? task.status === filterStatus : true))
         .filter((task) => (moduleFilter ? task.module == moduleFilter : true))
         .filter((task) =>
           findTask
             ? task.title.toLowerCase().includes(findTask.toLowerCase())
             : true
-        );
+        )
+        .filter((task) => {
+          if (timeRangeFillter != "") {
+            const rangeDate = timeRangeFillter
+              .split(" đến ")
+              .map((d) => parse(d, "dd/MM/yyyy", new Date()));
+            const fromDate = startOfDay(new Date(rangeDate[0])).getTime();
+            const toDate = endOfDay(new Date(rangeDate[1])).getTime();
+            const taskCreate = new Date(task.create_at).getTime();
+            return taskCreate > fromDate && taskCreate < toDate;
+          } else {
+            return true;
+          }
+        })
+        .filter((task) => {
+          if (filterStatus) return task.status === filterStatus;
+          else return task.status != "DONE" || task.is_update == false;
+        });
       setTaskList(filteredTasks);
+    } else {
+      setTaskList([]);
     }
-  }, [filterStatus, findTask, moduleFilter]);
+  }, [filterStatus, findTask, moduleFilter, tasks, timeRangeFillter]);
   return (
     <div className="flex flex-col gap-2">
       <div className="flex flex-row justify-between items-center">
@@ -72,7 +104,7 @@ function TaskByProduct() {
         </button>
       </div>
       <div className="flex flex-row justify-between items-center gap-4">
-        <div>
+        <div className="flex gap-2">
           <label className="input">
             <span className="label">Tìm kiếm</span>
             <input
@@ -82,6 +114,22 @@ function TaskByProduct() {
               onChange={(e) => setFindTask(e.target.value)}
             />
           </label>
+          <div className="flex gap-2 justify-center">
+            <DateTimeRangePick
+              value={timeRangeFillter}
+              onChange={settimeRangeFillter}
+              className="w-fit"
+            />
+            {timeRangeFillter != "" && (
+              <button
+                className="btn tooltip btn-ghost tooltip-right"
+                data-tip="Bỏ chọn"
+                onClick={() => settimeRangeFillter("")}
+              >
+                X
+              </button>
+            )}
+          </div>
         </div>
         <div className="flex gap-2">
           <label className="select w-full">

@@ -16,7 +16,9 @@ import { toast } from "sonner";
 import ListProject from "../work-share/project-list-select";
 import StaffTreeView from "./tab-tree-view";
 import GanttWrapper from "./gantt-wrrapper";
-import ScheduleDashboard from "./schedule";
+import { Search } from "lucide-react";
+import SearchGlobalModal from "./modals/search-global-modal";
+// import ScheduleDashboard from "./schedule";
 
 interface GanttTask {
   id: string;
@@ -92,6 +94,7 @@ function statusToProgress(status: string): number {
 
 function ClientDashboardPage() {
   const [projectId, setProjectId] = useState<number>(0);
+  const [showSearchModal, setShowSearchModal] = useState(false);
   const {
     data: overview,
     getData: getOverview,
@@ -141,10 +144,19 @@ function ClientDashboardPage() {
       {/* Project Selector */}
       <div className="flex justify-between">
         <h2 className="text-3xl font-bold">TỔNG QUAN</h2>
-        <ListProject
-          projectSelected={projectId}
-          setProjectSelect={setProjectId}
-        />
+        <div>
+          <button
+            className="btn btn-circle btn-outline m-2 tooltip"
+            data-tip="Tìm kiếm chung"
+            onClick={() => setShowSearchModal(true)}
+          >
+            <Search />
+          </button>
+          <ListProject
+            projectSelected={projectId}
+            setProjectSelect={setProjectId}
+          />
+        </div>
       </div>
 
       {/* Gantt Chart */}
@@ -160,17 +172,18 @@ function ClientDashboardPage() {
           />
         </div>
       )}
+
       {/* name of each tab group should be unique */}
-      <div className="tabs tabs-border">
+      {/* <div className="tabs tabs-border">
         <input
           type="radio"
           name="my_tabs_2"
           className="tab"
-          aria-label="Biểu đồ"
+          aria-label="Tổng quan"
           defaultChecked
         />
         <div className="tab-content">
-          {overview && <StatusPieChartGroup overview={overview} />}
+         
         </div>
 
         <input
@@ -182,10 +195,10 @@ function ClientDashboardPage() {
         <div className="tab-content">
           <ScheduleDashboard />
         </div>
-      </div>
+      </div> */}
 
       {/* Pie Charts */}
-
+      {overview && <StatusPieChartGroup overview={overview} />}
       {/* Staff Tasks */}
       {workOverview ? (
         workOverview.length > 1 ? (
@@ -194,6 +207,9 @@ function ClientDashboardPage() {
           <StaffTabs data={workOverview} />
         )
       ) : undefined}
+      {showSearchModal && (
+        <SearchGlobalModal onClose={() => setShowSearchModal(false)} />
+      )}
     </div>
   );
 }

@@ -104,6 +104,8 @@ export function StackedBarChartByModule({ data, moduleProduct }: Props) {
 function getStatusColorMap(): Record<string, string> {
   return {
     NEW: "#facc15",
+    DRAFT: "#a78bfa",
+    READY: "#fb923c",
     DONE: "#10b981",
     FAILED: "#ef4444",
     CANCELED: "#6b7280",

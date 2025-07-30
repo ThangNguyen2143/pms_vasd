@@ -122,12 +122,16 @@ function ProductModuleModal({
                   );
                 else
                   return (
-                    <li key={m.id} className="list-row">
-                      <div className="text-center items-center flex">
+                    <li
+                      key={m.id}
+                      className="list-row justify-center flex items-center"
+                    >
+                      <div className="text-center items-center flex flex-col gap-2">
                         <label className="floating-label">
                           <span className="label">Mã modlue</span>
                           <input
                             type="text"
+                            className="input"
                             value={formUpdate.code}
                             onChange={(e) =>
                               setFormUpdate((pre) => ({
@@ -137,12 +141,11 @@ function ProductModuleModal({
                             }
                           />
                         </label>
-                      </div>
-                      <div className="text-center items-center flex">
                         <label className="floating-label">
                           <span className="label">Tên hiển thị</span>
                           <input
                             type="text"
+                            className="input"
                             value={formUpdate.display}
                             onChange={(e) =>
                               setFormUpdate((pre) => ({
@@ -153,6 +156,7 @@ function ProductModuleModal({
                           />
                         </label>
                       </div>
+
                       <button
                         className="btn btn-info btn-outline"
                         onClick={handleUpdate}

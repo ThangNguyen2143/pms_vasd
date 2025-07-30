@@ -68,7 +68,7 @@ function TableWork({
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", page.toString());
-    router.replace(`?${params.toString()}`);
+    router.replace(`?${params.toString()}`, { scroll: false });
     setCurrentPage(page);
   };
 
@@ -257,20 +257,56 @@ function TableWork({
         </table>
       </div>
 
-      <div className="flex justify-center">
+      <div className="flex justify-center items-center w-full">
         {totalPages > 1 && (
-          <div className="join">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                onClick={() => handlePageChange(page)}
-                className={`join-item btn ${
-                  page === currentPage ? "btn-active" : ""
-                }`}
-              >
-                {page}
-              </button>
-            ))}
+          <div className="join p-4 flex justify-center">
+            {/* Trang đầu */}
+            {currentPage > 3 && (
+              <>
+                <button
+                  className="join-item btn"
+                  onClick={() => handlePageChange(1)}
+                >
+                  1
+                </button>
+                <button className="join-item btn btn-disabled">...</button>
+              </>
+            )}
+
+            {/* Các trang gần current */}
+            {Array.from({ length: totalPages }, (_, i) => i + 1)
+              .filter(
+                (page) =>
+                  page === currentPage ||
+                  page === currentPage - 1 ||
+                  page === currentPage + 1 ||
+                  (currentPage <= 3 && page <= 5) ||
+                  (currentPage >= totalPages - 2 && page >= totalPages - 4)
+              )
+              .map((page) => (
+                <button
+                  key={page}
+                  onClick={() => handlePageChange(page)}
+                  className={`join-item btn ${
+                    page === currentPage ? "btn-active" : ""
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+
+            {/* Trang cuối */}
+            {currentPage < totalPages - 3 && (
+              <>
+                <button className="join-item btn btn-disabled">...</button>
+                <button
+                  className="join-item btn"
+                  onClick={() => handlePageChange(totalPages)}
+                >
+                  {totalPages}
+                </button>
+              </>
+            )}
           </div>
         )}
       </div>

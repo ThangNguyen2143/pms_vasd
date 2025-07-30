@@ -2,6 +2,7 @@ import { BugDto } from "~/lib/types";
 import BugRow from "./bug-row";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import PagingComponent from "../ui/paging-table";
 interface BugListProps {
   product_id: string;
   bugList?: BugDto[];
@@ -9,7 +10,9 @@ interface BugListProps {
 }
 function BugList({ product_id, bugList, onUpdateInProduct }: BugListProps) {
   const [currentPage, setCurrentPage] = useState(1);
-  const fullBugList = bugList ? [...bugList] : [];
+  const fullBugList = bugList
+    ? [...bugList.sort((a, b) => b.bug_id - a.bug_id)]
+    : [];
   const router = useRouter();
   const searchParams = useSearchParams();
   const [selectBug, setSelectBug] = useState<number[]>([]);
@@ -21,11 +24,14 @@ function BugList({ product_id, bugList, onUpdateInProduct }: BugListProps) {
     if (pageParam >= 1 && pageParam <= totalPages) {
       setCurrentPage(pageParam);
     }
+    if (pageParam > totalPages) {
+      setCurrentPage(1);
+    }
   }, [searchParams, totalPages]);
   const handlePageChange = (page: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set("page", page.toString());
-    router.replace(`?${params.toString()}`);
+    router.replace(`?${params.toString()}`, { scroll: false });
     setCurrentPage(page);
   };
 
@@ -91,7 +97,6 @@ function BugList({ product_id, bugList, onUpdateInProduct }: BugListProps) {
                   }
                 }}
                 bug={bug}
-                product_id={product_id}
               />
             ))
           ) : (
@@ -119,23 +124,11 @@ function BugList({ product_id, bugList, onUpdateInProduct }: BugListProps) {
           </tr>
         </tfoot>
       </table>
-      <div className="flex justify-center">
-        {totalPages > 1 && (
-          <div className="join">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <button
-                key={page}
-                onClick={() => handlePageChange(page)}
-                className={`join-item btn ${
-                  page === currentPage ? "btn-active" : ""
-                }`}
-              >
-                {page}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
+      <PagingComponent
+        currentPage={currentPage}
+        totalPages={totalPages}
+        handleChangePage={handlePageChange}
+      />
     </div>
   );
 }

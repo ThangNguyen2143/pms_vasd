@@ -1,4 +1,5 @@
 import { Plus } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useApi } from "~/hooks/use-api";
@@ -83,8 +84,11 @@ function TestDependComp({
         <ul className="list-disc pl-5">
           {testDepend.length > 0 ? (
             testDepend.map((depend) => (
-              <li key={depend.id} className="mb-2 ">
-                <span className="font-semibold">{depend.name}</span> -
+              <li key={depend.id} className="mb-2 flex">
+                -
+                <div className="truncate max-w-36">
+                  <span className="font-semibold">{depend.name}</span>
+                </div>{" "}
                 <span
                   className="text-sm text-gray-500 tooltip"
                   data-tip={findType(depend.relation_type)?.description}
@@ -93,6 +97,14 @@ function TestDependComp({
                     ? findType(depend.relation_type)?.display
                     : depend.relation_type}
                 </span>
+                <Link
+                  href={
+                    "/test_case/" + encodeBase64({ testcase_id: depend.id })
+                  }
+                  className="btn btn-info ml-2"
+                >
+                  Chi tiết
+                </Link>
                 <button
                   className="btn btn-ghost btn-error ml-2"
                   onClick={() => handleRemoveDepend(depend.id)}

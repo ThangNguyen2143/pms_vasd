@@ -1,6 +1,16 @@
 "use client";
-import { Link2, Pencil, UserPlus } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import {
+  CheckCheck,
+  CirclePlay,
+  Info,
+  Link2,
+  Lock,
+  LucideIcon,
+  Pencil,
+  UserPlus,
+  X,
+} from "lucide-react";
+import React, { useEffect } from "react";
 import UpdatePriorytyComponent from "../modal/update-priority-btn";
 import UpdateSeverityComponent from "../modal/update-severity-btn";
 import { BugSeverity, BugStatus, Priority } from "~/lib/types";
@@ -8,6 +18,7 @@ import { useApi } from "~/hooks/use-api";
 import { toast } from "sonner";
 import { format_date } from "~/utils/fomat-date";
 import SafeHtmlViewer from "~/components/ui/safeHTMLviewer";
+import { status_with_color_badge } from "~/utils/status-with-color";
 
 type BugInfoProps = {
   bug: {
@@ -42,8 +53,7 @@ export default function BugInfo({
   onUpdate: () => Promise<void>;
   hiddenButton?: boolean;
 }) {
-  const [selectStatus, setSelectStatus] = useState<string>(bug.status);
-  const { putData, isLoading, errorData } = useApi<
+  const { putData, errorData } = useApi<
     string,
     { bug_id: number; status: string }
   >();
@@ -62,13 +72,13 @@ export default function BugInfo({
     getSeverity("/system/config/eyJ0eXBlIjoiYnVnX3NldmVyaXR5In0=");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  const handleStatusChange = async () => {
-    const newStatus = selectStatus;
-    if (newStatus === bug.status) return; // No change, do nothing
+  const handleStatusChange = async (code: string) => {
+    // const newStatus = selectStatus;
+    if (code === bug.status) return; // No change, do nothing
     try {
       const re = await putData("/bugs/status", {
         bug_id: bug.id,
-        status: newStatus,
+        status: code,
       });
       if (re != "") return;
       await onUpdate(); // Call the onUpdate function to refresh data
@@ -88,31 +98,90 @@ export default function BugInfo({
   }, [errorData]);
   const priority = priorityList?.find((pri) => pri.code == bug.priority);
   const severity = severityList?.find((ser) => ser.code == bug.severity);
+  const GroupBtnNew = (
+    <div className="tooltip" data-tip="Chỉnh sửa thông tin">
+      <button onClick={onEdit} className="btn btn-circle btn-sm">
+        <Pencil />
+      </button>
+    </div>
+  );
+  const RenderBtnByStatus = ({ currentStatus }: { currentStatus: string }) => {
+    const allowStatus = bug_status.find(
+      (st) => st.code == currentStatus
+    )?.allowed_transitions;
+
+    return (
+      <div className="join">
+        {allowStatus &&
+          allowStatus.map((st) => {
+            let Icon: LucideIcon = Info;
+            switch (st) {
+              case "CONFIRMED":
+                Icon = CheckCheck;
+                break;
+              case "REJECTED":
+                Icon = X;
+                break;
+              case "INPROGRESS":
+                Icon = CirclePlay;
+                break;
+              case "CLOSED":
+                Icon = Lock;
+                break;
+            }
+            return (
+              <button
+                key={st}
+                className={`btn btn-sm tooltip btn-circle btn-ghost`}
+                data-tip={bug_status.find((s) => st == s.code)?.description}
+                onClick={() => handleStatusChange(st)}
+              >
+                <Icon />
+              </button>
+            );
+          })}
+      </div>
+    );
+  };
   return (
     <div className="bg-base-200 p-4 rounded-lg">
       <div className="flex justify-between items-center mb-2">
-        <h2 className="text-lg font-bold text-primary">🐞 Thông tin Bug</h2>
+        <div className="indicator">
+          <span
+            className={`indicator-item ${status_with_color_badge[bug.status]}`}
+          >
+            {bug.status}
+          </span>
+          <h2 className="text-lg font-bold text-primary w-56">
+            🐞 Thông tin Bug
+          </h2>
+        </div>
+
         {!hiddenButton ? (
           <div className="flex gap-2">
-            <div className="tooltip" data-tip="Chỉnh sửa thông tin">
-              <button onClick={onEdit}>
-                <Pencil />
-              </button>
-            </div>
             <div
               className="tooltip"
               data-tip="Liên kết task, testcase liên quan"
             >
-              <button onClick={onLinkRequirement}>
+              <button
+                onClick={onLinkRequirement}
+                className="btn btn-circle btn-ghost btn-sm"
+              >
                 <Link2 />
               </button>
             </div>
             <div className="tooltip" data-tip="Giao việc">
-              <button onClick={onAssign}>
+              <button
+                onClick={onAssign}
+                className="btn btn-sm btn-circle btn-ghost "
+              >
                 <UserPlus />
               </button>
             </div>
-            <div className="join">
+            {bug.status == "NEW" && GroupBtnNew}
+
+            <RenderBtnByStatus currentStatus={bug.status} />
+            {/* <div className="join">
               <div className="select join-item select-sm">
                 <select
                   name=""
@@ -140,14 +209,13 @@ export default function BugInfo({
                 </select>
               </div>
               <button
-                className="tooltip join-item btn btn-sm"
-                data-tip="Bug không hợp lệ"
+                className="join-item btn btn-sm"
                 onClick={handleStatusChange}
                 disabled={isLoading || selectStatus === bug.status}
               >
                 Cập nhật
               </button>
-            </div>
+            </div> */}
           </div>
         ) : (
           ""
@@ -156,7 +224,7 @@ export default function BugInfo({
 
       <div className="space-y-2">
         <p>
-          <strong className="w-36">Tiêu đề:</strong> {bug.title}
+          <strong className="w-36">Tiêu đề:</strong> {bug.title} - (#{bug.id})
         </p>
         <div>
           <strong className="w-36">Mô tả:</strong>{" "}

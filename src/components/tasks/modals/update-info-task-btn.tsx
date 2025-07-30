@@ -2,14 +2,13 @@
 import { Plus, X } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
-import Select from "react-select";
-import Cookies from "js-cookie";
 import DateTimePicker from "~/components/ui/date-time-picker";
 import RichTextEditor from "~/components/ui/rich-text-editor";
 import { useApi } from "~/hooks/use-api";
 import { encodeBase64 } from "~/lib/services";
 import { DataRating, ProductModule, Task } from "~/lib/types";
 import { format_date, toISOString } from "~/utils/fomat-date";
+import SelectInput from "~/components/ui/selectOptions";
 
 interface DataSend {
   task_id: number;
@@ -17,12 +16,13 @@ interface DataSend {
   description: string;
   dead_line: string;
   module: string;
-  acceptances?: { title: string; type: string }[];
+  acceptances?: { title: string; type: string; percent: number }[];
 }
 interface Criteria {
   id: string;
   title: string;
   type: string;
+  percent: number;
 }
 export default function UpdateInfoTaskModal({
   task_info,
@@ -37,7 +37,6 @@ export default function UpdateInfoTaskModal({
   onUpdate: () => Promise<void>;
   onClose: () => void;
 }) {
-  const isDark = Cookies.get("theme") == "night";
   const [title, setTitle] = useState<string>(task_info.title);
   const [description, setDescription] = useState<string>(task_info.description);
   const [deadline, setDeadline] = useState<string>(
@@ -50,12 +49,14 @@ export default function UpdateInfoTaskModal({
           id: item.code,
           title: item.title,
           type: item.type,
+          percent: item.percent ?? 0,
         }))
       : [
           {
             id: Date.now().toString(),
             title: "",
             type: "",
+            percent: 100,
           },
         ]
   );
@@ -84,6 +85,7 @@ export default function UpdateInfoTaskModal({
       acceptances: criteriaList.map((criteria) => ({
         title: criteria.title,
         type: criteria.type,
+        percent: criteria.percent,
       })),
     };
     if (
@@ -101,12 +103,17 @@ export default function UpdateInfoTaskModal({
     }
   };
   const addCriteria = () => {
+    const totalPercent = criteriaList.reduce(
+      (sum, item) => sum + Number(item.percent || 0),
+      0
+    );
     setCriteriaList([
       ...criteriaList,
       {
         id: Date.now().toString(),
         title: "",
         type: "",
+        percent: Math.max(0, 100 - totalPercent),
       },
     ]);
   };
@@ -155,6 +162,7 @@ export default function UpdateInfoTaskModal({
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Deadline</legend>
             <DateTimePicker
+              minDate={new Date()}
               value={deadline}
               onChange={setDeadline}
               className="input-neutral w-full"
@@ -162,44 +170,12 @@ export default function UpdateInfoTaskModal({
           </fieldset>
           <fieldset>
             <legend>Module</legend>
-            <Select
-              className="join-item w-full"
-              styles={{
-                control: (styles) => ({
-                  ...styles,
-                  backgroundColor: isDark ? "#0f172a" : "white",
-                }),
-                option: (styles, { isFocused, isSelected }) => {
-                  let backgroundColor = isDark ? "#1e293b" : "#ffffff";
-                  let color = isDark ? "#f1f5f9" : "#111827";
-
-                  if (isSelected) {
-                    backgroundColor = isDark ? "#2563eb" : "#3b82f6"; // blue-600 | blue-500
-                    color = "#ffffff";
-                  } else if (isFocused) {
-                    backgroundColor = isDark ? "#334155" : "#e5e7eb"; // slate-700 | gray-200
-                  }
-
-                  return {
-                    ...styles,
-                    backgroundColor,
-                    color,
-                    cursor: "pointer",
-                  };
-                },
-                menuList: (styles) => ({
-                  ...styles,
-                  maxHeight: "200px", // 👈 Chiều cao tối đa của menu
-                  overflowY: "auto", // 👈 Hiển thị scroll khi vượt giới hạn
-                }),
-              }}
-              isClearable
-              value={
-                optionsModule.find((opt) => opt.value === selectModule) || null
-              }
-              onChange={(selected) => setSelectModule(selected?.value ?? "")}
+            <SelectInput
               options={optionsModule}
+              classNames="join-item"
               placeholder="Chọn module"
+              setValue={(e) => setSelectModule(typeof e === "string" ? e : "")}
+              singleValue={selectModule}
             />
           </fieldset>
         </div>
@@ -243,7 +219,21 @@ export default function UpdateInfoTaskModal({
                       </option>
                     ))}
                 </select>
-
+                <label
+                  className="tooltip tooltip-top join-item input"
+                  data-tip="Tỉ lệ hoàn thành (%)"
+                >
+                  <input
+                    type="number"
+                    max={100}
+                    min={0}
+                    value={criteria.percent}
+                    onChange={(e) =>
+                      updateCriteria(criteria.id, "percent", e.target.value)
+                    }
+                  />
+                  <span className="label">%</span>
+                </label>
                 <button
                   type="button"
                   onClick={() => removeCriteria(criteria.id)}

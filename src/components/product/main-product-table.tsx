@@ -19,6 +19,7 @@ function MainProductTable({ project_id }: { project_id: number }) {
   } = useApi<ProductDto[]>();
   const { data: userList, getData: getUser } = useApi<UserDto[]>();
   const [showFuncInModule, setShowFuncInModule] = useState<string>();
+  const [showAddModal, setShowAddModal] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductDto>();
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
   const [showModuleDetail, setShowModuleDetail] = useState<string>("");
@@ -58,12 +59,21 @@ function MainProductTable({ project_id }: { project_id: number }) {
       <div className="flex justify-between gap-2">
         <h2 className="text-2xl font-bold">Danh sách phần mềm</h2>
         {/* <LitsProject project_id={projectId} setProjectId={setprojectId} /> */}
-        <AddProductBtn
-          project_id={project_id}
-          onUpdate={async () => {
-            await onUpdate();
-          }}
-        />
+        <button
+          className="btn btn-primary"
+          onClick={() => setShowAddModal(true)}
+        >
+          Thêm phần mềm
+        </button>
+        {showAddModal && (
+          <AddProductBtn
+            project_id={project_id}
+            onClose={() => setShowAddModal(false)}
+            onUpdate={async () => {
+              await getProduct(endpointProduct, "reload");
+            }}
+          />
+        )}
       </div>
       {isLoading ? (
         <span className="loading loading-infinity" />

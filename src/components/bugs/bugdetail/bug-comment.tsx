@@ -34,7 +34,7 @@ export default function BugComments({
   updateComment: () => Promise<void>;
 }) {
   const { user } = useUser();
-  const [newComment, setNewComment] = useState("\u200B");
+  const [newComment, setNewComment] = useState("");
   const { data: memberProject, getData: getUsers } = useApi<ProjectMember[]>();
   const { postData, errorData } = useApi<
     ResponseNotify,
@@ -64,6 +64,7 @@ export default function BugComments({
       "/user/contacts/" +
         encodeBase64({ user_id: list?.map((l) => ({ id: l.id })) })
     );
+    const message = newComment.replace(/<img[^>]*>/i, "<Hình ảnh>");
     if (listContact && listContact.length > 0) {
       const email = listContact.map((us) => {
         const mail = us.contacts.filter((ct) => ct.code == "email");
@@ -72,12 +73,11 @@ export default function BugComments({
       const content = {
         id: bug_id,
         name: `Bạn đã được ${user?.name} nhắc đến trong bug`,
-        message: `Nội dung comment: ${DOMPurify.sanitize(newComment)}`,
+        message: `Nội dung comment: ${DOMPurify.sanitize(message)}`,
       };
       const link =
-        window.location.origin +
-          "/bug/" +
-          encodeBase64({ bug_id, product_id }) || "https://pm.vasd.vn/";
+        window.location.origin + "/bug/" + encodeBase64({ bug_id }) ||
+        "https://pm.vasd.vn/";
       if (email.length > 0)
         email.forEach((e) =>
           sendEmail(content, e, "Thông báo comment", link, "bug")
@@ -98,12 +98,11 @@ export default function BugComments({
       const content = {
         id: re.content.bug_id,
         name: re.content.bug_name,
-        message: newComment,
+        message: DOMPurify.sanitize(message),
       };
       const link =
-        window.location.origin +
-          "/bug/" +
-          encodeBase64({ bug_id, product_id }) || "https://pm.vasd.vn/";
+        window.location.origin + "/bug/" + encodeBase64({ bug_id }) ||
+        "https://pm.vasd.vn/";
       if (email.length > 0)
         email.forEach((e) =>
           sendEmail(content, e, "Bình luận mới", link, "bug", user?.name)
@@ -197,11 +196,12 @@ export default function BugComments({
               <button
                 className="btn btn-ghost btn-sm rounded-full"
                 onClick={() => {
-                  // console.log(newComment);
                   handleAddComment();
                 }}
                 disabled={
-                  newComment.trim().length == 0 || newComment == "<p><br></p>"
+                  newComment.trim().length == 0 ||
+                  newComment === "<p><br></p>" ||
+                  /^<p>\s*<\/p>$/.test(newComment)
                 }
                 aria-label="Gửi"
               >

@@ -7,6 +7,7 @@ import EditTypeModal from "./edit-type-account";
 import ResetPassBtn from "./reset-pass";
 import ListofRole from "./list-role";
 import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 function RenderCell({
   emp,
   item,
@@ -100,9 +101,26 @@ function Emp_Table({
   types: AccountType[];
   roles: RoleType[];
 }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [findText, setTextFind] = useState("");
   const [userList, setUserList] = useState<UserDto[]>([]);
   const [filterType, setFilterType] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.ceil(userList.length / 10);
+  // ⬅️ Khi load lại, đọc từ URL
+  useEffect(() => {
+    const pageParam = Number(searchParams.get("page")) || 1;
+    if (pageParam >= 1 && pageParam <= totalPages) {
+      setCurrentPage(pageParam);
+    }
+  }, [searchParams, totalPages]);
+  const handlePageChange = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", page.toString());
+    router.replace(`?${params.toString()}`, { scroll: false });
+    setCurrentPage(page);
+  };
   useEffect(() => {
     if (empData) setUserList(empData);
   }, [empData]);
@@ -125,6 +143,9 @@ function Emp_Table({
       setUserList(filteredUser);
     }
   }, [findText, filterType, empData]);
+  // 🔄 Cắt dữ liệu theo trang
+  const startIndex = (currentPage - 1) * 10;
+  const currentUsers = userList.slice(startIndex, startIndex + 10);
   if (!userList) {
     return <div className="alert alert-error">Không có dữ liệu</div>;
   }
@@ -173,7 +194,7 @@ function Emp_Table({
             </tr>
           </thead>
           <tbody>
-            {userList.map((emp) => (
+            {currentUsers.map((emp) => (
               <TableItem
                 key={emp.userid + "item"}
                 emp={emp}
@@ -184,6 +205,95 @@ function Emp_Table({
             ))}
           </tbody>
         </table>
+        {totalPages > 1 && (
+          <div className="join p-4 flex justify-center">
+            {(() => {
+              const paginationItems = [];
+
+              // Nếu totalPages <= 5 → hiển thị tất cả
+              if (totalPages <= 5) {
+                for (let page = 1; page <= totalPages; page++) {
+                  paginationItems.push(
+                    <button
+                      key={page}
+                      onClick={() => handlePageChange(page)}
+                      className={`join-item btn ${
+                        page === currentPage ? "btn-active" : ""
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  );
+                }
+              } else {
+                // Trang đầu
+                if (currentPage > 3) {
+                  paginationItems.push(
+                    <button
+                      key={1}
+                      className="join-item btn"
+                      onClick={() => handlePageChange(1)}
+                    >
+                      1
+                    </button>
+                  );
+                  if (currentPage > 4) {
+                    paginationItems.push(
+                      <button
+                        key="start-ellipsis"
+                        className="join-item btn btn-disabled"
+                      >
+                        ...
+                      </button>
+                    );
+                  }
+                }
+
+                // Các trang gần current
+                const start = Math.max(1, currentPage - 1);
+                const end = Math.min(totalPages, currentPage + 1);
+                for (let page = start; page <= end; page++) {
+                  paginationItems.push(
+                    <button
+                      key={page}
+                      onClick={() => handlePageChange(page)}
+                      className={`join-item btn ${
+                        page === currentPage ? "btn-active" : ""
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  );
+                }
+
+                // Trang cuối
+                if (currentPage < totalPages - 2) {
+                  if (currentPage < totalPages - 3) {
+                    paginationItems.push(
+                      <button
+                        key="end-ellipsis"
+                        className="join-item btn btn-disabled"
+                      >
+                        ...
+                      </button>
+                    );
+                  }
+                  paginationItems.push(
+                    <button
+                      key={totalPages}
+                      className="join-item btn"
+                      onClick={() => handlePageChange(totalPages)}
+                    >
+                      {totalPages}
+                    </button>
+                  );
+                }
+              }
+
+              return paginationItems;
+            })()}
+          </div>
+        )}
       </div>
     </>
   );

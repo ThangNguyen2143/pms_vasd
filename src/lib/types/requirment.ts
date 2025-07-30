@@ -14,6 +14,7 @@ export type RequirementDto = {
 export type RequirementDetail = Exclude<RequirementDto, "id"> & {
   description: string;
   product_id: string;
+  project_id: number;
   tags: string[];
   requesters: RequestersInfo;
   requirementFiles: RequirementFile[];

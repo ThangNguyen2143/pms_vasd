@@ -21,13 +21,7 @@ import CopyBugModal from "~/components/bugs/modal/copy-bug-modal";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-function BugDetailClient({
-  bug_id,
-  product_id,
-}: {
-  bug_id: number;
-  product_id: string;
-}) {
+function BugDetailClient({ bug_id }: { bug_id: number }) {
   const route = useRouter();
   const [retestAssign, setRetestAssign] = useState(false);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
@@ -118,7 +112,7 @@ function BugDetailClient({
           <BugComments
             comments={bugcomments || []}
             bug_id={bug_id}
-            product_id={product_id}
+            product_id={bugData.product_id}
             updateComment={async () => await reloadComment()}
           />
         </div>
@@ -165,7 +159,7 @@ function BugDetailClient({
       {showAssignModal && (
         <AssignBugModal
           bug_id={bug_id}
-          product_id={product_id}
+          product_id={bugData.product_id}
           onClose={() => setShowAssignModal(false)}
           onUpdate={reloadDataBug}
         />
@@ -173,7 +167,7 @@ function BugDetailClient({
       {retestAssign && (
         <ReTestBugAssignModal
           bug_id={bug_id}
-          product_id={product_id}
+          product_id={bugData.product_id}
           onClose={() => setRetestAssign(false)}
           onUpdate={reloadDataBug}
         />
@@ -190,7 +184,7 @@ function BugDetailClient({
           bug_id={bug_id}
           onClose={() => setShowLinkModal(false)}
           onUpdate={reloadDataBug}
-          product_id={product_id}
+          product_id={bugData.product_id}
         />
       )}
     </div>

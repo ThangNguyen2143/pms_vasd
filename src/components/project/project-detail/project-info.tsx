@@ -65,7 +65,7 @@ export default function ProjectInfo({
           </p>
           <p>
             <span className="font-bold">Kết thúc dự kiến:</span>{" "}
-            {format_date(info.end_date)}
+            {info.end_date ? format_date(info.end_date) : "-"}
           </p>
           <p>
             <span className="font-bold">Kết thúc thực tế:</span>{" "}

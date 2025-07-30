@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -30,8 +31,11 @@ export default function StandaloneQuill({
     null
   );
   const [showSuggest, setShowSuggest] = useState(false);
+  const [highlightIndex, setHighlightIndex] = useState<number>(0);
   const [keyword, setKeyword] = useState("");
   const [pos, setPos] = useState({ top: 0, left: 0 });
+
+  const [suggestions, setSuggestions] = useState(suggestList ?? []);
 
   const modules = useMemo(
     () => ({
@@ -44,6 +48,7 @@ export default function StandaloneQuill({
         ["image", "link"],
       ],
     }),
+
     []
   );
 
@@ -58,6 +63,7 @@ export default function StandaloneQuill({
     "color",
     "background",
     "image",
+    "link",
   ];
 
   useEffect(() => {
@@ -70,103 +76,129 @@ export default function StandaloneQuill({
   useEffect(() => {
     if (!editor?.root) return;
 
-    // const handlePaste = (e: ClipboardEvent) => {
-    //   const items = e.clipboardData?.items;
-    //   if (!items) return;
-    //   let hasImage = false;
-    //   for (const item of items) {
-    //     console.log("type:", item.type);
-    //     if (item.type.startsWith("image")) {
-    //       hasImage = true;
-    //       const file = item.getAsFile();
-    //       if (file) {
-    //         const reader = new FileReader();
-    //         reader.onload = (evt) => {
-    //           const base64 = evt.target?.result;
-    //           const range = editor.getSelection(true);
-    //           editor.insertEmbed(range.index, "image", base64);
-    //         };
-    //         reader.readAsDataURL(file);
-    //       }
-    //     }
-    //   }
-    //   if (hasImage) {
-    //     e.preventDefault(); // ✅ Chặn dán mặc định
-    //   }
-    // };
-
     const handleKeydown = (e: KeyboardEvent) => {
       if (e.key === "@") {
         const sel = editor.getSelection();
         if (!sel) return;
         const bounds = editor.getBounds(sel.index);
+        setMentionStartIndex(sel.index); // Track where @ started
         setKeyword("");
-        setMentionStartIndex(sel.index + 1); // Track where @ started
         setPos({
           top: bounds?.top ? bounds.top + 30 : 30,
           left: bounds?.left ?? 30,
         });
         setShowSuggest(true);
       }
+
+      // Move this block outside so it always runs if showSuggest is true
+      if (showSuggest && suggestions.length > 0) {
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          setHighlightIndex((prev) => (prev + 1) % suggestions.length);
+        }
+
+        if (e.key === "ArrowUp") {
+          e.preventDefault();
+          setHighlightIndex(
+            (prev) => (prev - 1 + suggestions.length) % suggestions.length
+          );
+        }
+        if (e.key === "Escape") {
+          e.preventDefault();
+          setShowSuggest(false);
+        }
+      }
     };
 
     const handleTextChange = () => {
-      if (!editor) return;
-      if (!editor.hasFocus()) editor.focus();
-      const sel = editor.getSelection();
-      if (
-        !sel ||
-        mentionStartIndex === null ||
-        sel.index < mentionStartIndex - 1
-      ) {
-        setShowSuggest(false);
-        setMentionStartIndex(null);
-        return;
-      }
-      const text = editor.getText(
-        mentionStartIndex,
-        sel.index - mentionStartIndex
-      );
-      if (/\\s/.test(text)) {
-        setShowSuggest(false);
-        setMentionStartIndex(null);
-      } else {
-        setKeyword(text);
-      }
+      setTimeout(() => {
+        if (!editor) return;
+        if (!editor.hasFocus()) editor.focus();
+
+        const sel = editor.getSelection();
+        if (
+          !sel ||
+          mentionStartIndex === null ||
+          sel.index <= mentionStartIndex
+        ) {
+          setShowSuggest(false);
+          setMentionStartIndex(null);
+          return;
+        }
+
+        const text = editor.getText(
+          mentionStartIndex,
+          sel.index - mentionStartIndex
+        );
+        if (/\s/.test(text)) {
+          setShowSuggest(false);
+          setMentionStartIndex(null);
+        } else {
+          setKeyword(text.replace("@", ""));
+          setShowSuggest(true);
+        }
+      }, 0);
     };
 
     const el = editor.root;
-    // el.addEventListener("paste", handlePaste);
     el.addEventListener("keydown", handleKeydown);
     editor.on("text-change", handleTextChange);
 
     return () => {
-      // el.removeEventListener("paste", handlePaste);
       el.removeEventListener("keydown", handleKeydown);
       editor.off("text-change", handleTextChange);
     };
-  }, [editor, mentionStartIndex]);
+  }, [editor, mentionStartIndex, highlightIndex, showSuggest]);
 
+  useEffect(() => {
+    const handleGlobalKeydown = (e: KeyboardEvent) => {
+      if (showSuggest && suggestions.length > 0) {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          const selected = suggestions[highlightIndex];
+          if (selected) {
+            handleSelect(selected);
+          }
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleGlobalKeydown);
+    return () => {
+      document.removeEventListener("keydown", handleGlobalKeydown);
+    };
+  }, [showSuggest, suggestions, highlightIndex]);
+  useEffect(() => {
+    if (keyword.trim() !== "")
+      setSuggestions(
+        suggestList?.filter((u) =>
+          u.toLowerCase().includes(keyword.toLowerCase())
+        ) ?? []
+      );
+    else {
+      setSuggestions(suggestList ?? []);
+    }
+  }, [keyword]);
   const handleSelect = (name: string) => {
     if (!editor || mentionStartIndex == null) return;
     const sel = editor.getSelection();
     if (!sel) return;
     const length = sel.index - mentionStartIndex;
+    // Xoá phần từ @ tới con trỏ
     editor.deleteText(mentionStartIndex, length);
-    editor.insertText(mentionStartIndex, `${name}`, {
-      bold: true,
-      background: "#ffffdd",
-    });
-    editor.insertText(mentionStartIndex + name.length + 1, " ");
-    editor.format("bold", false);
-    editor.setSelection(mentionStartIndex + name.length + 1);
+
+    // Chèn lại mention với format
+    editor.insertText(mentionStartIndex, `@${name}`);
+
+    // Chèn thêm khoảng trắng sau mention
+    const newIndex = mentionStartIndex + name.length + 1;
+    editor.insertText(newIndex, " ");
+    editor.setSelection(newIndex + 1);
+
+    // Reset trạng thái mention
     setShowSuggest(false);
     setMentionStartIndex(null);
   };
-
-  const suggestions = suggestList?.filter((u) =>
-    u.toLowerCase().includes(keyword.toLowerCase())
-  );
 
   return (
     <div className="relative">
@@ -182,19 +214,23 @@ export default function StandaloneQuill({
 
       {showSuggest && suggestions && suggestions.length > 0 && (
         <ul
-          className="absolute  border rounded z-60 w-fit bg-base-200"
-          style={{ left: pos.left }}
+          className="absolute  border rounded z-60 w-fit bg-base-200 max-h-[200px] overflow-auto"
+          style={{ left: pos.left, top: pos.top + 30 }}
         >
-          {suggestions.map((u) => (
+          {suggestions.map((u, index) => (
             <li
               key={u}
-              className="px-2 py-1  cursor-pointer"
+              className={`px-2 py-1 cursor-pointer ${
+                index === highlightIndex
+                  ? "bg-blue-500 text-white"
+                  : "hover:bg-gray-100"
+              }`}
               onMouseDown={(e) => {
                 e.preventDefault();
                 handleSelect(u);
               }}
             >
-              @{u}
+              {u}
             </li>
           ))}
         </ul>

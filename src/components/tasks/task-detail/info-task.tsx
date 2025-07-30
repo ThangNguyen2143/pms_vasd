@@ -16,19 +16,23 @@ import { useApi } from "~/hooks/use-api";
 import { format_date } from "~/utils/fomat-date";
 import SafeHtmlViewer from "~/components/ui/safeHTMLviewer";
 import { encodeBase64 } from "~/lib/services";
+import { useUser } from "~/providers/user-context";
 export default function TaskInfo({
   task,
   onEdit,
   onAssign,
   onUpdate,
+  onEditDeadline,
   hidden_button,
 }: {
   task: Task;
   onEdit: () => void;
   onAssign: () => void;
   onUpdate: () => Promise<void>;
+  onEditDeadline?: () => void;
   hidden_button?: boolean;
 }) {
+  const { user } = useUser();
   const { putData, errorData } = useApi<
     "",
     { task_id: number; status: string }
@@ -77,50 +81,55 @@ export default function TaskInfo({
                 <UserPlus />
               </button>
             </div>
-            <div className="join justify-end">
-              <button
-                className="btn btn-primary btn-outline join-item tooltip"
-                onClick={() => handleSubmit("START")}
-                data-tip={"Bắt đầu"}
-              >
-                <CirclePlay />
-              </button>
-              <button
-                className="btn btn-outline join-item btn-success tooltip"
-                onClick={() => handleSubmit("END")}
-                data-tip={"Hoàn thành"}
-              >
-                <SquareCheckBig />
-              </button>
-              <button
-                className="btn btn-outline join-item btn-warning tooltip"
-                onClick={() => handleSubmit("FAILED")}
-                data-tip={"Thất bại"}
-              >
-                <OctagonX />
-              </button>
-              <button
-                className="btn btn-outline join-item btn-accent tooltip"
-                onClick={() => handleSubmit("REOPEN")}
-                data-tip={"Mở lại"}
-              >
-                <RotateCcw />
-              </button>
-              <button
-                className="btn btn-outline join-item btn-error tooltip"
-                onClick={() => handleSubmit("CANCELED")}
-                data-tip={"Hủy task"}
-              >
-                <BookmarkX />
-              </button>
-            </div>
+            {user?.role == "Admin" && (
+              <div className="join justify-end">
+                <button
+                  className="btn btn-primary btn-outline join-item tooltip"
+                  onClick={() => handleSubmit("START")}
+                  data-tip={"Bắt đầu"}
+                >
+                  <CirclePlay />
+                </button>
+                <button
+                  className="btn btn-outline join-item btn-success tooltip"
+                  onClick={() => handleSubmit("END")}
+                  disabled={task.status == "DONE"}
+                  data-tip={"Hoàn thành"}
+                >
+                  <SquareCheckBig />
+                </button>
+                <button
+                  className="btn btn-outline join-item btn-warning tooltip"
+                  onClick={() => handleSubmit("FAILED")}
+                  data-tip={"Thất bại"}
+                >
+                  <OctagonX />
+                </button>
+                <button
+                  className="btn btn-outline join-item btn-accent tooltip"
+                  onClick={() => handleSubmit("REOPEN")}
+                  disabled={task.status != "DONE" && task.status != "FAILED"}
+                  data-tip={"Mở lại"}
+                >
+                  <RotateCcw />
+                </button>
+                <button
+                  className="btn btn-outline join-item btn-error tooltip"
+                  onClick={() => handleSubmit("CANCELED")}
+                  disabled={task.status == "CANCELED"}
+                  data-tip={"Hủy task"}
+                >
+                  <BookmarkX />
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
       <div className="space-y-2">
         <p>
           <span className="font-bold w-32 inline-block">Tiêu đề:</span>{" "}
-          {task.title}
+          {task.title} {"- (#" + task.task_id + ")"}
         </p>
         <div>
           <span className="font-bold w-32 inline-block">Mô tả:</span>{" "}
@@ -146,7 +155,19 @@ export default function TaskInfo({
         </p>
         <p>
           <span className="font-bold w-32 inline-block">Deadline:</span>{" "}
-          {format_date(task.dead_line)}
+          {format_date(task.dead_line)}{" "}
+          {!hidden_button &&
+            task.status != "NEW" &&
+            task.status != "DONE" &&
+            task.status != "FAILED" && (
+              <button
+                className="btn btn-circle btn-ghost tooltip"
+                data-tip={"Thay đổi deadline"}
+                onClick={onEditDeadline}
+              >
+                <Pencil></Pencil>
+              </button>
+            )}
         </p>
         <p>
           <span className="font-bold w-32 inline-block">
