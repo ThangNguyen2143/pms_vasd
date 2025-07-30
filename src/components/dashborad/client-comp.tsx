@@ -144,7 +144,7 @@ function ClientDashboardPage() {
       {/* Project Selector */}
       <div className="flex justify-between">
         <h2 className="text-3xl font-bold">TỔNG QUAN</h2>
-        <div>
+        <div className="flex items-center">
           <button
             className="btn btn-circle btn-outline m-2 tooltip"
             data-tip="Tìm kiếm chung"

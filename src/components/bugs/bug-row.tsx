@@ -22,7 +22,7 @@ export default function BugRow({ bug, isSelected, setSelect }: BugRowProps) {
     >
       <td className="px-4 py-2">{bug.bug_id}</td>
       <td className="px-4 py-2">{bug.name}</td>
-      <td className="px-4 py-2">{bug.create_by || "Không rõ"}</td>
+      <td className="px-4 py-1 min-w-42">{bug.create_by || "Không rõ"}</td>
       <td className="px-4 py-2">{format_date(bug.date_create)}</td>
       <td className="px-4 py-2">
         {bug.dead_line ? format_date(bug.dead_line) : "-"}
